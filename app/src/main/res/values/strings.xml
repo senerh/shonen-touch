@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">ShonenTouch</string>
+    <string name="menu_item_home">Accueil</string>
+    <string name="menu_item_favorites">Favoris</string>
+    <string name="menu_item_chat">Chat</string>
+    <string name="menu_item_history">Historique</string>
+    <string name="manga_activity">Favoris</string>
 </resources>
