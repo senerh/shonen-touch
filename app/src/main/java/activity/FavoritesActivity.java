@@ -15,7 +15,7 @@ import adapter.FavoritesAdapter;
 import dao.shonentouch.MangaShonentouchDAO;
 import dto.Manga;
 
-public class FavoritesActivity extends AppCompatActivity {
+public class FavoritesActivity extends AppCompatActivity implements InterfaceTaskActivity<List<Manga>>{
 
     private static final String ID_MANGA_LIST = "activity.FavoritesActivity.mangaList";
 
@@ -51,6 +51,7 @@ public class FavoritesActivity extends AppCompatActivity {
         savedInstanceState.putParcelableArrayList(ID_MANGA_LIST, mangaArrayList);
     }
 
+    @Override
     public void displayOnPostExecute(List<Manga> mangaList) {
         progressDialog.dismiss();
         if (mangaList == null) {
@@ -61,6 +62,7 @@ public class FavoritesActivity extends AppCompatActivity {
         }
     }
 
+    @Override
     public void displayOnPreExecute() {
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Chargement");

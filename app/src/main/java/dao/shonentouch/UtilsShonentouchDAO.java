@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
@@ -26,8 +25,6 @@ public class UtilsShonentouchDAO {
             while ((inputLine = in.readLine()) != null)
                 builder.append(inputLine);
             in.close();
-        } catch(MalformedURLException e ){
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
