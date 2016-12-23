@@ -2,9 +2,11 @@ package dao.shonentouch;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -46,12 +48,14 @@ public class ImageShonentouchDAO extends AbstractShonentouchDAO<Image> {
         Bitmap bitmap = null;
         try {
             URL url = new URL(address);
-            InputStream is = (InputStream) url.getContent();
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = 4;
-            bitmap = BitmapFactory.decodeStream(is, null, options);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            bitmap = BitmapFactory.decodeStream(input);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(getClass().getName(), "Error while downloading image from <~" + address + "~>.");
+            Log.e(e.getClass().getName(), e.getMessage(), e);
         }
         return bitmap;
     }
