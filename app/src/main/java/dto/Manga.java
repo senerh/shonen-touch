@@ -17,7 +17,7 @@ public class Manga implements Parcelable {
         this.name = name;
     }
 
-    public Manga(Parcel in) {
+    private Manga(Parcel in) {
         slug = in.readString();
         name = in.readString();
     }
