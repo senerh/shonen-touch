@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import adapter.FavoritesAdapter;
-import dao.shonentouch.MangaSTDAO;
+import dao.shonentouch.MangaShonentouchDAO;
 import dto.Manga;
 
 public class FavoritesActivity extends AppCompatActivity {
@@ -36,7 +36,7 @@ public class FavoritesActivity extends AppCompatActivity {
             mangaList = new ArrayList<Manga>();
             favoritesAdapter = new FavoritesAdapter(getBaseContext(), mangaList);
             mangaListView.setAdapter(favoritesAdapter);
-            new MangaSTDAO(this).execute();
+            new MangaShonentouchDAO(this).execute();
         } else {
             mangaList = savedInstanceState.getParcelableArrayList(ID_MANGA_LIST);
             favoritesAdapter = new FavoritesAdapter(getBaseContext(), mangaList);
