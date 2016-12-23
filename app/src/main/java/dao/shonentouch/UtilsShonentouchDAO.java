@@ -1,5 +1,7 @@
 package dao.shonentouch;
 
+import android.util.Log;
+
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -26,7 +28,8 @@ public class UtilsShonentouchDAO {
                 builder.append(inputLine);
             in.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(UtilsShonentouchDAO.class.getName(), "Error while calling the following address <~" + API_URL + path + "~>.");
+            Log.e(e.getClass().getName(), e.getMessage(), e);
         }
 
         return builder.toString();
@@ -40,7 +43,8 @@ public class UtilsShonentouchDAO {
         try {
             t = objectMapper.readValue(string, type);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(UtilsShonentouchDAO.class.getName(), "Error while converting the string <~" + string + "~> into <~" + type.getName() + "~> instance.");
+            Log.e(e.getClass().getName(), e.getMessage(), e);
         }
 
         return t;
@@ -55,7 +59,7 @@ public class UtilsShonentouchDAO {
         try {
             list = objectMapper.readValue(string, javaType);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(e.getClass().getName(), e.getMessage(), e);
         }
 
         return list;
