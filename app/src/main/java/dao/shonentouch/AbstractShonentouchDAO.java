@@ -2,24 +2,22 @@ package dao.shonentouch;
 
 import android.os.AsyncTask;
 
-import activity.InterfaceTaskActivity;
-
 public abstract class AbstractShonentouchDAO<T> extends AsyncTask<Void, Void, T> {
 
-    private InterfaceTaskActivity<T> interfaceTaskActivity;
+    private InterfaceTaskShonentouchDAO<T> interfaceTaskShonentouchDAO;
 
-    public AbstractShonentouchDAO(InterfaceTaskActivity<T> interfaceTaskActivity) {
-        this.interfaceTaskActivity = interfaceTaskActivity;
+    public AbstractShonentouchDAO(InterfaceTaskShonentouchDAO<T> interfaceTaskShonentouchDAO) {
+        this.interfaceTaskShonentouchDAO = interfaceTaskShonentouchDAO;
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        interfaceTaskActivity.displayOnPreExecute();
+        interfaceTaskShonentouchDAO.displayOnPreExecute();
     }
 
     @Override
     protected void onPostExecute(T retrivedData) {
-        interfaceTaskActivity.displayOnPostExecute(retrivedData);
+        interfaceTaskShonentouchDAO.displayOnPostExecute(retrivedData);
     }
 }

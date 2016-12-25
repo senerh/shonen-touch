@@ -7,10 +7,8 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
-import activity.InterfaceTaskActivity;
 import dto.Image;
 import dto.Manga;
 import dto.Page;
@@ -22,11 +20,11 @@ public class ImageShonentouchDAO extends AbstractShonentouchDAO<Image> {
     private Scan scan;
     private Page page;
 
-    public ImageShonentouchDAO(InterfaceTaskActivity<Image> interfaceTaskActivity,
+    public ImageShonentouchDAO(InterfaceTaskShonentouchDAO<Image> interfaceTaskShonentouchDAO,
                                Manga manga,
                                Scan scan,
                                Page page) {
-        super(interfaceTaskActivity);
+        super(interfaceTaskShonentouchDAO);
         this.manga = manga;
         this.scan = scan;
         this.page = page;

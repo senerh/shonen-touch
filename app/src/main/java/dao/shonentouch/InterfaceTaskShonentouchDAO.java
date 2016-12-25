@@ -1,6 +1,6 @@
-package activity;
+package dao.shonentouch;
 
-public interface InterfaceTaskActivity<T> {
+public interface InterfaceTaskShonentouchDAO<T> {
 
     public void displayOnPostExecute(T retrievedData);
 

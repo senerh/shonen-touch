@@ -2,7 +2,6 @@ package dao.shonentouch;
 
 import java.util.List;
 
-import activity.InterfaceTaskActivity;
 import dto.Manga;
 import dto.Page;
 import dto.Scan;
@@ -13,10 +12,10 @@ public class PageShonentouchDAO extends AbstractShonentouchDAO<List<Page>> {
     private Scan scan;
 
     public PageShonentouchDAO(
-            InterfaceTaskActivity<List<Page>> interfaceTaskActivity,
+            InterfaceTaskShonentouchDAO<List<Page>> interfaceTaskShonentouchDAO,
             Manga manga,
             Scan scan) {
-        super(interfaceTaskActivity);
+        super(interfaceTaskShonentouchDAO);
         this.manga = manga;
         this.scan = scan;
     }
