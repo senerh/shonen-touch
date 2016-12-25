@@ -17,16 +17,12 @@
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
     </android.support.design.widget.AppBarLayout>
 
-    <LinearLayout
+    <ListView
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:id="@+id/manga_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="56dp"
-        android:orientation="vertical">
-        <ListView
-            android:id="@+id/manga_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-        </ListView>
-    </LinearLayout>
+        android:layout_marginBottom="5dp">
+    </ListView>
 
 </android.support.design.widget.CoordinatorLayout>
