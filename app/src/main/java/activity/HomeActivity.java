@@ -29,15 +29,13 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.menu_item_home:
-                return true;
             case R.id.menu_item_favorites:
                 startActivity(new Intent(this, FavoritesActivity.class));
                 return true;
-            case R.id.menu_item_chat:
+            case R.id.menu_item_prefs:
                 Toast.makeText(getApplicationContext(), "Cette fonctionnalité n'a pas encore été développée.", Toast.LENGTH_LONG).show();
                 return true;
-            case R.id.menu_item_history:
+            case R.id.menu_item_about:
                 Toast.makeText(getApplicationContext(), "Cette fonctionnalité n'a pas encore été développée.", Toast.LENGTH_LONG).show();
                 return true;
         }

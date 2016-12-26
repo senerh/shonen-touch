@@ -6,4 +6,6 @@
     <string name="menu_item_history">Historique</string>
     <string name="manga_activity">One Piece</string>
     <string name="favortites_activity">Favoris</string>
+    <string name="menu_item_prefs">Préférences</string>
+    <string name="menu_item_about">À propos</string>
 </resources>
