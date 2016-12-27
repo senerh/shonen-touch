@@ -3,6 +3,8 @@ package activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -12,10 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import adapter.FavoritesAdapter;
+import dao.shonentouch.InterfaceTaskShonentouchDAO;
 import dao.shonentouch.MangaShonentouchDAO;
 import dto.Manga;
 
-public class FavoritesActivity extends AppCompatActivity implements InterfaceTaskActivity<List<Manga>>{
+public class FavoritesActivity extends AppCompatActivity implements InterfaceTaskShonentouchDAO<List<Manga>> {
 
     private static final String ID_MANGA_LIST = "activity.FavoritesActivity.mangaList";
 
@@ -29,6 +32,8 @@ public class FavoritesActivity extends AppCompatActivity implements InterfaceTas
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.favorites_layout);
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mangaListView = (ListView) findViewById(R.id.manga_list);
 
@@ -69,6 +74,16 @@ public class FavoritesActivity extends AppCompatActivity implements InterfaceTas
         progressDialog.setMessage("Veuillez patienter pendant le téléchargement de la liste des mangas.");
         progressDialog.setCancelable(false);
         progressDialog.show();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }
