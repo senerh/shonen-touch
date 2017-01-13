@@ -3,10 +3,15 @@ package dto;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Manga implements Parcelable {
 
     private String slug;
     private String name;
+    @JsonIgnore
+    private Boolean checked = false;
 
     public Manga() {
 
@@ -20,6 +25,8 @@ public class Manga implements Parcelable {
     private Manga(Parcel in) {
         slug = in.readString();
         name = in.readString();
+        checked = in.readByte() != 0;
+
     }
 
     public String getSlug() {
@@ -37,6 +44,17 @@ public class Manga implements Parcelable {
     public void setName(String name) {
         this.name = name;
     }
+
+    @JsonIgnore
+    public Boolean isChecked(){
+        return this.checked;
+    }
+
+    @JsonProperty
+    public void setChecked(Boolean bool){
+        this.checked = bool;
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -73,6 +91,7 @@ public class Manga implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(slug);
         dest.writeString(name);
+        dest.writeByte((byte) (checked ? 1 : 0));
     }
 
     public static final Parcelable.Creator<Manga> CREATOR = new Parcelable.Creator<Manga>() {
