@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import adapter.FavoritesAdapter;
-import dao.preferences.PreferencesDAO;
+import dao.preferences.FavoritesPreferencesDAO;
 import dao.shonentouch.InterfaceTaskShonentouchDAO;
 import dao.shonentouch.MangaShonentouchDAO;
 import dto.Manga;
@@ -24,16 +24,13 @@ import dto.Manga;
 public class FavoritesActivity extends AppCompatActivity implements InterfaceTaskShonentouchDAO<List<Manga>> {
 
     private static final String ID_MANGA_LIST = "activity.FavoritesActivity.mangaList";
-    private static final String KEY_MANGAS_FAVORIS = "favoris";
 
     private ListView mangaListView;
     private List<Manga> mangaList;
-    private String favoriteMangaListJson;
-    private List<Manga> favoriteMangaList;
     private FavoritesAdapter favoritesAdapter;
 
     private ProgressDialog progressDialog;
-    private PreferencesDAO preferencesDAO;
+    private FavoritesPreferencesDAO favoritesPreferencesDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +39,7 @@ public class FavoritesActivity extends AppCompatActivity implements InterfaceTas
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        preferencesDAO = new PreferencesDAO(getBaseContext());
-        favoriteMangaListJson = preferencesDAO.readPreferences(KEY_MANGAS_FAVORIS);
+        favoritesPreferencesDAO = new FavoritesPreferencesDAO(getBaseContext());
 
         mangaListView = (ListView) findViewById(R.id.manga_list);
 
@@ -63,16 +59,15 @@ public class FavoritesActivity extends AppCompatActivity implements InterfaceTas
         validate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                List<Manga> newFavoritesList = new ArrayList<>();
+                List<Manga> newFavoriteMangaList = new ArrayList<>();
                 for (int i = 0; i < favoritesAdapter.getCount(); i++) {
                     Manga manga = favoritesAdapter.getItem(i);
                     if (manga.isChecked()) {
-                        newFavoritesList.add(manga);
+                        newFavoriteMangaList.add(manga);
                     }
                 }
+                favoritesPreferencesDAO.saveFavoriteMangaList(newFavoriteMangaList);
                 Toast.makeText(getBaseContext(), "Favoris sauvegardés", Toast.LENGTH_SHORT).show();
-                String newFavoritesListJson = preferencesDAO.mangaToJson(newFavoritesList);
-                preferencesDAO.savePreferences(KEY_MANGAS_FAVORIS, newFavoritesListJson);
             }
         });
     }
@@ -91,12 +86,10 @@ public class FavoritesActivity extends AppCompatActivity implements InterfaceTas
             Toast.makeText(getApplicationContext(), "Aucun manga n'a été trouvé, vérifiez votre connexion internet.", Toast.LENGTH_LONG).show();
         } else {
             this.mangaList.addAll(mangaList);
-            if (!favoriteMangaListJson.equals("No preferencesDAO")) {
-                favoriteMangaList = preferencesDAO.jsonToManga(favoriteMangaListJson);
-                for (Manga manga:mangaList) {
-                    if (favoriteMangaList.contains(manga)){
-                        manga.setChecked(true);
-                    }
+            List<Manga> favoriteMangaList = favoritesPreferencesDAO.getFavoriteMangaList();
+            for (Manga manga : mangaList) {
+                if (favoriteMangaList.contains(manga)){
+                    manga.setChecked(true);
                 }
             }
             favoritesAdapter.notifyDataSetChanged();
