@@ -47,7 +47,7 @@ public class Manga implements Parcelable {
 
     @JsonIgnore
     public Boolean isChecked(){
-        return this.checked;
+        return checked;
     }
 
     @JsonProperty
