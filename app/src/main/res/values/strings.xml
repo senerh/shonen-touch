@@ -8,4 +8,5 @@
     <string name="favortites_activity">Favoris</string>
     <string name="menu_item_prefs">Préférences</string>
     <string name="menu_item_about">À propos</string>
+    <string name="validate_button">Valider</string>
 </resources>

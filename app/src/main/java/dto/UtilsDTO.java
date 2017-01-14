@@ -48,7 +48,7 @@ public class UtilsDTO {
         try {
             json = objectMapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            Log.e(AbstractPreferencesDAO.class.getName(), "Error while trying to get json from the following object <~" + object + "~>");
+            Log.e(AbstractPreferencesDAO.class.getName(), "Error while trying to get json from the following instance of <~" + object + "~>");
             Log.e(e.getClass().getName(), e.getMessage(), e);
         }
         return json;
