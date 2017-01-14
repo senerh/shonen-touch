@@ -11,31 +11,43 @@ import java.util.List;
 
 import dto.Channel;
 
-public class ChannelSlackDAO extends AbstractSlackDAO {
+public class ChannelSlackDAO {
 
-    public List<Channel> getChannelList() {
-        String json = call(new Method("channels.list").addArgument("exclude_archived", "1"));
+    public static List<Channel> getChannelList() {
+        String json = null;
+        try {
+            json = UtilsSlackDAO.call(new Method("channels.list").addArgument("exclude_archived", "1"));
+        } catch (ExceptionSlackDAO e) {
+            Log.e(ChannelSlackDAO.class.getName(), "Error while getting list of channels.");
+            Log.e(e.getClass().getName(), e.getMessage(), e);
+        }
         return jsonToChannelList(json);
     }
 
-    public Channel getChannelByName(String name) {
+    public static Channel getChannelByName(String name) {
         List<Channel> channelList = getChannelList();
         Channel channel = new Channel("", name);
         int index = channelList.indexOf(channel);
         if (index == -1) {
-            Log.d(getClass().getName(), "The channel named <~" + name + "~> was not found.");
+            Log.d(ChannelSlackDAO.class.getName(), "The channel named <~" + name + "~> was not found.");
             return createChannel(name);
         } else {
             return channelList.get(index);
         }
     }
 
-    private Channel createChannel(String name) {
-        String json = call(new Method("channels.create").addArgument("name", name));
+    private static Channel createChannel(String name) {
+        String json = null;
+        try {
+            json = UtilsSlackDAO.call(new Method("channels.create").addArgument("name", name));
+        } catch (ExceptionSlackDAO e) {
+            Log.e(ChannelSlackDAO.class.getName(), "Error while creating the channel <~" + name + "~>.");
+            Log.e(e.getClass().getName(), e.getMessage(), e);
+        }
         return jsonToChannel(json);
     }
 
-    private Channel jsonToChannel(String json) {
+    private static Channel jsonToChannel(String json) {
         Channel channel = null;
         try {
             JSONObject jsonObject = new JSONObject(json);
@@ -48,7 +60,7 @@ public class ChannelSlackDAO extends AbstractSlackDAO {
         return channel;
     }
 
-    private List<Channel> jsonToChannelList(String json) {
+    private static List<Channel> jsonToChannelList(String json) {
         List<Channel> channelList = new ArrayList<>();
         try {
             JSONObject jsonObject = new JSONObject(json);

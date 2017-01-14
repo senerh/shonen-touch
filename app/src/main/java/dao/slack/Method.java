@@ -19,4 +19,11 @@ public class Method {
     public String getUrl() {
         return url;
     }
+
+    @Override
+    public String toString() {
+        return "Method{" +
+                "url='" + url + '\'' +
+                '}';
+    }
 }
