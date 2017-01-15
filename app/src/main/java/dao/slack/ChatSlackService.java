@@ -10,6 +10,7 @@ public class ChatSlackService {
     private InterfaceChatSlackServiceConsumer interfaceChatSlackServiceConsumer;
     private String channelName;
     private boolean isRunning;
+    private Channel channel;
 
     public ChatSlackService(InterfaceChatSlackServiceConsumer interfaceChatSlackServiceConsumer, String channelName) {
         this.interfaceChatSlackServiceConsumer = interfaceChatSlackServiceConsumer;
@@ -29,12 +30,11 @@ public class ChatSlackService {
 
     private void loop() {
         Message lastMessage = null;
-        Channel channel = ChannelSlackDAO.getChannelByName(channelName);
         while (isRunning) {
-            Message message = ChatSlackDAO.getLastMessage(channel);
+            Message message = ChatSlackDAO.getLastMessage(loadChannel());
             if (lastMessage == null || !lastMessage.equals(message)) {
                 lastMessage = message;
-                interfaceChatSlackServiceConsumer.handleMessages(ChatSlackDAO.getMessageList(channel));
+                interfaceChatSlackServiceConsumer.handleMessages(ChatSlackDAO.getMessageList(loadChannel()));
             }
             try {
                 Thread.sleep(1000);
@@ -46,5 +46,21 @@ public class ChatSlackService {
 
     public void stop() {
         isRunning = false;
+    }
+
+    public void sendMessage(final Message message) {
+        new Thread() {
+            @Override
+            public void run() {
+                ChatSlackDAO.postMessage(message, loadChannel());
+            }
+        }.start();
+    }
+
+    private Channel loadChannel() {
+        if (channel == null) {
+            channel = ChannelSlackDAO.getChannelByName(channelName);
+        }
+        return channel;
     }
 }
