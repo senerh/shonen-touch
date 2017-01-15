@@ -19,18 +19,27 @@ public class ChatSlackDAO {
     private static final String SPLITTER = " : ";
 
     public static List<Message> getMessageList(Channel channel) {
+        return getMessageList(channel, 20);
+    }
+
+    private static List<Message> getMessageList(Channel channel, int nbMax) {
         String json = null;
         try {
             json = UtilsSlackDAO.call(
                     new Method("channels.history")
                             .addArgument("channel", channel.getId())
-                            .addArgument("count", "20")
+                            .addArgument("count", "" + nbMax)
             );
         } catch (ExceptionSlackDAO e) {
             Log.e(ChatSlackDAO.class.getName(), "Error while getting list of messages for channel <~" + channel + "~>.");
             Log.e(e.getClass().getName(), e.getMessage(), e);
         }
         return jsonToMessageList(json);
+    }
+
+    public static Message getLastMessage(Channel channel) {
+        List<Message> messageList = getMessageList(channel, 1);
+        return messageList.get(0);
     }
 
     public static void postMessage(Message message, Channel channel) {
