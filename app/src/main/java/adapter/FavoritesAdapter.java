@@ -1,6 +1,7 @@
 package adapter;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,10 +21,11 @@ public class FavoritesAdapter extends ArrayAdapter<Manga> {
     private Context context;
 
     public FavoritesAdapter(Context context, List<Manga> mangaList) {
-        super(context, R.layout.favorites_list_layout, mangaList);
+        super(context, R.layout.element_favorite_list, mangaList);
         this.context = context;
     }
 
+    @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -33,7 +35,7 @@ public class FavoritesAdapter extends ArrayAdapter<Manga> {
         TextView textView;
 
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.favorites_list_layout, null);
+            convertView = inflater.inflate(R.layout.element_favorite_list, null);
             textView = (TextView) convertView.findViewById(R.id.name_favoris);
             checkBox = (CheckBox) convertView.findViewById(R.id.checkbox_favoris);
             checkBox.setChecked(manga.isChecked());

@@ -1,6 +1,19 @@
 <resources>
     <string name="app_name">ShonenTouch</string>
-    <string name="menu_item_home">Accueil</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string-array name="menu_list">
+        <item name="Accueil">Accueil</item>
+        <item name="Favoris">Favoris</item>
+        <item>Chat</item>
+        <item>Historique</item>
+    </string-array>
+
+    <string name="menu_item_home" id="home">Accueil</string>
     <string name="menu_item_favorites">Favoris</string>
     <string name="menu_item_chat">Chat</string>
     <string name="menu_item_history">Historique</string>
@@ -9,4 +22,13 @@
     <string name="menu_item_prefs">Préférences</string>
     <string name="menu_item_about">À propos</string>
     <string name="validate_button">Valider</string>
+    <string name="menu_item_accueil">Accueil</string>
+    <string name="drawer_open">open</string>
+    <string name="drawer_close">close</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="nav_header_title">ShonenTouch</string>
+
+
 </resources>
