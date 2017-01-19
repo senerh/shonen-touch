@@ -19,12 +19,12 @@ import java.util.List;
 
 import adapter.FavoritesAdapter;
 import dao.preferences.FavoritesPreferencesDAO;
-import dao.shonentouch.InterfaceTaskShonentouchDAO;
-import dao.shonentouch.MangaShonentouchDAO;
+import dao.shonentouch.InterfaceTaskShonentouchService;
+import dao.shonentouch.MangaShonentouchService;
 import dto.Manga;
 
 
-public class FavoriteFragment extends Fragment implements InterfaceTaskShonentouchDAO<List<Manga>> {
+public class FavoriteFragment extends Fragment implements InterfaceTaskShonentouchService<List<Manga>> {
 
     private static final String ID_MANGA_LIST = "activity.FavoritesFragment.mangaList";
     private ListView manga_list_view;
@@ -53,7 +53,7 @@ public class FavoriteFragment extends Fragment implements InterfaceTaskShonentou
 
         if (savedInstanceState == null) {
             mangaList = new ArrayList<>();
-            new MangaShonentouchDAO(this).execute();
+            new MangaShonentouchService(this).execute();
 
         } else {
             mangaList = savedInstanceState.getParcelableArrayList(ID_MANGA_LIST);

@@ -18,12 +18,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import adapter.ScansAdapter;
-import dao.shonentouch.InterfaceTaskShonentouchDAO;
-import dao.shonentouch.ScanShonentouchDAO;
+import dao.shonentouch.InterfaceTaskShonentouchService;
+import dao.shonentouch.ScanShonentouchService;
 import dto.Manga;
 import dto.Scan;
 
-public class ScanFragment extends ListFragment implements InterfaceTaskShonentouchDAO<List<Scan>> {
+public class ScanFragment extends ListFragment implements InterfaceTaskShonentouchService<List<Scan>> {
 
     private static final String ID_SCAN_LIST = "fragment.ScanFragment.scanList";
     private NavigationView.OnNavigationItemSelectedListener mListener;
@@ -54,7 +54,7 @@ public class ScanFragment extends ListFragment implements InterfaceTaskShonentou
 
         if (savedInstanceState == null) {
             scanList = new ArrayList<>();
-            new ScanShonentouchDAO(this, (Manga)this.getArguments().getParcelable("manga")).execute();
+            new ScanShonentouchService(this, (Manga)this.getArguments().getParcelable("manga")).execute();
 
         } else {
             scanList = savedInstanceState.getParcelableArrayList(ID_SCAN_LIST);

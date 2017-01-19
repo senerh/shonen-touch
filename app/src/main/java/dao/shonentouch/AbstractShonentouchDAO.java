@@ -4,20 +4,20 @@ import android.os.AsyncTask;
 
 public abstract class AbstractShonentouchDAO<T> extends AsyncTask<Void, Void, T> {
 
-    private InterfaceTaskShonentouchDAO<T> interfaceTaskShonentouchDAO;
+    private InterfaceTaskShonentouchService<T> interfaceTaskShonentouchService;
 
-    public AbstractShonentouchDAO(InterfaceTaskShonentouchDAO<T> interfaceTaskShonentouchDAO) {
-        this.interfaceTaskShonentouchDAO = interfaceTaskShonentouchDAO;
+    public AbstractShonentouchDAO(InterfaceTaskShonentouchService<T> interfaceTaskShonentouchService) {
+        this.interfaceTaskShonentouchService = interfaceTaskShonentouchService;
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        interfaceTaskShonentouchDAO.displayOnPreExecute();
+        interfaceTaskShonentouchService.displayOnPreExecute();
     }
 
     @Override
     protected void onPostExecute(T retrivedData) {
-        interfaceTaskShonentouchDAO.displayOnPostExecute(retrivedData);
+        interfaceTaskShonentouchService.displayOnPostExecute(retrivedData);
     }
 }

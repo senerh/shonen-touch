@@ -1,6 +1,6 @@
 package dao.shonentouch;
 
-public interface InterfaceTaskShonentouchDAO<T> {
+public interface InterfaceTaskShonentouchService<T> {
 
     public void displayOnPostExecute(T retrievedData);
 
