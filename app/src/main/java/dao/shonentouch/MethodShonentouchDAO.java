@@ -8,30 +8,33 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 import dto.Image;
 import dto.Manga;
 import dto.Page;
 import dto.Scan;
 
-public class ImageShonentouchDAO extends AbstractShonentouchDAO<Image> {
+public class MethodShonentouchDAO {
 
-    private Manga manga;
-    private Scan scan;
-    private Page page;
-
-    public ImageShonentouchDAO(InterfaceTaskShonentouchDAO<Image> interfaceTaskShonentouchDAO,
-                               Manga manga,
-                               Scan scan,
-                               Page page) {
-        super(interfaceTaskShonentouchDAO);
-        this.manga = manga;
-        this.scan = scan;
-        this.page = page;
+    public static List<Manga> getMangaList() {
+        String path = "/mangas";
+        return UtilsShonentouchDAO.getList(path, Manga.class);
     }
 
-    @Override
-    protected Image doInBackground(Void... params) {
+    public static List<Scan> getScanList(Manga manga) {
+        String path = "/mangas/" + manga.getSlug() + "/scans";
+        return UtilsShonentouchDAO.getList(path, Scan.class);
+    }
+
+    public static List<Page> getPageList(Manga manga, Scan scan) {
+        String path = "/mangas/" + manga.getSlug()
+                + "/scans/" + scan.getNum()
+                + "/pages";
+        return UtilsShonentouchDAO.getList(path, Page.class);
+    }
+
+    public static Image getImage(Manga manga, Scan scan, Page page) {
         String path = "/mangas/" + manga.getSlug() +
                 "/scans/" + scan.getNum() +
                 "/pages/" + page.getNum() +
@@ -42,7 +45,7 @@ public class ImageShonentouchDAO extends AbstractShonentouchDAO<Image> {
         return image;
     }
 
-    private Bitmap downloadImage(String address) {
+    public static Bitmap downloadImage(String address) {
         Bitmap bitmap = null;
         try {
             URL url = new URL(address);
@@ -52,7 +55,7 @@ public class ImageShonentouchDAO extends AbstractShonentouchDAO<Image> {
             InputStream input = connection.getInputStream();
             bitmap = BitmapFactory.decodeStream(input);
         } catch (IOException e) {
-            Log.e(getClass().getName(), "Error while downloading image from <~" + address + "~>.");
+            Log.e(MethodShonentouchDAO.class.getName(), "Error while downloading image from <~" + address + "~>.");
             Log.e(e.getClass().getName(), e.getMessage(), e);
         }
         return bitmap;
