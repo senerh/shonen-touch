@@ -26,7 +26,6 @@ public class Manga implements Parcelable {
         slug = in.readString();
         name = in.readString();
         checked = in.readByte() != 0;
-
     }
 
     public String getSlug() {
