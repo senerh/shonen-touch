@@ -25,7 +25,6 @@ public class HomeFragment extends ListFragment {
 
     private List<Manga> mangaList;
     private HomeAdapter homeAdapter;
-    private NavigationView.OnNavigationItemSelectedListener mListener;
     private ListView manga_list_view;
 
     public HomeFragment() {
@@ -61,18 +60,11 @@ public class HomeFragment extends ListFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof NavigationView.OnNavigationItemSelectedListener) {
-            mListener = (NavigationView.OnNavigationItemSelectedListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
     @Override
