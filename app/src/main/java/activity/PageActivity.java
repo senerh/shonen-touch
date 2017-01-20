@@ -6,15 +6,18 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.widget.Toast;
+
 import com.shonen.shonentouch.R;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import adapter.SlidePageAdapter;
+import dao.shonentouch.FullPageShonentouchService;
 import dao.shonentouch.InterfaceFullPageShonentouchService;
 import dto.FullPage;
 import dto.Manga;
 import dto.Scan;
-import dao.shonentouch.FullPageShonentouchService;
 
 
 public class PageActivity extends FragmentActivity implements InterfaceFullPageShonentouchService {
