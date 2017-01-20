@@ -4,11 +4,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -22,25 +22,25 @@ import dao.preferences.FavoritesPreferencesDAO;
 import dao.shonentouch.InterfaceTaskShonentouchService;
 import dao.shonentouch.MangaShonentouchService;
 import dto.Manga;
+import holder.MangaViewHolder;
 
 
-public class FavoriteFragment extends Fragment implements InterfaceTaskShonentouchService<List<Manga>> {
+public class FavoriteFragment extends ListFragment implements InterfaceTaskShonentouchService<List<Manga>> {
 
     private static final String ID_MANGA_LIST = "activity.FavoritesFragment.mangaList";
     private ListView manga_list_view;
     private List<Manga> mangaList;
     private FavoritesAdapter favoritesAdapter;
-    private Button validate;
     private ProgressDialog progressDialog;
     private FavoritesPreferencesDAO favoritesPreferencesDAO;
     private NavigationView.OnNavigationItemSelectedListener mListener;
 
     public FavoriteFragment() {
+
     }
 
 
     public static FavoriteFragment newInstance(Context context) {
-
         FavoriteFragment fragment = new FavoriteFragment();
         return fragment;
     }
@@ -66,26 +66,10 @@ public class FavoriteFragment extends Fragment implements InterfaceTaskShonentou
 
         View view = inflater.inflate(R.layout.fragment_favorite, container, false);
 
-        validate = (Button) view.findViewById(R.id.validate);
-        manga_list_view = (ListView) view.findViewById(R.id.manga_favorite_list);
+        manga_list_view = (ListView) view.findViewById(android.R.id.list);
 
         favoritesAdapter = new FavoritesAdapter(getActivity().getBaseContext(), mangaList);
         manga_list_view.setAdapter(favoritesAdapter);
-
-        validate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                List<Manga> newFavoriteMangaList = new ArrayList<>();
-                for (int i = 0; i < favoritesAdapter.getCount(); i++) {
-                    Manga manga = favoritesAdapter.getItem(i);
-                    if (manga.isChecked()) {
-                        newFavoriteMangaList.add(manga);
-                    }
-                }
-                favoritesPreferencesDAO.saveFavoriteMangaList(newFavoriteMangaList);
-                Toast.makeText(getActivity().getBaseContext(), "Favoris sauvegardés", Toast.LENGTH_SHORT).show();
-            }
-        });
 
         return view;
     }
@@ -109,7 +93,6 @@ public class FavoriteFragment extends Fragment implements InterfaceTaskShonentou
 
     @Override
     public void displayOnPostExecute(List<Manga> mangaList) {
-
         progressDialog.dismiss();
         if (mangaList == null) {
             Toast.makeText(getActivity().getApplicationContext(), "Aucun manga n'a été trouvé, vérifiez votre connexion internet.", Toast.LENGTH_LONG).show();
@@ -140,5 +123,24 @@ public class FavoriteFragment extends Fragment implements InterfaceTaskShonentou
 
         ArrayList<Manga> mangaArrayList = new ArrayList<>(mangaList);
         outState.putParcelableArrayList(ID_MANGA_LIST, mangaArrayList);
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        MangaViewHolder viewHolder = (MangaViewHolder) v.getTag();
+        CheckBox checkBox = viewHolder.getCheckBox();
+        checkBox.toggle();
+
+        Manga selectedManga = (Manga) checkBox.getTag();
+        selectedManga.setChecked(checkBox.isChecked());
+
+        List<Manga> newFavoriteMangaList = new ArrayList<>();
+        for (int i = 0; i < favoritesAdapter.getCount(); i++) {
+            Manga manga = favoritesAdapter.getItem(i);
+            if (manga.isChecked()) {
+                newFavoriteMangaList.add(manga);
+            }
+        }
+        favoritesPreferencesDAO.saveFavoriteMangaList(newFavoriteMangaList);
     }
 }

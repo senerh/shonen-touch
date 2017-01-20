@@ -15,6 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:onClick="onCheckboxClicked" />
+        android:clickable="false"
+        android:focusable="false"/>
 
 </LinearLayout>

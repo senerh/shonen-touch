@@ -35,19 +35,11 @@ public class FavoritesAdapter extends ArrayAdapter<Manga> {
         TextView textView;
 
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.element_favorite_list, null);
+            convertView = inflater.inflate(R.layout.element_favorite_list, parent, false);
             textView = (TextView) convertView.findViewById(R.id.name_favoris);
             checkBox = (CheckBox) convertView.findViewById(R.id.checkbox_favoris);
             checkBox.setChecked(manga.isChecked());
             convertView.setTag(new MangaViewHolder(textView, checkBox));
-
-            checkBox.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    CheckBox cb = (CheckBox) v;
-                    Manga manga = (Manga) cb.getTag();
-                    manga.setChecked(cb.isChecked());
-                }
-            });
         } else {
             MangaViewHolder viewHolder = (MangaViewHolder) convertView.getTag();
             checkBox = viewHolder.getCheckBox();
