@@ -1,7 +1,6 @@
 package dao.shonentouch;
 
 import java.util.List;
-
 import dto.FullPage;
 
 public interface InterfaceFullPageShonentouchService {

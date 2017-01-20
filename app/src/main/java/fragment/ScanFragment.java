@@ -1,22 +1,19 @@
 package fragment;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import com.shonen.shonentouch.R;
-
 import java.util.ArrayList;
 import java.util.List;
-
+import activity.PageActivity;
 import adapter.ScansAdapter;
 import dao.shonentouch.InterfaceTaskShonentouchService;
 import dao.shonentouch.ScanShonentouchService;
@@ -26,17 +23,14 @@ import dto.Scan;
 public class ScanFragment extends ListFragment implements InterfaceTaskShonentouchService<List<Scan>> {
 
     private static final String ID_SCAN_LIST = "fragment.ScanFragment.scanList";
-    private NavigationView.OnNavigationItemSelectedListener mListener;
     private List<Scan> scanList;
     private ListView scan_list_view;
     private ScansAdapter scansAdapter;
-    private Manga manga;
-    private Dialog progressDialog;
+    private ProgressDialog progressDialog;
 
 
     public ScanFragment() {
     }
-
 
     public static ScanFragment newInstance(Manga manga) {
         ScanFragment fragment = new ScanFragment();
@@ -77,18 +71,11 @@ public class ScanFragment extends ListFragment implements InterfaceTaskShonentou
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof NavigationView.OnNavigationItemSelectedListener) {
-            mListener = (NavigationView.OnNavigationItemSelectedListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
     @Override
@@ -107,6 +94,7 @@ public class ScanFragment extends ListFragment implements InterfaceTaskShonentou
     public void displayOnPreExecute() {
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setTitle("Chargement");
+        progressDialog.setMessage("Veuillez patienter pendant le chargement des scans");
         progressDialog.setCancelable(false);
         progressDialog.show();
     }
@@ -114,8 +102,20 @@ public class ScanFragment extends ListFragment implements InterfaceTaskShonentou
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
         ArrayList<Scan> scanArrayList = new ArrayList<>(scanList);
         outState.putParcelableArrayList(ID_SCAN_LIST, scanArrayList);
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+
+        Intent myIntent = new Intent(getActivity(), PageActivity.class);
+
+        Bundle b = new Bundle();
+        b.putParcelable("manga", this.getArguments().getParcelable("manga"));
+        b.putParcelable("scan", scanList.get(position));
+        myIntent.putExtras(b); //Put your id to your next Intent
+
+        startActivity(myIntent);
     }
 }
