@@ -35,6 +35,9 @@ public class FullPageShonentouchService extends AsyncTask<Void, FullPage, List<F
             FullPage fullPage = new FullPage(page, image);
             fullPageList.add(fullPage);
             publishProgress(fullPage);
+            if (isCancelled()) {
+                break;
+            }
         }
         return fullPageList;
     }
