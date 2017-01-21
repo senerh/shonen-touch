@@ -46,6 +46,7 @@ public class MethodShonentouchDAO {
     }
 
     public static Bitmap downloadImage(String address) {
+        System.gc();
         Bitmap bitmap = null;
         try {
             URL url = new URL(address);

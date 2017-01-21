@@ -1,5 +1,6 @@
 package activity;
 
+import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -13,14 +14,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import adapter.SlidePageAdapter;
-import dao.shonentouch.FullPageShonentouchService;
 import dao.shonentouch.InterfaceFullPageShonentouchService;
 import dto.FullPage;
 import dto.Manga;
 import dto.Scan;
+import fragment.FullPageTaskFragment;
 
 
 public class PageActivity extends FragmentActivity implements InterfaceFullPageShonentouchService {
+
+    private static final String FULL_PAGE_TASK_FRAGMENT = "FULL_PAGE_TASK_FRAGMENT";
 
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
@@ -28,6 +31,7 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
     private Manga manga;
     private Scan scan;
     private ProgressDialog progressDialog;
+    private FullPageTaskFragment fullPageTaskFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,12 +43,15 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
         manga = b.getParcelable("manga");
         scan = b.getParcelable("scan");
 
+        FragmentManager fragmentManager = getFragmentManager();
+        fullPageTaskFragment = (FullPageTaskFragment) fragmentManager.findFragmentByTag(FULL_PAGE_TASK_FRAGMENT);
+        if (fullPageTaskFragment == null) {
+            fullPageTaskFragment = FullPageTaskFragment.newInstance(manga, scan);
+            fragmentManager.beginTransaction().add(fullPageTaskFragment, FULL_PAGE_TASK_FRAGMENT).commit();
+        }
+
         if (savedInstanceState == null) {
             listFullPage = new ArrayList<>();
-            new FullPageShonentouchService(
-                    this,
-                    manga,
-                    scan).execute();
         }
         else {
             listFullPage = savedInstanceState.getParcelableArrayList("fullPageList");
@@ -55,10 +62,11 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
         mPager.setAdapter(mPagerAdapter);
     }
 
-
     @Override
     public void onPostExecute(List<FullPage> fullPageList) {
-        progressDialog.dismiss();
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
         if (fullPageList == null) {
             Toast.makeText(this.getApplicationContext(), "Aucune page n'a été trouvée, vérifiez votre connexion internet.", Toast.LENGTH_LONG).show();
         }
@@ -66,7 +74,9 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
 
     @Override
     public void onProgressUpdate(FullPage fullPage) {
-        progressDialog.dismiss();
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
         this.listFullPage.add(fullPage);
         mPagerAdapter.notifyDataSetChanged();
     }
