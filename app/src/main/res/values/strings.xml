@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ShonenTouch</string>
+    <string name="app_name">Shonen Touch</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -15,8 +15,5 @@
     <string name="menu_item_accueil">Accueil</string>
 
     <string name="validate_button">Valider</string>
-
-    <string name="nav_header_title">ShonenTouch</string>
-
 
 </resources>

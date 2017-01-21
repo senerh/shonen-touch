@@ -2,6 +2,8 @@ package fragment;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
@@ -88,6 +90,7 @@ public class FavoriteFragment extends ListFragment implements InterfaceTaskShone
 
     @Override
     public void displayOnPostExecute(List<Manga> mangaList) {
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         progressDialog.dismiss();
         if (mangaList == null) {
             Toast.makeText(getActivity().getApplicationContext(), "Aucun manga n'a été trouvé, vérifiez votre connexion internet.", Toast.LENGTH_LONG).show();
@@ -106,6 +109,12 @@ public class FavoriteFragment extends ListFragment implements InterfaceTaskShone
 
     @Override
     public void displayOnPreExecute() {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
+
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setTitle("Chargement");
         progressDialog.setMessage("Veuillez patienter pendant le chargement des mangas.");
