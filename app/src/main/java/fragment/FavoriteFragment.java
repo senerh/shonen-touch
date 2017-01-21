@@ -61,6 +61,8 @@ public class FavoriteFragment extends ListFragment implements InterfaceTaskShone
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        getActivity().setTitle(R.string.menu_item_favorites);
+
         View view = inflater.inflate(R.layout.fragment_favorite, container, false);
 
         manga_list_view = (ListView) view.findViewById(android.R.id.list);

@@ -1,6 +1,7 @@
 package adapter;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +33,9 @@ public class ScansAdapter extends ArrayAdapter<Scan> {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.element_scan_list, parent, false);
         TextView name = (TextView) rowView.findViewById(R.id.name_scan);
-        name.setText(scanList.get(position).getNum());
+
+        String text = context.getString(R.string.scan, scanList.get(position).getNum());
+        name.setText(text);
 
         return rowView;
     }

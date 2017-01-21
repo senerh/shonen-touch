@@ -49,6 +49,8 @@ public class HomeFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        getActivity().setTitle(R.string.menu_item_accueil);
+
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         manga_list_view = (ListView) view.findViewById(android.R.id.list);
         homeAdapter = new HomeAdapter(getActivity().getBaseContext(), mangaList);

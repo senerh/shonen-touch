@@ -65,6 +65,9 @@ public class ScanFragment extends ListFragment implements InterfaceTaskShonentou
         scansAdapter = new ScansAdapter(getActivity().getBaseContext(), scanList);
         scan_list_view.setAdapter(scansAdapter);
 
+        Manga manga = this.getArguments().getParcelable("manga");
+        getActivity().setTitle(manga.getName());
+
         return view;
     }
 
