@@ -35,14 +35,12 @@ public class FullPageTaskFragment extends Fragment implements InterfaceFullPageS
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Log.e(getClass().getName(), "Le fragment a été mise à jour");
         interfaceFullPageShonentouchService = (InterfaceFullPageShonentouchService) context;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e(getClass().getName(), "Le fragment a été créé");
         setRetainInstance(true);
 
         Manga manga = getArguments().getParcelable(MANGA);
@@ -58,7 +56,6 @@ public class FullPageTaskFragment extends Fragment implements InterfaceFullPageS
     @Override
     public void onDetach() {
         super.onDetach();
-        Log.e(getClass().getName(), "L'activité a été détachée");
         interfaceFullPageShonentouchService = null;
     }
 
@@ -66,7 +63,6 @@ public class FullPageTaskFragment extends Fragment implements InterfaceFullPageS
     public void onDestroy() {
         super.onDestroy();
         fullPageShonentouchService.cancel(false);
-        Log.e(getClass().getName(), "l'activité a été détruite");
     }
 
     @Override

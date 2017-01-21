@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.shonen.shonentouch.R;
@@ -60,6 +62,7 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
         mPager = (ViewPager) findViewById(R.id.pager);
         mPagerAdapter = new SlidePageAdapter(getSupportFragmentManager(), listFullPage);
         mPager.setAdapter(mPagerAdapter);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override
@@ -95,5 +98,10 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
         super.onSaveInstanceState(outState);
         ArrayList<FullPage> fullPagesArrayList = new ArrayList<>(listFullPage);
         outState.putParcelableArrayList("fullPageList", fullPagesArrayList);
+    }
+
+    public void onDestroy() {
+        super.onDestroy();
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 }
