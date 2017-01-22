@@ -32,17 +32,6 @@ public class FavoriteFragment extends ListFragment implements InterfaceTaskShone
     private ProgressDialog progressDialog;
     private FavoritesPreferencesDAO favoritesPreferencesDAO;
 
-    public FavoriteFragment() {
-
-    }
-
-
-    public static FavoriteFragment newInstance(Context context) {
-        FavoriteFragment fragment = new FavoriteFragment();
-        return fragment;
-    }
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -57,7 +46,6 @@ public class FavoriteFragment extends ListFragment implements InterfaceTaskShone
             mangaList = savedInstanceState.getParcelableArrayList(ID_MANGA_LIST);
         }
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -75,18 +63,15 @@ public class FavoriteFragment extends ListFragment implements InterfaceTaskShone
         return view;
     }
 
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
     }
 
-
     @Override
     public void onDetach() {
         super.onDetach();
     }
-
 
     @Override
     public void displayOnPostExecute(List<Manga> mangaList) {
@@ -106,7 +91,6 @@ public class FavoriteFragment extends ListFragment implements InterfaceTaskShone
         }
     }
 
-
     @Override
     public void displayOnPreExecute() {
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -121,7 +105,6 @@ public class FavoriteFragment extends ListFragment implements InterfaceTaskShone
         progressDialog.setCancelable(false);
         progressDialog.show();
     }
-
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
