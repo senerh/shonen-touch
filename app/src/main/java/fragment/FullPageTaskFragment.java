@@ -3,10 +3,7 @@ package fragment;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
-
 import java.util.List;
-
 import dao.shonentouch.FullPageShonentouchService;
 import dao.shonentouch.InterfaceFullPageShonentouchService;
 import dto.FullPage;
