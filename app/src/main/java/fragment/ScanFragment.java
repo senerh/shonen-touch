@@ -30,8 +30,8 @@ public class ScanFragment extends ListFragment implements InterfaceTaskShonentou
     private ScansAdapter scansAdapter;
     private ProgressDialog progressDialog;
 
-
     public ScanFragment() {
+
     }
 
     public static ScanFragment newInstance(Manga manga) {

@@ -16,6 +16,9 @@ public class PageFragment extends Fragment {
     public static final String ARG_PAGE = "page";
     private FullPage mFullPage;
 
+    public PageFragment() {
+
+    }
 
     public static PageFragment create(FullPage fullPage) {
         PageFragment fragment = new PageFragment();
@@ -25,17 +28,11 @@ public class PageFragment extends Fragment {
         return fragment;
     }
 
-
-    public PageFragment() {
-    }
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mFullPage = getArguments().getParcelable("page");
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

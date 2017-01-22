@@ -2,11 +2,7 @@ package fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +12,7 @@ import com.shonen.shonentouch.R;
 
 import java.util.List;
 
+import activity.MainActivity;
 import adapter.HomeAdapter;
 import dao.preferences.FavoritesPreferencesDAO;
 import dto.Manga;
@@ -26,15 +23,7 @@ public class HomeFragment extends ListFragment {
     private List<Manga> mangaList;
     private HomeAdapter homeAdapter;
     private ListView manga_list_view;
-
-    public HomeFragment() {
-    }
-
-    public static HomeFragment newInstance(Context context) {
-        HomeFragment fragment = new HomeFragment();
-
-        return fragment;
-    }
+    private MainActivity mainActivity;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,7 +31,6 @@ public class HomeFragment extends ListFragment {
 
         FavoritesPreferencesDAO favoritesPreferencesDAO = new FavoritesPreferencesDAO(getActivity());
         mangaList = favoritesPreferencesDAO.getFavoriteMangaList();
-
     }
 
     @Override
@@ -62,22 +50,18 @@ public class HomeFragment extends ListFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        mainActivity = (MainActivity) context;
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        mainActivity = null;
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        FragmentTransaction tx = getActivity().getSupportFragmentManager().beginTransaction();
-        getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
         ScanFragment scanFragment = ScanFragment.newInstance(mangaList.get(position));
-        tx.replace(R.id.main_content, scanFragment, "activeFragment");
-        tx.commit();
-
-        DrawerLayout drawer = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        mainActivity.switchFragment(scanFragment);
     }
 }
