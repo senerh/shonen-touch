@@ -1,6 +1,7 @@
 package dao.shonentouch;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +31,22 @@ public class FullPageShonentouchService extends AsyncTask<Void, FullPage, List<F
     protected List<FullPage> doInBackground(Void... params) {
         List<Page> pageList = MethodShonentouchDAO.getPageList(manga, scan);
         List<FullPage> fullPageList = new ArrayList<>();
-        for (Page page : pageList) {
+        int i = 0;
+        int n = pageList.size();
+        while (i < n && !isCancelled()) {
+            Page page = pageList.get(i);
             Image image = MethodShonentouchDAO.getImage(manga, scan, page);
-            FullPage fullPage = new FullPage(page, image);
-            fullPageList.add(fullPage);
-            publishProgress(fullPage);
-            if (isCancelled()) {
-                break;
+            if (image == null) {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    Log.e(e.getClass().getName(), e.getMessage(), e);
+                }
+            } else {
+                FullPage fullPage = new FullPage(page, image);
+                fullPageList.add(fullPage);
+                publishProgress(fullPage);
+                i++;
             }
         }
         return fullPageList;
