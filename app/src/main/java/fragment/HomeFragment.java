@@ -10,6 +10,7 @@ import android.widget.ListView;
 
 import com.shonen.shonentouch.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import activity.MainActivity;
@@ -24,19 +25,19 @@ public class HomeFragment extends ListFragment {
     private HomeAdapter homeAdapter;
     private ListView manga_list_view;
     private MainActivity mainActivity;
+    private FavoritesPreferencesDAO favoritesPreferencesDAO;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        FavoritesPreferencesDAO favoritesPreferencesDAO = new FavoritesPreferencesDAO(getActivity());
-        mangaList = favoritesPreferencesDAO.getFavoriteMangaList();
+        favoritesPreferencesDAO = new FavoritesPreferencesDAO(getActivity());
+        mangaList = new ArrayList<>();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         getActivity().setTitle(R.string.menu_item_accueil);
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
@@ -45,6 +46,14 @@ public class HomeFragment extends ListFragment {
         manga_list_view.setAdapter(homeAdapter);
 
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mangaList.clear();
+        mangaList.addAll(favoritesPreferencesDAO.getFavoriteMangaList());
+        homeAdapter.notifyDataSetChanged();
     }
 
     @Override

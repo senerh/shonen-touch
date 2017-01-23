@@ -2,6 +2,8 @@ package activity;
 
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
@@ -68,6 +70,7 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
     @Override
     public void onPostExecute(List<FullPage> fullPageList) {
         if (progressDialog != null && progressDialog.isShowing()) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
             progressDialog.dismiss();
         }
         if (fullPageList == null) {
@@ -78,6 +81,7 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
     @Override
     public void onProgressUpdate(FullPage fullPage) {
         if (progressDialog != null && progressDialog.isShowing()) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
             progressDialog.dismiss();
         }
         this.listFullPage.add(fullPage);
@@ -86,6 +90,12 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
 
     @Override
     public void onPreExecute() {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
+
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Chargement");
         progressDialog.setMessage("Veuillez patienter pendant le chargement de la page.");
