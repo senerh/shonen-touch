@@ -103,16 +103,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void switchFragment(Fragment fragment) {
-        FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
-        tx.replace(R.id.main_content, fragment, FRAGMENT_TAG);
         Fragment currentFragment = getVisibleFragment();
         if (!fragment.getClass().equals(currentFragment.getClass())) {
+            FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
+            tx.replace(R.id.main_content, fragment, FRAGMENT_TAG);
             tx.addToBackStack(null);
-        }
-        tx.commit();
+            tx.commit();
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
+        }
     }
 
     private Fragment getVisibleFragment() {
