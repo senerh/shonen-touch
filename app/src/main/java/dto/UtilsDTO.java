@@ -9,8 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.List;
 
-import dao.preferences.AbstractPreferencesDAO;
-
 public class UtilsDTO {
 
     public static <T> T jsonToObject(String json, Class<T> type) {
@@ -20,7 +18,7 @@ public class UtilsDTO {
         try {
             t = objectMapper.readValue(json, type);
         } catch (IOException e) {
-            Log.e(AbstractPreferencesDAO.class.getName(), "Error while converting the string <~" + json + "~> into <~" + type.getName() + "~> instance.");
+            Log.e(UtilsDTO.class.getName(), "Error while converting the string <~" + json + "~> into <~" + type.getName() + "~> instance.");
             Log.e(e.getClass().getName(), e.getMessage(), e);
         }
 
@@ -35,7 +33,7 @@ public class UtilsDTO {
         try {
             list = objectMapper.readValue(json, javaType);
         } catch (IOException e) {
-            Log.e(AbstractPreferencesDAO.class.getName(), "Error while converting the string <~" + json + "~> into list of <~" + type.getName() + "~> instance.");
+            Log.e(UtilsDTO.class.getName(), "Error while converting the string <~" + json + "~> into list of <~" + type.getName() + "~> instance.");
             Log.e(e.getClass().getName(), e.getMessage(), e);
         }
 
@@ -48,7 +46,7 @@ public class UtilsDTO {
         try {
             json = objectMapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            Log.e(AbstractPreferencesDAO.class.getName(), "Error while trying to get json from the following instance of <~" + object + "~>");
+            Log.e(UtilsDTO.class.getName(), "Error while trying to get json from the following instance of <~" + object + "~>");
             Log.e(e.getClass().getName(), e.getMessage(), e);
         }
         return json;

@@ -40,8 +40,13 @@ public class MethodShonentouchDAO {
                 "/pages/" + page.getNum() +
                 "/image";
         Image image = UtilsShonentouchDAO.get(path, Image.class);
-        Bitmap bitmap = downloadImage(image.getUrl());
-        image.setImage(bitmap);
+        if (image != null) {
+            Bitmap bitmap = downloadImage(image.getUrl());
+            image.setImage(bitmap);
+            if (bitmap == null) {
+                image = null;
+            }
+        }
         return image;
     }
 
