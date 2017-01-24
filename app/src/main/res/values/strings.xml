@@ -17,8 +17,20 @@
     <string name="validate">Valider</string>
     <string name="cancel">Annuler</string>
 
-    <string name="msg">%1$s\n%2$s</string>
     <string name="chat">Chat</string>
     <string name="username">Pseudonyme</string>
+    <string name="about_footer">&lt;/&gt; with &lt;3</string>
+    <string name="about_content">
+        <![CDATA[
+        <p>
+            L’application a été réalisée dans le cadre des études à l’école de Polytech Lyon par l’équipe suivante :
+            <ul>
+                <li>Nathan FRANCOIS</li>
+                <li>Franck LACASTAIGNERATTE</li>
+                <li>Hakan SENER</li>
+            </ul>
+        </p>
+        ]]>
+    </string>
 
 </resources>

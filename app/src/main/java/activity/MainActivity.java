@@ -18,6 +18,7 @@ import com.shonen.shonentouch.R;
 
 import java.util.List;
 
+import fragment.AboutFragment;
 import fragment.FavoriteFragment;
 import fragment.HomeFragment;
 import fragment.PreferenceFragment;
@@ -91,6 +92,8 @@ public class MainActivity extends AppCompatActivity
             switchFragment(new FavoriteFragment());
         } else if (id == R.id.nav_preferences) {
             switchFragment(new PreferenceFragment());
+        } else if (id == R.id.nav_about) {
+            switchFragment(new AboutFragment());
         }
 
         return true;
