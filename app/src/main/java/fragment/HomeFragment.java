@@ -1,5 +1,6 @@
 package fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -60,6 +61,15 @@ public class HomeFragment extends ListFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mainActivity = (MainActivity) context;
+    }
+
+    /**
+     * Pour les sdk < 23
+     */
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mainActivity = (MainActivity) activity;
     }
 
     @Override
