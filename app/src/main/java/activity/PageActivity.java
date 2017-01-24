@@ -23,6 +23,7 @@ import dto.FullPage;
 import dto.Manga;
 import dto.Scan;
 import fragment.FullPageTaskFragment;
+import fragment.ScanFragment;
 
 
 public class PageActivity extends FragmentActivity implements InterfaceFullPageShonentouchService {
@@ -44,8 +45,8 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
 
         Bundle b = getIntent().getExtras();
 
-        manga = b.getParcelable("manga");
-        scan = b.getParcelable("scan");
+        manga = b.getParcelable(ScanFragment.ID_MANGA_PARCELABLE);
+        scan = b.getParcelable(ScanFragment.ID_SCAN_PARCELABLE);
 
         FragmentManager fragmentManager = getFragmentManager();
         fullPageTaskFragment = (FullPageTaskFragment) fragmentManager.findFragmentByTag(FULL_PAGE_TASK_FRAGMENT);

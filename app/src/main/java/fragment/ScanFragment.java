@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,24 +22,27 @@ import dao.shonentouch.InterfaceTaskShonentouchService;
 import dao.shonentouch.ScanShonentouchService;
 import dto.Manga;
 import dto.Scan;
+import listener.ChatButtonListener;
 
 public class ScanFragment extends ListFragment implements InterfaceTaskShonentouchService<List<Scan>> {
 
-    private static final String ID_SCAN_LIST = "fragment.ScanFragment.scanList";
+    public static final String ID_SCAN_LIST = "fragment.ScanFragment.scanList";
+    public static final String ID_MANGA_PARCELABLE = "fragment.ScanFragment.manga";
+    public static final String ID_SCAN_PARCELABLE = "fragment.ScanFragment.scan";
+
     private List<Scan> scanList;
     private ListView scan_list_view;
     private ScansAdapter scansAdapter;
     private ProgressDialog progressDialog;
 
     public ScanFragment() {
-
     }
 
     public static ScanFragment newInstance(Manga manga) {
         ScanFragment fragment = new ScanFragment();
 
         Bundle bundle = new Bundle();
-        bundle.putParcelable("manga", manga);
+        bundle.putParcelable(ID_MANGA_PARCELABLE, manga);
         fragment.setArguments(bundle);
 
         return fragment;
@@ -50,8 +54,8 @@ public class ScanFragment extends ListFragment implements InterfaceTaskShonentou
 
         if (savedInstanceState == null) {
             scanList = new ArrayList<>();
-            new ScanShonentouchService(this, (Manga)this.getArguments().getParcelable("manga")).execute();
-
+            new ScanShonentouchService(this,
+                    (Manga)this.getArguments().getParcelable(ID_MANGA_PARCELABLE)).execute();
         } else {
             scanList = savedInstanceState.getParcelableArrayList(ID_SCAN_LIST);
         }
@@ -67,7 +71,16 @@ public class ScanFragment extends ListFragment implements InterfaceTaskShonentou
         scansAdapter = new ScansAdapter(getActivity().getBaseContext(), scanList);
         scan_list_view.setAdapter(scansAdapter);
 
-        Manga manga = this.getArguments().getParcelable("manga");
+        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        fab.setOnClickListener(
+                new ChatButtonListener(
+                        (Manga)this.getArguments().getParcelable(ID_MANGA_PARCELABLE),
+                        getActivity()
+                )
+        );
+
+        Manga manga = this.getArguments().getParcelable(ID_MANGA_PARCELABLE);
+
         getActivity().setTitle(manga.getName());
 
         return view;
@@ -124,9 +137,9 @@ public class ScanFragment extends ListFragment implements InterfaceTaskShonentou
         Intent myIntent = new Intent(getActivity(), PageActivity.class);
 
         Bundle b = new Bundle();
-        b.putParcelable("manga", this.getArguments().getParcelable("manga"));
-        b.putParcelable("scan", scanList.get(position));
-        myIntent.putExtras(b); //Put your id to your next Intent
+        b.putParcelable(ID_MANGA_PARCELABLE, this.getArguments().getParcelable(ID_MANGA_PARCELABLE));
+        b.putParcelable(ID_SCAN_PARCELABLE, scanList.get(position));
+        myIntent.putExtras(b);
 
         startActivity(myIntent);
     }

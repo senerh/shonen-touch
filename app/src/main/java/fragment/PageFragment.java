@@ -31,7 +31,7 @@ public class PageFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mFullPage = getArguments().getParcelable("page");
+        mFullPage = getArguments().getParcelable(ARG_PAGE);
     }
 
     @Override
