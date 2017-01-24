@@ -1,5 +1,6 @@
 package dao.slack;
 
+import android.text.Html;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -16,6 +17,7 @@ import dto.Message;
 
 public class ChatSlackDAO {
 
+    public static final String ADMIN_USERNAME = "admin";
     private static final String SPLITTER = " : ";
 
     public static List<Message> getMessageList(Channel channel) {
@@ -64,12 +66,13 @@ public class ChatSlackDAO {
             for (int i=0; i<jsonArray.length(); i++) {
                 JSONObject messageJson = jsonArray.getJSONObject(i);
                 String text = messageJson.getString("text");
-                String[] s = text.split(SPLITTER);
+                text = Html.fromHtml(text).toString();
+                String[] s = text.split(SPLITTER, 2);
                 Message message;
                 if (s.length == 2) {
                     message = new Message(s[0], s[1]);
                 } else {
-                    message = new Message("admin", text);
+                    message = new Message(ADMIN_USERNAME, text);
                 }
                 messageList.add(message);
             }

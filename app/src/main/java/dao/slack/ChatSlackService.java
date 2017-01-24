@@ -2,6 +2,9 @@ package dao.slack;
 
 import android.util.Log;
 
+import java.util.Collections;
+import java.util.List;
+
 import dto.Channel;
 import dto.Message;
 
@@ -34,7 +37,9 @@ public class ChatSlackService {
             Message message = ChatSlackDAO.getLastMessage(loadChannel());
             if (lastMessage == null || !lastMessage.equals(message)) {
                 lastMessage = message;
-                interfaceChatSlackServiceConsumer.handleMessages(ChatSlackDAO.getMessageList(loadChannel()));
+                List<Message> messageList = ChatSlackDAO.getMessageList(loadChannel());
+                Collections.reverse(messageList);
+                interfaceChatSlackServiceConsumer.handleMessages(messageList);
             }
             try {
                 Thread.sleep(1000);
@@ -52,7 +57,11 @@ public class ChatSlackService {
         new Thread() {
             @Override
             public void run() {
-                ChatSlackDAO.postMessage(message, loadChannel());
+                Channel channel = loadChannel();
+                Message lastMessage = ChatSlackDAO.getLastMessage(channel);
+                if (!message.equals(lastMessage)) {
+                    ChatSlackDAO.postMessage(message, channel);
+                }
             }
         }.start();
     }
