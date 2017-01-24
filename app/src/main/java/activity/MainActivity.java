@@ -20,6 +20,7 @@ import java.util.List;
 
 import fragment.FavoriteFragment;
 import fragment.HomeFragment;
+import fragment.PreferenceFragment;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -88,6 +89,8 @@ public class MainActivity extends AppCompatActivity
             switchFragment(new HomeFragment());
         } else if (id == R.id.nav_favorite) {
             switchFragment(new FavoriteFragment());
+        } else if (id == R.id.nav_preferences) {
+            switchFragment(new PreferenceFragment());
         }
 
         return true;
