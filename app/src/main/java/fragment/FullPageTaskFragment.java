@@ -1,5 +1,6 @@
 package fragment;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -33,6 +34,15 @@ public class FullPageTaskFragment extends Fragment implements InterfaceFullPageS
     public void onAttach(Context context) {
         super.onAttach(context);
         interfaceFullPageShonentouchService = (InterfaceFullPageShonentouchService) context;
+    }
+
+    /**
+     * Pour les sdk < 23
+     */
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        interfaceFullPageShonentouchService = (InterfaceFullPageShonentouchService) activity;
     }
 
     @Override
