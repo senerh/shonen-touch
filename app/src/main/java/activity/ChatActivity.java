@@ -6,11 +6,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+
 import com.shonen.shonentouch.R;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import adapter.ChatAdapter;
-import dao.preferences.UserPreferences;
+import dao.preferences.UserPreferencesDAO;
 import dao.slack.ChatSlackService;
 import dao.slack.InterfaceChatSlackServiceConsumer;
 import dto.Manga;
@@ -48,10 +51,10 @@ public class ChatActivity extends AppCompatActivity implements InterfaceChatSlac
             @Override
             public void onClick(View arg0) {
 
-                UserPreferences userPreferences = new UserPreferences(getBaseContext());
+                UserPreferencesDAO userPreferencesDAO = new UserPreferencesDAO(getBaseContext());
                 Message message = new Message();
                 message.setMessage(chatText.getText().toString());
-                message.setAuthor(userPreferences.getPseudonyme());
+                message.setAuthor(userPreferencesDAO.getUsername());
                 chatSlackService.sendMessage(message);
                 chatText.setText("");
             }
@@ -65,13 +68,8 @@ public class ChatActivity extends AppCompatActivity implements InterfaceChatSlac
 
     @Override
     public void handleMessages(List<Message> messageList) {
-        this.msgList.clear();
-
-        //TODO: A enlever
-        for(int i=messageList.size()-1 ; i>-1 ; i--){
-            this.msgList.add(messageList.get(i));
-        }
-
+        msgList.clear();
+        msgList.addAll(messageList);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -82,7 +80,7 @@ public class ChatActivity extends AppCompatActivity implements InterfaceChatSlac
 
     @Override
     public void onBackPressed() {
-        chatSlackService.stop();
         super.onBackPressed();
+        chatSlackService.stop();
     }
 }

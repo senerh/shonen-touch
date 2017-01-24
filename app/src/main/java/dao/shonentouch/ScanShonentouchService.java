@@ -1,5 +1,6 @@
 package dao.shonentouch;
 
+import java.util.Collections;
 import java.util.List;
 
 import dto.Manga;
@@ -16,6 +17,8 @@ public class ScanShonentouchService extends AbstractShonentouchDAO<List<Scan>> {
 
     @Override
     protected List<Scan> doInBackground(Void... params) {
-        return MethodShonentouchDAO.getScanList(manga);
+        List<Scan> scanList = MethodShonentouchDAO.getScanList(manga);
+        Collections.reverse(scanList);
+        return scanList;
     }
 }

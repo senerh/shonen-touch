@@ -7,9 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
 import com.shonen.shonentouch.R;
+
 import java.util.List;
-import dao.preferences.UserPreferences;
+
+import dao.preferences.UserPreferencesDAO;
 import dto.Message;
 
 
@@ -44,13 +47,13 @@ public class ChatAdapter extends ArrayAdapter<Message> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Message chatMessage = getItem(position);
-        UserPreferences userPreferences = new UserPreferences(this.context);
+        UserPreferencesDAO userPreferencesDAO = new UserPreferencesDAO(this.context);
         LayoutInflater inflater = (LayoutInflater) this.getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         String msg;
 
-        if (chatMessage.getAuthor().equals(userPreferences.getPseudonyme())) {
+        if (chatMessage.getAuthor().equals(userPreferencesDAO.getUsername())) {
             msg = chatMessage.getMessage();
             convertView = inflater.inflate(R.layout.element_right_chat_list, parent, false);
 
