@@ -1,13 +1,12 @@
 package fragment;
 
-
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
+import android.widget.TextView;
 
 import com.shonen.shonentouch.R;
 
@@ -20,11 +19,8 @@ public class AboutFragment extends Fragment {
 
         getActivity().setTitle(R.string.menu_item_about);
 
-        String aboutContentString = getString(R.string.about_content);
-        WebView aboutContentWebView = (WebView) view.findViewById(R.id.about_content);
-        aboutContentWebView.setBackgroundColor(Color.TRANSPARENT);
-
-        aboutContentWebView.loadData(aboutContentString, "text/html; charset=utf-8", "utf-8");
+        TextView authorsTextView = (TextView) view.findViewById(R.id.about_authors);
+        authorsTextView.setMovementMethod(LinkMovementMethod.getInstance());
 
         return view;
     }

@@ -21,16 +21,12 @@
     <string name="username">Pseudonyme</string>
     <string name="about_footer">&lt;/&gt; with &lt;3</string>
     <string name="about_content">
-        <![CDATA[
-        <p>
-            L’application a été réalisée dans le cadre des études à l’école de Polytech Lyon par l’équipe suivante :
-            <ul>
-                <li>Nathan FRANCOIS</li>
-                <li>Franck LACASTAIGNERATTE</li>
-                <li>Hakan SENER</li>
-            </ul>
-        </p>
-        ]]>
+        L’application a été réalisée dans le cadre des études à l’école de Polytech Lyon par l’équipe suivante :
+    </string>
+    <string name="about_authors">
+        Nathan FRANCOIS\n
+        Franck LACASTAIGNERATTE\n
+        <a href="https://senerh.github.io">Hakan SENER</a>
     </string>
 
 </resources>
