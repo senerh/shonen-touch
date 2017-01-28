@@ -13,12 +13,11 @@ import com.shonen.shonentouch.R;
 import java.util.List;
 
 import dao.preferences.UserPreferencesDAO;
+import dao.slack.ChatSlackDAO;
 import dto.Message;
-
 
 public class ChatAdapter extends ArrayAdapter<Message> {
 
-    private TextView chatText;
     private List<Message> chatMessageList;
     private Context context;
 
@@ -46,28 +45,25 @@ public class ChatAdapter extends ArrayAdapter<Message> {
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Message chatMessage = getItem(position);
+        Message message = getItem(position);
         UserPreferencesDAO userPreferencesDAO = new UserPreferencesDAO(this.context);
         LayoutInflater inflater = (LayoutInflater) this.getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        String msg;
-
-        if (chatMessage.getAuthor().equals(userPreferencesDAO.getUsername())) {
-            msg = chatMessage.getMessage();
+        if (message.getAuthor().equals(userPreferencesDAO.getUsername())) {
             convertView = inflater.inflate(R.layout.element_right_chat_list, parent, false);
-
-        }else{
-            msg = String.format(
-                    context.getResources().getString(R.string.msg),
-                    chatMessage.getAuthor(),
-                    chatMessage.getMessage()
-            );
+        } else {
             convertView = inflater.inflate(R.layout.element_left_chat_list, parent, false);
+            TextView authorTextView = (TextView) convertView.findViewById(R.id.msg_author);
+            authorTextView.setText(message.getAuthor());
+            if (message.getAuthor().equals(ChatSlackDAO.ADMIN_USERNAME)) {
+                int color = convertView.getResources().getColor(R.color.colorAccent);
+                authorTextView.setTextColor(color);
+            }
         }
 
-        chatText = (TextView) convertView.findViewById(R.id.msg_row);
-        chatText.setText(msg);
+        TextView messageTextView = (TextView) convertView.findViewById(R.id.msg_row);
+        messageTextView.setText(message.getMessage());
 
         return convertView;
     }

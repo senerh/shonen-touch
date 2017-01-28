@@ -54,6 +54,9 @@ public class ChatSlackService {
     }
 
     public void sendMessage(final Message message) {
+        if (message.equals("")) {
+            return;
+        }
         new Thread() {
             @Override
             public void run() {
