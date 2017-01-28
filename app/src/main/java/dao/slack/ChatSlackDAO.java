@@ -20,11 +20,11 @@ public class ChatSlackDAO {
     public static final String ADMIN_USERNAME = "admin";
     private static final String SPLITTER = " : ";
 
-    public static List<Message> getMessageList(Channel channel) {
+    public static List<Message> getMessageList(Channel channel) throws SlackDAOException {
         return getMessageList(channel, 20);
     }
 
-    private static List<Message> getMessageList(Channel channel, int nbMax) {
+    private static List<Message> getMessageList(Channel channel, int nbMax) throws SlackDAOException {
         String json = null;
         try {
             json = UtilsSlackDAO.call(
@@ -32,19 +32,18 @@ public class ChatSlackDAO {
                             .addArgument("channel", channel.getId())
                             .addArgument("count", "" + nbMax)
             );
-        } catch (ExceptionSlackDAO e) {
-            Log.e(ChatSlackDAO.class.getName(), "Error while getting list of messages for channel <~" + channel + "~>.");
-            Log.e(e.getClass().getName(), e.getMessage(), e);
+        } catch (SlackDAOException e) {
+            throw new SlackDAOException("Error while getting list of messages for channel <~" + channel + "~>.", e);
         }
         return jsonToMessageList(json);
     }
 
-    public static Message getLastMessage(Channel channel) {
+    public static Message getLastMessage(Channel channel) throws SlackDAOException {
         List<Message> messageList = getMessageList(channel, 1);
         return messageList.get(0);
     }
 
-    public static void postMessage(Message message, Channel channel) {
+    public static void postMessage(Message message, Channel channel) throws SlackDAOException {
         try {
             String text = messageToText(message);
             UtilsSlackDAO.call(
@@ -52,13 +51,12 @@ public class ChatSlackDAO {
                             addArgument("channel", channel.getId())
                             .addArgument("text", text)
             );
-        } catch (ExceptionSlackDAO e) {
-            Log.e(ChatSlackDAO.class.getName(), "Error while posting message on channel <~" + channel + "~>.");
-            Log.e(e.getClass().getName(), e.getMessage(), e);
+        } catch (SlackDAOException e) {
+            throw new SlackDAOException("Error while posting message on channel <~" + channel + "~>.", e);
         }
     }
 
-    private static List<Message> jsonToMessageList(String json) {
+    private static List<Message> jsonToMessageList(String json) throws SlackDAOException {
         List<Message> messageList = new ArrayList<>();
         try {
             JSONObject jsonObject = new JSONObject(json);
@@ -77,8 +75,7 @@ public class ChatSlackDAO {
                 messageList.add(message);
             }
         } catch (JSONException e) {
-            Log.e(ChatSlackDAO.class.getName(), "Error while converting the string <~" + json + "~> into List<Channel> instance.");
-            Log.e(e.getClass().getName(), e.getMessage(), e);
+            throw new SlackDAOException("Error while converting the string <~" + json + "~> into List<Channel> instance.", e);
         }
         return messageList;
     }

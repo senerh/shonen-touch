@@ -34,18 +34,18 @@ public class ChatSlackService {
     private void loop() {
         Message lastMessage = null;
         while (isRunning) {
-            Message message = ChatSlackDAO.getLastMessage(loadChannel());
-            if (lastMessage == null || !lastMessage.equals(message)) {
-                lastMessage = message;
-                List<Message> messageList = ChatSlackDAO.getMessageList(loadChannel());
-                Collections.reverse(messageList);
-                interfaceChatSlackServiceConsumer.handleMessages(messageList);
-            }
             try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Log.e(e.getClass().getName(), e.getMessage(), e);
+                Message message = ChatSlackDAO.getLastMessage(loadChannel());
+                if (lastMessage == null || !lastMessage.equals(message)) {
+                    lastMessage = message;
+                    List<Message> messageList = ChatSlackDAO.getMessageList(loadChannel());
+                    Collections.reverse(messageList);
+                    interfaceChatSlackServiceConsumer.handleMessages(messageList);
+                }
+            } catch (SlackDAOException e) {
+                Log.e(getClass().getName(), "Error while getting chat messages", e);
             }
+            ChatSlackService.this.sleep(500);
         }
     }
 
@@ -54,13 +54,25 @@ public class ChatSlackService {
     }
 
     public void sendMessage(final Message message) {
+        if (message.equals("")) {
+            return;
+        }
         new Thread() {
             @Override
             public void run() {
-                Channel channel = loadChannel();
-                Message lastMessage = ChatSlackDAO.getLastMessage(channel);
-                if (!message.equals(lastMessage)) {
-                    ChatSlackDAO.postMessage(message, channel);
+                boolean isPosted = false;
+                while (!isPosted) {
+                    try {
+                        Channel channel = loadChannel();
+                        Message lastMessage = ChatSlackDAO.getLastMessage(channel);
+                        if (!message.equals(lastMessage)) {
+                            ChatSlackDAO.postMessage(message, channel);
+                        }
+                        isPosted = true;
+                    } catch (SlackDAOException e) {
+                        Log.e(getClass().getName(), "Error while posting chat message", e);
+                        ChatSlackService.this.sleep(5000);
+                    }
                 }
             }
         }.start();
@@ -68,8 +80,25 @@ public class ChatSlackService {
 
     private Channel loadChannel() {
         if (channel == null) {
-            channel = ChannelSlackDAO.getChannelByName(channelName);
+            boolean isLoaded = false;
+            while (!isLoaded) {
+                try {
+                    channel = ChannelSlackDAO.getChannelByName(channelName);
+                    isLoaded = true;
+                } catch (SlackDAOException e) {
+                    Log.e(getClass().getName(), "Error while getting channel", e);
+                    sleep(5000);
+                }
+            }
         }
         return channel;
+    }
+
+    private void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Log.e(getClass().getName(), e.getMessage(), e);
+        }
     }
 }

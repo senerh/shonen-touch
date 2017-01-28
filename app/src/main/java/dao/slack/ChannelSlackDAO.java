@@ -13,18 +13,17 @@ import dto.Channel;
 
 public class ChannelSlackDAO {
 
-    public static List<Channel> getChannelList() {
+    public static List<Channel> getChannelList() throws SlackDAOException {
         String json = null;
         try {
             json = UtilsSlackDAO.call(new Method("channels.list").addArgument("exclude_archived", "1"));
-        } catch (ExceptionSlackDAO e) {
-            Log.e(ChannelSlackDAO.class.getName(), "Error while getting list of channels.");
-            Log.e(e.getClass().getName(), e.getMessage(), e);
+        } catch (SlackDAOException e) {
+            throw new SlackDAOException("Error while getting list of channels.", e);
         }
         return jsonToChannelList(json);
     }
 
-    public static Channel getChannelByName(String name) {
+    public static Channel getChannelByName(String name) throws SlackDAOException {
         List<Channel> channelList = getChannelList();
         Channel channel = new Channel("", name);
         int index = channelList.indexOf(channel);
@@ -36,31 +35,29 @@ public class ChannelSlackDAO {
         }
     }
 
-    private static Channel createChannel(String name) {
+    private static Channel createChannel(String name) throws SlackDAOException {
         String json = null;
         try {
             json = UtilsSlackDAO.call(new Method("channels.create").addArgument("name", name));
-        } catch (ExceptionSlackDAO e) {
-            Log.e(ChannelSlackDAO.class.getName(), "Error while creating the channel <~" + name + "~>.");
-            Log.e(e.getClass().getName(), e.getMessage(), e);
+        } catch (SlackDAOException e) {
+            throw new SlackDAOException("Error while creating the channel <~" + name + "~>.", e);
         }
         return jsonToChannel(json);
     }
 
-    private static Channel jsonToChannel(String json) {
+    private static Channel jsonToChannel(String json) throws SlackDAOException {
         Channel channel = null;
         try {
             JSONObject jsonObject = new JSONObject(json);
             JSONObject channelJson = jsonObject.getJSONObject("channel");
             channel = new Channel(channelJson.getString("id"), channelJson.getString("name"));
         } catch (JSONException e) {
-            Log.e(ChannelSlackDAO.class.getName(), "Error while converting the string <~" + json + "~> into Channel instance.");
-            Log.e(e.getClass().getName(), e.getMessage(), e);
+            throw new SlackDAOException("Error while converting the string <~" + json + "~> into Channel instance.", e);
         }
         return channel;
     }
 
-    private static List<Channel> jsonToChannelList(String json) {
+    private static List<Channel> jsonToChannelList(String json) throws SlackDAOException {
         List<Channel> channelList = new ArrayList<>();
         try {
             JSONObject jsonObject = new JSONObject(json);
@@ -71,8 +68,7 @@ public class ChannelSlackDAO {
                 channelList.add(channel);
             }
         } catch (JSONException e) {
-            Log.e(ChannelSlackDAO.class.getName(), "Error while converting the string <~" + json + "~> into List<Channel> instance.");
-            Log.e(e.getClass().getName(), e.getMessage(), e);
+            throw new SlackDAOException("Error while converting the string <~" + json + "~> into List<Channel> instance.", e);
         }
         return channelList;
     }
