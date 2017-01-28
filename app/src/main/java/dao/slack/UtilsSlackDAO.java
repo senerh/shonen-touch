@@ -13,11 +13,11 @@ import java.net.URLConnection;
 
 public class UtilsSlackDAO {
 
-    protected static String call(String method) throws ExceptionSlackDAO {
+    protected static String call(String method) throws SlackDAOException {
         return call(new Method(method));
     }
 
-    protected static String call(Method method) throws ExceptionSlackDAO {
+    protected static String call(Method method) throws SlackDAOException {
         StringBuilder builder = new StringBuilder();
 
         try {
@@ -30,8 +30,7 @@ public class UtilsSlackDAO {
             in.close();
             Log.d(UtilsSlackDAO.class.getName(), "The following method was called <~" + method + "~>");
         } catch (IOException e) {
-            Log.e(UtilsSlackDAO.class.getName(), "Error while calling the following address <~" + method.getUrl() + "~>.");
-            Log.e(e.getClass().getName(), e.getMessage(), e);
+            throw new SlackDAOException("Error while calling the following address <~" + method.getUrl() + "~>.", e);
         }
 
         String json = builder.toString();
@@ -39,15 +38,15 @@ public class UtilsSlackDAO {
         return json;
     }
 
-    private static void isOk(String json) throws ExceptionSlackDAO {
+    private static void isOk(String json) throws SlackDAOException {
         try {
             JSONObject jsonObject = new JSONObject(json);
             if (!jsonObject.getBoolean("ok")) {
                 String error = jsonObject.getString("error");
-                throw new ExceptionSlackDAO("Error <~" + error + "~> in the following json <~" + json + "~>.");
+                throw new SlackDAOException("Error <~" + error + "~> is returned by slack api in the following json <~" + json + "~>.");
             }
         } catch (JSONException e) {
-            Log.e(e.getClass().getName(), e.getMessage(), e);
+            throw new SlackDAOException("Error while parsing json <~" + json + "~>", e);
         }
     }
 
