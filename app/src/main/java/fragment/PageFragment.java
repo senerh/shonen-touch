@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import com.shonen.shonentouch.R;
 import dto.FullPage;
+import listener.ImageListener;
 
 
 public class PageFragment extends Fragment {
@@ -43,6 +44,7 @@ public class PageFragment extends Fragment {
 
         ImageView imageMangaView = (ImageView)rootView.findViewById(R.id.image_manga);
         imageMangaView.setImageBitmap(mFullPage.getImage().getImage());
+        imageMangaView.setOnTouchListener(new ImageListener());
 
         View decorView = getActivity().getWindow().getDecorView();
 
@@ -58,4 +60,5 @@ public class PageFragment extends Fragment {
 
         return rootView;
     }
+
 }

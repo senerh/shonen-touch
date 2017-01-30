@@ -10,6 +10,8 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 import com.shonen.shonentouch.R;
@@ -119,3 +121,4 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
         Toast.makeText(this.getApplicationContext(), "Historique mis à jour", Toast.LENGTH_LONG).show();
     }
 }
+
