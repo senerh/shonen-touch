@@ -29,9 +29,9 @@ import listener.ChatButtonListener;
 
 public class ScanFragment extends ListFragment implements InterfaceTaskShonentouchService<List<Scan>> {
 
-    public static final String ID_SCAN_LIST = "fragment.ScanFragment.scanList";
-    public static final String ID_MANGA_PARCELABLE = "fragment.ScanFragment.manga";
-    public static final String ID_SCAN_PARCELABLE = "fragment.ScanFragment.scan";
+    public static final String ID_SCAN_LIST = "fragment.ScanFragment.ID_SCAN_LIST";
+    public static final String ID_MANGA_PARCELABLE = "fragment.ScanFragment.ID_MANGA_PARCELABLE";
+    public static final String ID_SCAN_PARCELABLE = "fragment.ScanFragment.ID_SCAN_PARCELABLE";
 
     private List<Scan> scanList;
     private ListView scan_list_view;
@@ -136,12 +136,12 @@ public class ScanFragment extends ListFragment implements InterfaceTaskShonentou
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-
         Intent myIntent = new Intent(getActivity(), PageActivity.class);
 
         Bundle b = new Bundle();
         b.putParcelable(ID_MANGA_PARCELABLE, this.getArguments().getParcelable(ID_MANGA_PARCELABLE));
         b.putParcelable(ID_SCAN_PARCELABLE, scanList.get(position));
+        b.putParcelableArrayList(ID_SCAN_LIST, new ArrayList<>(scanList));
         myIntent.putExtras(b);
 
         startActivity(myIntent);
