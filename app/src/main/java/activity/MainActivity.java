@@ -20,6 +20,7 @@ import java.util.List;
 
 import fragment.AboutFragment;
 import fragment.FavoriteFragment;
+import fragment.HistoryFragment;
 import fragment.HomeFragment;
 import fragment.PreferenceFragment;
 
@@ -94,6 +95,8 @@ public class MainActivity extends AppCompatActivity
             switchFragment(new PreferenceFragment());
         } else if (id == R.id.nav_about) {
             switchFragment(new AboutFragment());
+        }else if (id == R.id.nav_history) {
+            switchFragment(new HistoryFragment());
         }
 
         return true;

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import adapter.SlidePageAdapter;
+import dao.preferences.HistoryPreferencesDAO;
 import dao.shonentouch.InterfaceFullPageShonentouchService;
 import dto.FullPage;
 import dto.Manga;
@@ -114,5 +115,7 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
     public void onDestroy() {
         super.onDestroy();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        new HistoryPreferencesDAO(this).updateHistoryList(manga, scan);
+        Toast.makeText(this.getApplicationContext(), "Historique mis à jour", Toast.LENGTH_LONG).show();
     }
 }

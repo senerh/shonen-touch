@@ -13,6 +13,10 @@
             android:icon="@drawable/ic_favorite_black_48px"
             android:title="Favoris" />
         <item
+            android:id="@+id/nav_history"
+            android:icon="@drawable/ic_access_time_black_24dp"
+            android:title="Historique" />
+        <item
             android:id="@+id/nav_preferences"
             android:icon="@drawable/ic_menu_preferences"
             android:title="Préférences" />

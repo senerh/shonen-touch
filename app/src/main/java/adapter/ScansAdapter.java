@@ -36,7 +36,6 @@ public class ScansAdapter extends ArrayAdapter<Scan> {
 
         String text = context.getString(R.string.scan, scanList.get(position).getNum());
         name.setText(text);
-
         return rowView;
     }
 
