@@ -34,6 +34,8 @@ public class ImageListener implements View.OnTouchListener {
     public boolean onTouch(View v, MotionEvent event) {
 
         ImageView view = (ImageView) v;
+        view.setScaleType(ImageView.ScaleType.MATRIX);
+
         dumpEvent(event);
 
         // Handle touch events here...
