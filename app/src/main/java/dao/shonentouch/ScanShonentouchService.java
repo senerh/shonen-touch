@@ -18,7 +18,9 @@ public class ScanShonentouchService extends AbstractShonentouchDAO<List<Scan>> {
     @Override
     protected List<Scan> doInBackground(Void... params) {
         List<Scan> scanList = MethodShonentouchDAO.getScanList(manga);
-        Collections.reverse(scanList);
+        if (scanList != null) {
+            Collections.reverse(scanList);
+        }
         return scanList;
     }
 }

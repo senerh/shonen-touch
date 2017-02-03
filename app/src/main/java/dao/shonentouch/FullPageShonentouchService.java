@@ -32,7 +32,10 @@ public class FullPageShonentouchService extends AsyncTask<Void, FullPage, List<F
         List<Page> pageList = MethodShonentouchDAO.getPageList(manga, scan);
         List<FullPage> fullPageList = new ArrayList<>();
         int i = 0;
-        int n = pageList.size();
+        int n = 0;
+        if (pageList != null) {
+            n = pageList.size();
+        }
         while (i < n && !isCancelled()) {
             Page page = pageList.get(i);
             Image image = MethodShonentouchDAO.getImage(manga, scan, page);
