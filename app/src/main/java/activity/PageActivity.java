@@ -74,8 +74,9 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
             progressDialog.dismiss();
         }
-        if (fullPageList == null) {
+        if (fullPageList == null || fullPageList.isEmpty()) {
             Toast.makeText(this.getApplicationContext(), "Aucune page n'a été trouvée, vérifiez votre connexion internet.", Toast.LENGTH_LONG).show();
+            finish();
         }
     }
 
