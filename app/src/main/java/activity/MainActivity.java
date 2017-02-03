@@ -70,13 +70,11 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_home) {
             switchFragment(new HomeFragment());
-        } else if (id == R.id.nav_favorite) {
-            switchFragment(new FavoriteFragment());
         } else if (id == R.id.nav_preferences) {
             switchFragment(new PreferenceFragment());
         } else if (id == R.id.nav_about) {
             switchFragment(new AboutFragment());
-        }else if (id == R.id.nav_history) {
+        } else if (id == R.id.nav_history) {
             switchFragment(new HistoryFragment());
         }
 

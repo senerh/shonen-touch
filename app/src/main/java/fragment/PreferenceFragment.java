@@ -35,13 +35,18 @@ public class PreferenceFragment extends Fragment {
 
         getActivity().setTitle(R.string.menu_item_prefs);
 
-        LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.usernamePreference);
-        linearLayout.setOnClickListener(
-                new PreferencesListener(this, linearLayout.getId()));
+        LinearLayout usernameLinearLayout = (LinearLayout) view.findViewById(R.id.usernamePreference);
+        usernameLinearLayout.setOnClickListener(
+                new PreferencesListener(this, usernameLinearLayout.getId()));
 
         textView = (TextView) view.findViewById(R.id.usernamePreferenceTextView);
         userPreferencesDAO = new UserPreferencesDAO(getContext());
         updateUsername();
+
+
+        LinearLayout favoriteLinearLayout = (LinearLayout) view.findViewById(R.id.favoritePreference);
+        favoriteLinearLayout.setOnClickListener(
+                new PreferencesListener(this, favoriteLinearLayout.getId()));
 
         return view;
     }

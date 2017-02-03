@@ -19,7 +19,7 @@
 
     <string name="chat">Chat</string>
     <string name="username">Pseudonyme</string>
-    <string name="about_footer">&lt;/&gt; with &lt;3</string>
+    <string name="about_footer">Codée avec le </string>
     <string name="about_content">
         L’application a été réalisée dans le cadre des études à l’école de Polytech Lyon par l’équipe suivante :
     </string>
@@ -28,5 +28,7 @@
         Franck LACASTAIGNERATTE\n
         <a href="https://senerh.github.io">Hakan SENER</a>
     </string>
+    <string name="updateFavoritesText">Modifier</string>
+    <string name="updateFavoritesDescriptionText">Sélectionnez vos mangas favoris qui apparaitrons sur l\'accueil</string>
 
 </resources>
