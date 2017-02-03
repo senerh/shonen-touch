@@ -116,7 +116,6 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
         super.onDestroy();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         new HistoryPreferencesDAO(this).updateHistoryList(manga, scan);
-        Toast.makeText(this.getApplicationContext(), "Historique mis à jour", Toast.LENGTH_LONG).show();
     }
 }
 

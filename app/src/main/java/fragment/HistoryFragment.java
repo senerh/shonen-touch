@@ -6,12 +6,14 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.shonen.shonentouch.R;
@@ -24,7 +26,10 @@ import adapter.HistoryAdapter;
 import dao.preferences.HistoryPreferencesDAO;
 import dao.shonentouch.InterfaceTaskShonentouchService;
 import dto.History;
+import dto.Manga;
 import holder.MangaViewHolder;
+import listener.ChatButtonListener;
+import listener.HistoryCleanerListener;
 
 /**
  * Created by Franck on 30/01/2017.
@@ -36,6 +41,10 @@ public class HistoryFragment extends ListFragment {
     private List<History> historyList;
     private HistoryAdapter historyAdapter;
     private HistoryPreferencesDAO historyPreferencesDAO;
+
+
+
+    private TextView emptyTextView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,11 +69,30 @@ public class HistoryFragment extends ListFragment {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
 
         history_list_view = (ListView) view.findViewById(android.R.id.list);
+        emptyTextView = (TextView) view.findViewById(R.id.empty_history);
 
         historyAdapter = new HistoryAdapter(getActivity().getBaseContext(), historyList);
         history_list_view.setAdapter(historyAdapter);
 
+        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        fab.setOnClickListener(
+                new HistoryCleanerListener(this)
+        );
+
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        historyList.clear();
+        historyList.addAll(historyPreferencesDAO.getHistoryList());
+        if (historyList.isEmpty()){
+            emptyTextView.setText("Historique vide");
+        }else{
+            emptyTextView.setText("");
+        }
+        historyAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -102,4 +130,15 @@ public class HistoryFragment extends ListFragment {
 
     }
 
+    public List<History> getHistoryList() {
+        return historyList;
+    }
+
+    public HistoryAdapter getHistoryAdapter() {
+        return historyAdapter;
+    }
+
+    public TextView getEmptyTextView() {
+        return emptyTextView;
+    }
 }
