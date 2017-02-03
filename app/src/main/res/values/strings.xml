@@ -30,5 +30,6 @@
     </string>
     <string name="updateFavoritesText">Modifier</string>
     <string name="updateFavoritesDescriptionText">Sélectionnez vos mangas favoris qui apparaitrons sur l\'accueil</string>
+    <string name="emptyHistoryText">L\'historique ne contient aucun élément.</string>
 
 </resources>

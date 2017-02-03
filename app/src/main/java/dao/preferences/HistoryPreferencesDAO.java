@@ -10,11 +10,8 @@ import dto.Manga;
 import dto.Scan;
 import dto.UtilsDTO;
 
-/**
- * Created by Franck on 20/01/2017.
- */
+public class HistoryPreferencesDAO extends AbstractPreferencesDAO {
 
-public class HistoryPreferencesDAO extends AbstractPreferencesDAO{
     private static final String HISTORY_LIST_KEY = "dao.preferences.HistoryPreferencesDAO.HISTORY_LIST_KEY";
 
     public HistoryPreferencesDAO(Context context) {
@@ -32,23 +29,26 @@ public class HistoryPreferencesDAO extends AbstractPreferencesDAO{
         return historyList;
     }
 
-    public void saveHistoryList(List<History> HistoryList) {
-        String historyListString = UtilsDTO.objectToJson(HistoryList);
-        savePreferences(HISTORY_LIST_KEY, historyListString);
-    }
-
-    public void updateHistoryList(Manga manga, Scan scan) {
+    public void addEntry(Manga manga, Scan scan) {
         History history = new History(manga,scan);
         List<History> historyList = getHistoryList();
-        List<History> historyListTemp = new ArrayList<>();
-        historyListTemp.add(history);
-        for (History current_history:historyList) {
-            if (!current_history.equals(history)) {
-                historyListTemp.add(current_history);
+        List<History> newHistoryList = new ArrayList<>();
+        newHistoryList.add(history);
+        for (History currentHistory : historyList) {
+            if (!currentHistory.equals(history)) {
+                newHistoryList.add(currentHistory);
             }
         }
 
-        String historyListString = UtilsDTO.objectToJson(historyListTemp);
+        saveHistoryList(newHistoryList);
+    }
+
+    public void clean() {
+        saveHistoryList(new ArrayList<History>());
+    }
+
+    private void saveHistoryList(List<History> historyList) {
+        String historyListString = UtilsDTO.objectToJson(historyList);
         savePreferences(HISTORY_LIST_KEY, historyListString);
     }
 }

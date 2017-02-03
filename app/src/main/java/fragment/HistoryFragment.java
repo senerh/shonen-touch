@@ -11,10 +11,8 @@ import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.shonen.shonentouch.R;
 
@@ -25,39 +23,28 @@ import activity.PageActivity;
 import adapter.HistoryAdapter;
 import dao.preferences.HistoryPreferencesDAO;
 import dao.shonentouch.InterfaceTaskShonentouchService;
+import dao.shonentouch.ScanShonentouchService;
 import dto.History;
-import dto.Manga;
-import holder.MangaViewHolder;
-import listener.ChatButtonListener;
+import dto.Scan;
 import listener.HistoryCleanerListener;
 
-/**
- * Created by Franck on 30/01/2017.
- */
+public class HistoryFragment extends ListFragment implements InterfaceTaskShonentouchService<List<Scan>> {
 
-public class HistoryFragment extends ListFragment {
-    private static final String ID_HISTORY_LIST = "activity.HistoryFragment.historyList";
     private ListView history_list_view;
     private List<History> historyList;
     private HistoryAdapter historyAdapter;
     private HistoryPreferencesDAO historyPreferencesDAO;
 
-
-
     private TextView emptyTextView;
+    private ProgressDialog progressDialog;
+    private List<Scan> scanList;
+    private History current_history;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         historyPreferencesDAO = new HistoryPreferencesDAO(getActivity());
-
-        if (savedInstanceState == null) {
-            historyList = historyPreferencesDAO.getHistoryList();
-        } else {
-            historyList = savedInstanceState.getParcelableArrayList(ID_HISTORY_LIST);
-
-        }
+        historyList = historyPreferencesDAO.getHistoryList();
     }
 
     @Override
@@ -87,10 +74,10 @@ public class HistoryFragment extends ListFragment {
         super.onStart();
         historyList.clear();
         historyList.addAll(historyPreferencesDAO.getHistoryList());
-        if (historyList.isEmpty()){
-            emptyTextView.setText("Historique vide");
-        }else{
-            emptyTextView.setText("");
+        if (historyList.isEmpty()) {
+            emptyTextView.setVisibility(View.VISIBLE);
+        } else {
+            emptyTextView.setVisibility(View.INVISIBLE);
         }
         historyAdapter.notifyDataSetChanged();
     }
@@ -105,29 +92,10 @@ public class HistoryFragment extends ListFragment {
         super.onDetach();
     }
 
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        ArrayList<History> historyArrayList = new ArrayList<>(historyList);
-        outState.putParcelableArrayList(ID_HISTORY_LIST, historyArrayList);
-    }
-
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        History current_history = historyList.get(position);
-        Toast.makeText(getActivity().getApplicationContext(), current_history.getManga().getName()+" - "+current_history.getScan().getNum(), Toast.LENGTH_LONG).show();
-
-        Intent myIntent = new Intent(getActivity(), PageActivity.class);
-
-        Bundle b = new Bundle();
-        b.putParcelable(ScanFragment.ID_MANGA_PARCELABLE, current_history.getManga());
-        b.putParcelable(ScanFragment.ID_SCAN_PARCELABLE, current_history.getScan());
-        myIntent.putExtras(b);
-
-        startActivity(myIntent);
-
+        current_history = historyList.get(position);
+        new ScanShonentouchService(this, current_history.getManga()).execute();
     }
 
     public List<History> getHistoryList() {
@@ -140,5 +108,40 @@ public class HistoryFragment extends ListFragment {
 
     public TextView getEmptyTextView() {
         return emptyTextView;
+    }
+
+    @Override
+    public void displayOnPostExecute(List<Scan> retrievedData) {
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        progressDialog.dismiss();
+        scanList = new ArrayList<>();
+        if (retrievedData != null) {
+            scanList.addAll(retrievedData);
+        }
+
+        Intent myIntent = new Intent(getActivity(), PageActivity.class);
+
+        Bundle b = new Bundle();
+        b.putParcelable(ScanFragment.ID_MANGA_PARCELABLE, current_history.getManga());
+        b.putParcelable(ScanFragment.ID_SCAN_PARCELABLE, current_history.getScan());
+        b.putParcelableArrayList(ScanFragment.ID_SCAN_LIST, new ArrayList<>(scanList));
+        myIntent.putExtras(b);
+
+        startActivity(myIntent);
+    }
+
+    @Override
+    public void displayOnPreExecute() {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
+
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setTitle("Chargement");
+        progressDialog.setMessage("Veuillez patienter pendant le chargement des scans");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
     }
 }
