@@ -32,13 +32,11 @@ public class HistoryAdapter extends ArrayAdapter<History> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        convertView = inflater.inflate(R.layout.element_history_list, parent, false);
 
         History history = getItem(position);
-
-        convertView = inflater.inflate(R.layout.element_history_list, parent, false);
         TextView textView = (TextView) convertView.findViewById(R.id.manga_history);
-
-        textView.setText(history.getManga().getName()+"-"+history.getScan().getNum());
+        textView.setText(history.getManga().getName()+" \t "+history.getScan().getNum());
 
         return convertView;
     }
