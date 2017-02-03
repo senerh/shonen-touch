@@ -7,7 +7,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -24,19 +23,25 @@ import dto.Manga;
 import dto.Scan;
 import fragment.FullPageTaskFragment;
 import fragment.ScanFragment;
+import listener.OnSwipeOutListener;
+import view.CustomViewPager;
 
 
 public class PageActivity extends FragmentActivity implements InterfaceFullPageShonentouchService {
 
-    private static final String FULL_PAGE_TASK_FRAGMENT = "FULL_PAGE_TASK_FRAGMENT";
+    private static final String FULL_PAGE_TASK_FRAGMENT = "activity.PageActivity.FULL_PAGE_TASK_FRAGMENT";
+    private static final String IS_LOADED_TAG = "activity.PageActivity.IS_LOADED_TAG";
+    private static final String FULL_PAGE_LIST_TAG = "activity.PageActivity.FULL_PAGE_LIST_TAG";
 
-    private ViewPager mPager;
+    private CustomViewPager mPager;
     private PagerAdapter mPagerAdapter;
     private List<FullPage> listFullPage;
     private Manga manga;
     private Scan scan;
+    private List<Scan> scanList;
     private ProgressDialog progressDialog;
     private FullPageTaskFragment fullPageTaskFragment;
+    private boolean isLoaded;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +52,7 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
 
         manga = b.getParcelable(ScanFragment.ID_MANGA_PARCELABLE);
         scan = b.getParcelable(ScanFragment.ID_SCAN_PARCELABLE);
+        scanList = b.getParcelableArrayList(ScanFragment.ID_SCAN_LIST);
 
         FragmentManager fragmentManager = getFragmentManager();
         fullPageTaskFragment = (FullPageTaskFragment) fragmentManager.findFragmentByTag(FULL_PAGE_TASK_FRAGMENT);
@@ -57,14 +63,18 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
 
         if (savedInstanceState == null) {
             listFullPage = new ArrayList<>();
-        }
-        else {
-            listFullPage = savedInstanceState.getParcelableArrayList("fullPageList");
+            isLoaded = false;
+        } else {
+            listFullPage = savedInstanceState.getParcelableArrayList(FULL_PAGE_LIST_TAG);
+            isLoaded = savedInstanceState.getBoolean(IS_LOADED_TAG);
         }
 
-        mPager = (ViewPager) findViewById(R.id.pager);
         mPagerAdapter = new SlidePageAdapter(getSupportFragmentManager(), listFullPage);
+        mPager = (CustomViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mPagerAdapter);
+        mPager.setOnSwipeOutListener(new OnSwipeOutListener(this));
+        mPager.setIsLoaded(isLoaded);
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
@@ -77,6 +87,9 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
         if (fullPageList == null || fullPageList.isEmpty()) {
             Toast.makeText(this.getApplicationContext(), "Aucune page n'a été trouvée, vérifiez votre connexion internet.", Toast.LENGTH_LONG).show();
             finish();
+        } else {
+            isLoaded = true;
+            mPager.setIsLoaded(isLoaded);
         }
     }
 
@@ -109,13 +122,26 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         ArrayList<FullPage> fullPagesArrayList = new ArrayList<>(listFullPage);
-        outState.putParcelableArrayList("fullPageList", fullPagesArrayList);
+        outState.putParcelableArrayList(FULL_PAGE_LIST_TAG, fullPagesArrayList);
+        outState.putBoolean(IS_LOADED_TAG, isLoaded);
     }
 
     public void onDestroy() {
         super.onDestroy();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         new HistoryPreferencesDAO(this).updateHistoryList(manga, scan);
+    }
+
+    public Manga getManga() {
+        return manga;
+    }
+
+    public Scan getScan() {
+        return scan;
+    }
+
+    public List<Scan> getScanList() {
+        return scanList;
     }
 }
 
