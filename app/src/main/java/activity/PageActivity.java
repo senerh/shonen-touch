@@ -75,6 +75,8 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
         mPager.setOnSwipeOutListener(new OnSwipeOutListener(this));
         mPager.setIsLoaded(isLoaded);
 
+        new HistoryPreferencesDAO(this).addEntry(manga, scan);
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
@@ -129,7 +131,6 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
     public void onDestroy() {
         super.onDestroy();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        new HistoryPreferencesDAO(this).updateHistoryList(manga, scan);
     }
 
     public Manga getManga() {
