@@ -25,7 +25,7 @@ public class UserPreferencesDAO extends AbstractPreferencesDAO {
     }
 
     public void saveUsername(String username) {
-        if (!username.equals(ChatSlackDAO.ADMIN_USERNAME) && username.length() < 20) {
+        if (!username.equals(ChatSlackDAO.ADMIN_USERNAME) && 0 < username.length() && username.length() < 20) {
             savePreferences(USERNAME_KEY, username);
         }
     }
