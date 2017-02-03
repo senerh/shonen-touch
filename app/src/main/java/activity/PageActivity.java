@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -119,3 +118,4 @@ public class PageActivity extends FragmentActivity implements InterfaceFullPageS
         Toast.makeText(this.getApplicationContext(), "Historique mis à jour", Toast.LENGTH_LONG).show();
     }
 }
+

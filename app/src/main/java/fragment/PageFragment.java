@@ -9,12 +9,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import com.shonen.shonentouch.R;
 import dto.FullPage;
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 
 public class PageFragment extends Fragment {
 
     public static final String ARG_PAGE = "page";
     private FullPage mFullPage;
+    private PhotoViewAttacher mAttacher;
 
     public PageFragment() {
 
@@ -44,6 +46,8 @@ public class PageFragment extends Fragment {
         ImageView imageMangaView = (ImageView)rootView.findViewById(R.id.image_manga);
         imageMangaView.setImageBitmap(mFullPage.getImage().getImage());
 
+        mAttacher = new PhotoViewAttacher(imageMangaView);
+
         View decorView = getActivity().getWindow().getDecorView();
 
         decorView.setSystemUiVisibility(
@@ -58,4 +62,5 @@ public class PageFragment extends Fragment {
 
         return rootView;
     }
+
 }
