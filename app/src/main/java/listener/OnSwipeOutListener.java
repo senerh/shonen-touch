@@ -2,7 +2,6 @@ package listener;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -10,7 +9,7 @@ import java.util.ArrayList;
 import activity.PageActivity;
 import dto.Scan;
 import fragment.ScanFragment;
-import widget.CustomViewPager;
+import view.CustomViewPager;
 
 public class OnSwipeOutListener implements CustomViewPager.OnSwipeOutListener {
 

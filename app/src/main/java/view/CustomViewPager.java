@@ -1,4 +1,4 @@
-package widget;
+package view;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
@@ -21,6 +21,17 @@ public class CustomViewPager extends ViewPager {
         super(context, attrs);
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        try {
+            return super.onTouchEvent(ev);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            Log.e(getClass().getName(), e.getMessage(), e);
+        }
+        return false;
+    }
+
     public void setOnSwipeOutListener(OnSwipeOutListener listener) {
         mListener = listener;
     }
@@ -30,25 +41,25 @@ public class CustomViewPager extends ViewPager {
         float x = ev.getX();
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                isSwipingOut = false;
                 mStartDragX = x;
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (mStartDragX < x && getCurrentItem() == 0) {
-                    if (!isSwipingOut) {
-                        isSwipingOut = true;
-                        mListener.onSwipeOutAtStart();
-                    }
-                } else if (isLoaded && mStartDragX > x && getCurrentItem() == getAdapter().getCount() - 1) {
-                    if (!isSwipingOut) {
-                        isSwipingOut = true;
-                        mListener.onSwipeOutAtEnd();
-                    }
-                } else if (isSwipingOut){
-                    isSwipingOut = false;
+                if (!isSwipingOut && mStartDragX < x && getCurrentItem() == 0) {
+                    isSwipingOut = true;
+                    mListener.onSwipeOutAtStart();
+                } else if (!isSwipingOut && isLoaded && mStartDragX > x && getCurrentItem() == getAdapter().getCount() - 1) {
+                    isSwipingOut = true;
+                    mListener.onSwipeOutAtEnd();
                 }
                 break;
         }
-        return super.onInterceptTouchEvent(ev);
+        try {
+            return super.onInterceptTouchEvent(ev);
+        } catch (IllegalArgumentException e) {
+            Log.e(getClass().getName(), e.getMessage(), e);
+        }
+        return false;
     }
 
     public void setIsLoaded(boolean isLoaded) {

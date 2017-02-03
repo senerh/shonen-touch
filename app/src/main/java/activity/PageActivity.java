@@ -24,7 +24,7 @@ import dto.Scan;
 import fragment.FullPageTaskFragment;
 import fragment.ScanFragment;
 import listener.OnSwipeOutListener;
-import widget.CustomViewPager;
+import view.CustomViewPager;
 
 
 public class PageActivity extends FragmentActivity implements InterfaceFullPageShonentouchService {
