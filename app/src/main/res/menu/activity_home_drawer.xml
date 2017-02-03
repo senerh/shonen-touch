@@ -6,24 +6,24 @@
             android:id="@+id/nav_home"
             android:icon="@drawable/ic_home_black_24px"
             android:color="#000000"
-            android:title="Accueil"
+            android:title="@string/menu_item_accueil"
             android:height="20dp"/>
         <item
             android:id="@+id/nav_favorite"
             android:icon="@drawable/ic_favorite_black_48px"
-            android:title="Favoris" />
+            android:title="@string/menu_item_favorites" />
         <item
             android:id="@+id/nav_history"
             android:icon="@drawable/ic_access_time_black_24dp"
-            android:title="Historique" />
+            android:title="@string/menu_item_history" />
         <item
             android:id="@+id/nav_preferences"
-            android:icon="@drawable/ic_menu_preferences"
-            android:title="Préférences" />
+            android:icon="@drawable/ic_build_black_24dp"
+            android:title="@string/menu_item_prefs" />
         <item
             android:id="@+id/nav_about"
-            android:icon="@drawable/ic_menu_about"
-            android:title="A propos" />
+            android:icon="@drawable/ic_local_offer_black_24dp"
+            android:title="@string/menu_item_about" />
     </group>
 
 </menu>
