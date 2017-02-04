@@ -1,7 +1,6 @@
 package fragment;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -12,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.shonen.shonentouch.R;
@@ -21,11 +21,14 @@ import java.util.List;
 
 import activity.PageActivity;
 import adapter.ScansAdapter;
+import dao.preferences.HistoryPreferencesDAO;
 import dao.shonentouch.InterfaceTaskShonentouchService;
 import dao.shonentouch.ScanShonentouchService;
+import dto.History;
 import dto.Manga;
 import dto.Scan;
 import listener.ChatButtonListener;
+import listener.LastScanListener;
 
 public class ScanFragment extends ListFragment implements InterfaceTaskShonentouchService<List<Scan>> {
 
@@ -37,6 +40,7 @@ public class ScanFragment extends ListFragment implements InterfaceTaskShonentou
     private ListView scan_list_view;
     private ScansAdapter scansAdapter;
     private ProgressDialog progressDialog;
+    private TextView lastScan;
 
     public ScanFragment() {
     }
@@ -69,8 +73,11 @@ public class ScanFragment extends ListFragment implements InterfaceTaskShonentou
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_manga, container, false);
-        scan_list_view = (ListView) view.findViewById(android.R.id.list);
 
+        lastScan  = (TextView) view.findViewById(R.id.last_scan);
+        addLastScanTextviewListener();
+
+        scan_list_view = (ListView) view.findViewById(android.R.id.list);
         scansAdapter = new ScansAdapter(getActivity().getBaseContext(), scanList);
         scan_list_view.setAdapter(scansAdapter);
 
@@ -90,13 +97,9 @@ public class ScanFragment extends ListFragment implements InterfaceTaskShonentou
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onStart() {
+        super.onStart();
+        addLastScanTextviewListener();
     }
 
     @Override
@@ -105,10 +108,11 @@ public class ScanFragment extends ListFragment implements InterfaceTaskShonentou
         progressDialog.dismiss();
         if (scanList == null) {
             Toast.makeText(getActivity().getApplicationContext(), "Aucun scan n'a été trouvé, vérifiez votre connexion internet.", Toast.LENGTH_LONG).show();
-
         } else {
             this.scanList.addAll(scanList);
             scansAdapter.notifyDataSetChanged();
+
+            addLastScanTextviewListener();
         }
     }
 
@@ -136,14 +140,34 @@ public class ScanFragment extends ListFragment implements InterfaceTaskShonentou
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
+        Manga manga = getArguments().getParcelable(ID_MANGA_PARCELABLE);
+        Scan scan = scanList.get(position);
+        startPageActivity(manga, scan, scanList);
+    }
+
+    public void startPageActivity(Manga manga, Scan scan, List<Scan> scanList) {
         Intent myIntent = new Intent(getActivity(), PageActivity.class);
 
         Bundle b = new Bundle();
-        b.putParcelable(ID_MANGA_PARCELABLE, this.getArguments().getParcelable(ID_MANGA_PARCELABLE));
-        b.putParcelable(ID_SCAN_PARCELABLE, scanList.get(position));
+        b.putParcelable(ID_MANGA_PARCELABLE, manga);
+        b.putParcelable(ID_SCAN_PARCELABLE, scan);
         b.putParcelableArrayList(ID_SCAN_LIST, new ArrayList<>(scanList));
         myIntent.putExtras(b);
 
         startActivity(myIntent);
+    }
+
+    private void addLastScanTextviewListener() {
+        Manga manga = getArguments().getParcelable(ID_MANGA_PARCELABLE);
+        History history = new HistoryPreferencesDAO(getContext()).getLastEntry(manga);
+        if (history == null || scanList == null || scanList.isEmpty()) {
+            lastScan.setVisibility(View.GONE);
+            lastScan.setOnClickListener(null);
+        } else {
+            lastScan.setOnClickListener(new LastScanListener(this, history, scanList));
+            String text = getContext().getString(R.string.continueLastScan, history.getScan().getNum());
+            lastScan.setText(text);
+            lastScan.setVisibility(View.VISIBLE);
+        }
     }
 }
