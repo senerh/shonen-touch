@@ -43,12 +43,22 @@ public class HistoryPreferencesDAO extends AbstractPreferencesDAO {
         saveHistoryList(newHistoryList);
     }
 
-    public void clean() {
+    public void clear() {
         saveHistoryList(new ArrayList<History>());
     }
 
     private void saveHistoryList(List<History> historyList) {
         String historyListString = UtilsDTO.objectToJson(historyList);
         savePreferences(HISTORY_LIST_KEY, historyListString);
+    }
+
+    public History getLastEntry(Manga manga) {
+        List<History> historyList = getHistoryList();
+        for (History history : historyList) {
+            if (history.getManga().equals(manga)) {
+                return history;
+            }
+        }
+        return null;
     }
 }

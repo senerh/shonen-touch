@@ -15,7 +15,7 @@ public class HistoryCleanerListener implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        new HistoryPreferencesDAO(historyFragment.getContext()).clean();
+        new HistoryPreferencesDAO(historyFragment.getContext()).clear();
         historyFragment.getHistoryList().clear();
         historyFragment.getHistoryAdapter().notifyDataSetChanged();
         historyFragment.getEmptyTextView().setVisibility(View.VISIBLE);
