@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import com.google.common.io.ByteStreams;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -59,7 +61,16 @@ public class MethodShonentouchDAO {
             connection.setDoInput(true);
             connection.connect();
             InputStream input = connection.getInputStream();
-            bitmap = BitmapFactory.decodeStream(input);
+
+            byte[] bytes = ByteStreams.toByteArray(input);
+            //permet de charger les jpg corrompus
+            if (bytes != null && bytes.length >= 4 && bytes[0] == (byte)0xFF && bytes[1] == (byte)0xD8) {
+                bytes[bytes.length - 2] = (byte) 0xFF;
+                bytes[bytes.length - 1] = (byte) 0xD9;
+            }
+
+            bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            connection.disconnect();
         } catch (IOException e) {
             Log.e(MethodShonentouchDAO.class.getName(), "Error while downloading image from <~" + address + "~>.");
             Log.e(e.getClass().getName(), e.getMessage(), e);
