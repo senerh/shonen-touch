@@ -24,6 +24,9 @@ public class ChannelSlackDAO {
     }
 
     public static Channel getChannelByName(String name) throws SlackDAOException {
+        //slack limite le nom d'un channel à 21 caractères.
+        name = name.substring(0, Math.min(name.length(), 21));
+
         List<Channel> channelList = getChannelList();
         Channel channel = new Channel("", name);
         int index = channelList.indexOf(channel);

@@ -32,5 +32,6 @@
     <string name="updateFavoritesDescriptionText">Sélectionnez vos mangas favoris qui apparaitrons sur l\'accueil</string>
     <string name="emptyHistoryText">L\'historique ne contient aucun élément.</string>
     <string name="continueLastScan">Reprendre la lecture du scan %1$s</string>
+    <string name="emptyFavortiteText"><![CDATA[Sélectionnez vos favoris depuis le menu Réglages > Favoris]]></string>
 
 </resources>
