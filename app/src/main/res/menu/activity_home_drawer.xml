@@ -5,7 +5,6 @@
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/ic_home_black_24px"
-            android:color="#000000"
             android:title="@string/menu_item_accueil"
             android:height="20dp"/>
         <item

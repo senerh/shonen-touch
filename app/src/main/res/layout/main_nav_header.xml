@@ -13,13 +13,13 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
 
-    <TextView android:id="@+id/nav_header_title"
+    <view.MangaTextView android:id="@+id/nav_header_title"
         android:layout_weight="1"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginTop="20dp"
-        android:textSize="38sp"
+        android:textSize="30sp"
         android:textColor="@color/textColor"
-        android:text="@string/app_name"/>
+        android:text="@string/app_name" />
 
 </LinearLayout>
