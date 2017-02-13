@@ -54,7 +54,9 @@ public class ChatSlackService {
     }
 
     public void sendMessage(final Message message) {
-        if (message.equals("")) {
+        if (message.getMessage().isEmpty() ||
+                message.getMessage().equals("") ||
+                message.getMessage().length() > 200) {
             return;
         }
         new Thread() {

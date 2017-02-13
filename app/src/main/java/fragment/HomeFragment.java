@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.shonen.shonentouch.R;
 
@@ -27,6 +28,7 @@ public class HomeFragment extends ListFragment {
     private ListView manga_list_view;
     private MainActivity mainActivity;
     private FavoritesPreferencesDAO favoritesPreferencesDAO;
+    private TextView emptyFavoriteTextView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,8 @@ public class HomeFragment extends ListFragment {
         getActivity().setTitle(R.string.menu_item_accueil);
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        emptyFavoriteTextView = (TextView) view.findViewById(R.id.empty_favorite);
         manga_list_view = (ListView) view.findViewById(android.R.id.list);
         homeAdapter = new HomeAdapter(getActivity().getBaseContext(), mangaList);
         manga_list_view.setAdapter(homeAdapter);
@@ -55,6 +59,12 @@ public class HomeFragment extends ListFragment {
         mangaList.clear();
         mangaList.addAll(favoritesPreferencesDAO.getFavoriteMangaList());
         homeAdapter.notifyDataSetChanged();
+
+        if (mangaList.isEmpty()) {
+            emptyFavoriteTextView.setVisibility(View.VISIBLE);
+        } else {
+            emptyFavoriteTextView.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
