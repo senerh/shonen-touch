@@ -14,8 +14,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.shonen.shonentouch.R;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +25,7 @@ import dao.shonentouch.ScanShonentouchService;
 import dto.History;
 import dto.Manga;
 import dto.Scan;
+import io.github.senerh.shonentouch.R;
 import listener.ChatButtonListener;
 import listener.LastScanListener;
 

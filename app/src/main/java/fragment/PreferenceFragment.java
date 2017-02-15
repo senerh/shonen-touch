@@ -8,9 +8,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.shonen.shonentouch.R;
-
 import dao.preferences.UserPreferencesDAO;
+import io.github.senerh.shonentouch.R;
 import listener.PreferencesListener;
 
 public class PreferenceFragment extends Fragment {

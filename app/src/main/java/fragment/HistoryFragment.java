@@ -14,8 +14,6 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.shonen.shonentouch.R;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +24,7 @@ import dao.shonentouch.InterfaceTaskShonentouchService;
 import dao.shonentouch.ScanShonentouchService;
 import dto.History;
 import dto.Scan;
+import io.github.senerh.shonentouch.R;
 import listener.HistoryCleanerListener;
 
 public class HistoryFragment extends ListFragment implements InterfaceTaskShonentouchService<List<Scan>> {

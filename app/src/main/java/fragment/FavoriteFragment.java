@@ -6,24 +6,23 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
-import com.shonen.shonentouch.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import activity.MainActivity;
 import adapter.FavoritesAdapter;
 import dao.preferences.FavoritesPreferencesDAO;
 import dao.shonentouch.InterfaceTaskShonentouchService;
 import dao.shonentouch.MangaShonentouchService;
 import dto.Manga;
 import holder.MangaViewHolder;
+import io.github.senerh.shonentouch.R;
 
 
 public class FavoriteFragment extends ListFragment implements InterfaceTaskShonentouchService<List<Manga>> {

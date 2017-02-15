@@ -7,8 +7,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.shonen.shonentouch.R;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +16,7 @@ import dao.slack.ChatSlackService;
 import dao.slack.InterfaceChatSlackServiceConsumer;
 import dto.Manga;
 import dto.Message;
+import io.github.senerh.shonentouch.R;
 
 public class ChatActivity extends AppCompatActivity implements InterfaceChatSlackServiceConsumer{
 

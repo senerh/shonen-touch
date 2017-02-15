@@ -8,11 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.shonen.shonentouch.R;
-
 import java.util.List;
 
 import dto.Manga;
+import io.github.senerh.shonentouch.R;
 
 
 public class HomeAdapter extends ArrayAdapter<Manga> {

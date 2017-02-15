@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.shonen.shonentouch.R;
+import io.github.senerh.shonentouch.R;
 
 public class AboutFragment extends Fragment {
 

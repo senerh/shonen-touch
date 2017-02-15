@@ -1,7 +1,6 @@
 package adapter;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,12 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.shonen.shonentouch.R;
-
 import java.util.List;
 
 import dto.Scan;
-
+import io.github.senerh.shonentouch.R;
 
 public class ScansAdapter extends ArrayAdapter<Scan> {
 

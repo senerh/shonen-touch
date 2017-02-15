@@ -6,12 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
-import com.shonen.shonentouch.R;
-
 import activity.MainActivity;
 import dao.preferences.UserPreferencesDAO;
 import fragment.FavoriteFragment;
 import fragment.PreferenceFragment;
+import io.github.senerh.shonentouch.R;
 
 public class PreferencesListener implements View.OnClickListener {
 
