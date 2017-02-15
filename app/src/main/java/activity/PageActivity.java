@@ -10,8 +10,6 @@ import android.support.v4.view.PagerAdapter;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.shonen.shonentouch.R;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +21,7 @@ import dto.Manga;
 import dto.Scan;
 import fragment.FullPageTaskFragment;
 import fragment.ScanFragment;
+import io.github.senerh.shonentouch.R;
 import listener.OnSwipeOutListener;
 import view.CustomViewPager;
 

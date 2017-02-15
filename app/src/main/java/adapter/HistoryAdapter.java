@@ -8,15 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.shonen.shonentouch.R;
-
 import java.util.List;
 
 import dto.History;
-
-/**
- * Created by Franck on 31/01/2017.
- */
+import io.github.senerh.shonentouch.R;
 
 public class HistoryAdapter extends ArrayAdapter<History> {
     private Context context;

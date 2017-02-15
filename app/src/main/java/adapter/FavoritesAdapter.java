@@ -9,12 +9,11 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import com.shonen.shonentouch.R;
-
 import java.util.List;
 
 import dto.Manga;
 import holder.MangaViewHolder;
+import io.github.senerh.shonentouch.R;
 
 public class FavoritesAdapter extends ArrayAdapter<Manga> {
 

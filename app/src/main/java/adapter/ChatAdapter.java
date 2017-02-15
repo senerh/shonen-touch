@@ -8,13 +8,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.shonen.shonentouch.R;
-
 import java.util.List;
 
 import dao.preferences.UserPreferencesDAO;
 import dao.slack.ChatSlackDAO;
 import dto.Message;
+import io.github.senerh.shonentouch.R;
 
 public class ChatAdapter extends ArrayAdapter<Message> {
 

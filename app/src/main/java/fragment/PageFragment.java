@@ -7,8 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import com.shonen.shonentouch.R;
+
 import dto.FullPage;
+import io.github.senerh.shonentouch.R;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 

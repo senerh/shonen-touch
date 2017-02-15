@@ -10,8 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.shonen.shonentouch.R;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +17,7 @@ import activity.MainActivity;
 import adapter.HomeAdapter;
 import dao.preferences.FavoritesPreferencesDAO;
 import dto.Manga;
+import io.github.senerh.shonentouch.R;
 
 
 public class HomeFragment extends ListFragment {

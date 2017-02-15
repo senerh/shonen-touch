@@ -4,7 +4,7 @@ android {
     compileSdkVersion 24
     buildToolsVersion "24.0.3"
     defaultConfig {
-        applicationId 'com.shonen.shonentouch'
+        applicationId 'io.github.senerh.shonentouch'
         minSdkVersion 16
         targetSdkVersion 24
         versionCode 1
