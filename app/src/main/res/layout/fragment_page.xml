@@ -1,13 +1,19 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/slide_content"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
-    <ImageView
-        android:id="@+id/image_manga"
+    <ScrollView
+        android:id="@+id/slide_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:layout_gravity="center_vertical" />
+        android:layout_centerVertical="true">
 
-</ScrollView>
+        <ImageView
+            android:id="@+id/image_manga"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"/>
+
+    </ScrollView>
+
+</RelativeLayout>

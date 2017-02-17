@@ -1,5 +1,7 @@
 package fragment;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,7 +17,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class PageFragment extends Fragment {
 
-    public static final String ARG_PAGE = "page";
+    public static final String FULL_PAGE_KEY = "fragment.FULL_PAGE_KEY";
     private FullPage mFullPage;
     private PhotoViewAttacher mAttacher;
 
@@ -26,7 +28,7 @@ public class PageFragment extends Fragment {
     public static PageFragment create(FullPage fullPage) {
         PageFragment fragment = new PageFragment();
         Bundle args = new Bundle();
-        args.putParcelable(ARG_PAGE, fullPage);
+        args.putParcelable(FULL_PAGE_KEY, fullPage);
         fragment.setArguments(args);
         return fragment;
     }
@@ -34,7 +36,7 @@ public class PageFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mFullPage = getArguments().getParcelable(ARG_PAGE);
+        mFullPage = getArguments().getParcelable(FULL_PAGE_KEY);
     }
 
     @Override
@@ -45,7 +47,8 @@ public class PageFragment extends Fragment {
                 .inflate(R.layout.fragment_page, container, false);
 
         ImageView imageMangaView = (ImageView)rootView.findViewById(R.id.image_manga);
-        imageMangaView.setImageBitmap(mFullPage.getImage().getImage());
+        Bitmap bitmap = bytesToBitmap(mFullPage.getImage().getImageBytes());
+        imageMangaView.setImageBitmap(bitmap);
 
         mAttacher = new PhotoViewAttacher(imageMangaView);
 
@@ -62,6 +65,11 @@ public class PageFragment extends Fragment {
         decorView.setBackgroundColor(Color.BLACK);
 
         return rootView;
+    }
+
+    private static Bitmap bytesToBitmap(byte[] bytes) {
+        System.gc();
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
 }
