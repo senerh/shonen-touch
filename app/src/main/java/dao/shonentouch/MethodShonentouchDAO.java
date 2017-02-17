@@ -1,7 +1,5 @@
 package dao.shonentouch;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.google.common.io.ByteStreams;
@@ -43,18 +41,17 @@ public class MethodShonentouchDAO {
                 "/image";
         Image image = UtilsShonentouchDAO.get(path, Image.class);
         if (image != null) {
-            Bitmap bitmap = downloadImage(image.getUrl());
-            image.setImage(bitmap);
-            if (bitmap == null) {
+            byte[] bytes = downloadImageBytes(image.getUrl());
+            image.setImageBytes(bytes);
+            if (bytes == null) {
                 image = null;
             }
         }
         return image;
     }
 
-    public static Bitmap downloadImage(String address) {
-        System.gc();
-        Bitmap bitmap = null;
+    public static byte[] downloadImageBytes(String address) {
+        byte[] bytes = null;
         try {
             URL url = new URL(address);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -62,19 +59,17 @@ public class MethodShonentouchDAO {
             connection.connect();
             InputStream input = connection.getInputStream();
 
-            byte[] bytes = ByteStreams.toByteArray(input);
+            bytes = ByteStreams.toByteArray(input);
             //permet de charger les jpg corrompus
             if (bytes != null && bytes.length >= 4 && bytes[0] == (byte)0xFF && bytes[1] == (byte)0xD8) {
                 bytes[bytes.length - 2] = (byte) 0xFF;
                 bytes[bytes.length - 1] = (byte) 0xD9;
             }
-
-            bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
             connection.disconnect();
         } catch (IOException e) {
             Log.e(MethodShonentouchDAO.class.getName(), "Error while downloading image from <~" + address + "~>.");
             Log.e(e.getClass().getName(), e.getMessage(), e);
         }
-        return bitmap;
+        return bytes;
     }
 }

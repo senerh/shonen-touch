@@ -1,18 +1,19 @@
 package dto;
 
-import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Arrays;
+
 public class Image implements Parcelable {
 
     private String url;
 
     @JsonIgnore
-    private Bitmap image;
+    private byte[] imageBytes;
 
     public Image() {
 
@@ -24,7 +25,7 @@ public class Image implements Parcelable {
 
     private Image(Parcel in) {
         url = in.readString();
-        image = in.readParcelable(Bitmap.class.getClassLoader());
+        in.readByteArray(imageBytes);
     }
 
     public String getUrl() {
@@ -36,13 +37,13 @@ public class Image implements Parcelable {
     }
 
     @JsonIgnore
-    public Bitmap getImage() {
-        return image;
+    public byte[] getImageBytes() {
+        return imageBytes;
     }
 
     @JsonProperty
-    public void setImage(Bitmap image) {
-        this.image = image;
+    public void setImageBytes(byte[] imageBytes) {
+        this.imageBytes = imageBytes;
     }
 
     @Override
@@ -50,17 +51,16 @@ public class Image implements Parcelable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Image image1 = (Image) o;
+        Image image = (Image) o;
 
-        if (url != null ? !url.equals(image1.url) : image1.url != null) return false;
-        return image != null ? image.equals(image1.image) : image1.image == null;
-
+        if (url != null ? !url.equals(image.url) : image.url != null) return false;
+        return Arrays.equals(imageBytes, image.imageBytes);
     }
 
     @Override
     public int hashCode() {
         int result = url != null ? url.hashCode() : 0;
-        result = 31 * result + (image != null ? image.hashCode() : 0);
+        result = 31 * result + Arrays.hashCode(imageBytes);
         return result;
     }
 
@@ -68,7 +68,7 @@ public class Image implements Parcelable {
     public String toString() {
         return "Image{" +
                 "url='" + url + '\'' +
-                ", image=" + image +
+                ", imageBytes=" + Arrays.toString(imageBytes) +
                 '}';
     }
 
@@ -80,7 +80,7 @@ public class Image implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(url);
-        dest.writeValue(image);
+        dest.writeByteArray(imageBytes);
     }
 
     public static final Creator<Image> CREATOR = new Creator<Image>() {
