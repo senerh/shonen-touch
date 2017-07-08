@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="controller.activities.HomeActivity"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/app_bar"
+        layout="@layout/app_bar_main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <fragment
+        android:id="@+id/plugs_list_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="controller.fragments.MangaListFragment"
+        tools:layout="@layout/fragment_manga_list"/>
+
+    <!--<include layout="@layout/content_plugs_list" />-->
+
+</LinearLayout>
