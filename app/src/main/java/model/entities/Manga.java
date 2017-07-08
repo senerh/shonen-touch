@@ -9,12 +9,20 @@ public class Manga {
 
     private String mName;
 
+    public Manga() {
+    }
+
+    public Manga(String name, String slug) {
+        mSlug = slug;
+        mName = name;
+    }
+
     public String getName() {
         return mName;
     }
 
     public void setName(String name) {
-        this.mName = name;
+        mName = name;
     }
 
     public String getSlug() {
@@ -22,6 +30,6 @@ public class Manga {
     }
 
     public void setSlug(String slug) {
-        this.mSlug = slug;
+        mSlug = slug;
     }
 }

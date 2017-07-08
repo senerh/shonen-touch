@@ -23,6 +23,9 @@
         <activity android:name="activity.PageActivity" />
         <activity android:name="activity.MainActivity" />
         <activity android:name="activity.ChatActivity" />
+        <activity
+            android:name="controller.activities.AddNewMangaActivity"
+            android:parentActivityName="controller.activities.HomeActivity"/>
 
         <service
             android:name="model.services.WSIntentService" />

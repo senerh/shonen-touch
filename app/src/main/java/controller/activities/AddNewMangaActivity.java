@@ -1,6 +1,7 @@
 package controller.activities;
 
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -15,6 +16,11 @@ public class AddNewMangaActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_toolbar);
         setSupportActionBar(toolbar);
 //        Stetho.initializeWithDefaults(this); // for debug only, don't worry
+
+        ActionBar ab = getSupportActionBar();
+
+        // Enable the Up button
+        ab.setDisplayHomeAsUpEnabled(true);
 
     }
 }

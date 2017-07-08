@@ -32,6 +32,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import controller.activities.AddNewMangaActivity;
 import io.github.senerh.shonentouch.R;
 import model.services.WSIntentService;
 
@@ -67,7 +68,7 @@ public class MangaListFragment extends Fragment implements View.OnClickListener 
         switch (v.getId())
         {
             case R.id.meurguez:
-                Intent intent = new Intent(getActivity(), AddNewMangaFragment.class);
+                Intent intent = new Intent(getActivity(), AddNewMangaActivity.class);
                 startActivity(intent);
                 break;
             default :
