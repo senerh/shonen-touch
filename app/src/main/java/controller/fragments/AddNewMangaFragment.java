@@ -61,9 +61,9 @@ public class AddNewMangaFragment extends Fragment implements View.OnClickListene
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-//        getActivity().getApplicationContext().deleteDatabase("Plug.db");
+//        getActivity().getApplicationContext().deleteDatabase("Manga.db");
 //        mPlugsList = readPlugsInDb();
-//        int nbRowsDeleted = getActivity().getApplicationContext().getContentResolver().delete(PlugContract.Measure.CONTENT_URI, null, null);
+//        int nbRowsDeleted = getActivity().getApplicationContext().getContentResolver().delete(ShonenTouchContract.Measure.CONTENT_URI, null, null);
 //        Date date = new Date(1483225200000l);
 //        Date date = new Date(1483225200000l);
 //        mWifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
