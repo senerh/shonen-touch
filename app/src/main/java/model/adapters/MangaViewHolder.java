@@ -17,7 +17,7 @@ public class MangaViewHolder extends RecyclerView.ViewHolder implements View.OnC
 
     public MangaViewHolder(View itemView) {
         super(itemView);
-        mMangaNameTextView = (TextView) itemView.findViewById(R.id.text_view_manga_name);
+        mMangaNameTextView = (TextView) itemView.findViewById(android.R.id.text1);
     }
 
     public MangaViewHolder(View itemView, MangaAdapterListener listener) {

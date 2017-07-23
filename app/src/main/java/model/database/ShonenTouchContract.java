@@ -37,7 +37,89 @@ public final class ShonenTouchContract {
         private Manga() { }
 
         /**
-         * The table that stores plugs.
+         * The table that stores mangas.
+         */
+        public static final String TABLE_NAME = "manga";
+        /**
+         * The {@link Uri} for querying manga.
+         */
+        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE_NAME);
+        /**
+         * The {@link Uri} for querying a particular manga.
+         */
+        public static final Uri CONTENT_ID_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE_NAME + "/");
+        /**
+         * The MIME type for multiple mangas.
+         */
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + AUTHORITY + "." + TABLE_NAME;
+        /**
+         * The MIME type for a particular manga.
+         */
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + AUTHORITY + "." + TABLE_NAME;
+    }
+
+    public interface ScanColumns extends BaseColumns {
+
+        // Define the table schema
+        public static final String NAME = "name";
+        public static final String MANGA_ID = "mangaId";
+
+        String[] PROJECTION = {
+                _ID,
+                NAME,
+                MANGA_ID
+        };
+    }
+
+    public static final class Scan {
+
+        // This class cannot be instantiated.
+        private Scan() { }
+
+        /**
+         * The table that stores mangas.
+         */
+        public static final String TABLE_NAME = "manga";
+        /**
+         * The {@link Uri} for querying manga.
+         */
+        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE_NAME);
+        /**
+         * The {@link Uri} for querying a particular manga.
+         */
+        public static final Uri CONTENT_ID_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE_NAME + "/");
+        /**
+         * The MIME type for multiple mangas.
+         */
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + AUTHORITY + "." + TABLE_NAME;
+        /**
+         * The MIME type for a particular manga.
+         */
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + AUTHORITY + "." + TABLE_NAME;
+    }
+
+    public interface PageColumns extends BaseColumns {
+
+        // Define the table schema
+        public static final String PATH = "path";
+        public static final String MANGA_ID = "mangaId";
+        public static final String SCAN_ID = "scanId";
+
+        String[] PROJECTION = {
+                _ID,
+                PATH,
+                MANGA_ID,
+                SCAN_ID
+        };
+    }
+
+    public static final class Page {
+
+        // This class cannot be instantiated.
+        private Page() { }
+
+        /**
+         * The table that stores mangas.
          */
         public static final String TABLE_NAME = "manga";
         /**

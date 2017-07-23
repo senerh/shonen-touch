@@ -1,14 +1,11 @@
 package controller.fragments;
 
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -17,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +24,7 @@ import model.adapters.MangaAdapterListener;
 import model.entities.Manga;
 import model.services.WSIntentService;
 
-public class AddNewMangaFragment extends Fragment implements View.OnClickListener, MangaAdapterListener {
+public class MangaOverviewFragment extends Fragment implements View.OnClickListener, MangaAdapterListener {
     private RecyclerView mMangaRecyclerView;
     private MangaAdapter mMangaAdapter;
     private List<Manga> mMangaList;
@@ -37,16 +33,7 @@ public class AddNewMangaFragment extends Fragment implements View.OnClickListene
         @Override
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
-                case WSIntentService.GET_ALL_MANGA:
-                    List<String> names = intent.getStringArrayListExtra(WSIntentService.PARAM_MANGA_NAMES);
-                    List<String> slugs = intent.getStringArrayListExtra(WSIntentService.PARAM_MANGA_SLUGS);
 
-                    for (int i = 0; i < names.size(); i++) {
-                        mMangaList.add(new Manga(names.get(i), slugs.get(i)));
-                    }
-
-                    mMangaAdapter.notifyDataSetChanged();
-                    break;
                 default :
                     break;
             }
@@ -56,7 +43,7 @@ public class AddNewMangaFragment extends Fragment implements View.OnClickListene
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_add_new_manga, null, false);
+        return inflater.inflate(R.layout.fragment_manga_overview, null, false);
     }
 
     @Override
@@ -75,7 +62,7 @@ public class AddNewMangaFragment extends Fragment implements View.OnClickListene
 
         mMangaRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_manga);
         mMangaList = new ArrayList<>();
-        mMangaAdapter = new MangaAdapter(mMangaList, this);
+//        mMangaAdapter = new MangaAdapter(mMangaList, this);
         mMangaRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
         mMangaRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mMangaRecyclerView.setAdapter(mMangaAdapter);

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="controller.activities.AddNewMangaActivity"
+    tools:context="controller.activities.MangaActivity"
     android:orientation="vertical">
 
     <include
@@ -17,7 +17,7 @@
         android:id="@+id/plugs_list_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="controller.fragments.AddNewMangaFragment"
+        android:name="controller.fragments.MangaOverviewFragment"
         tools:layout="@layout/fragment_manga_list"/>
 
     <!--<include layout="@layout/content_plugs_list" />-->

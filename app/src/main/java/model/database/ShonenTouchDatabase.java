@@ -22,6 +22,23 @@ public class ShonenTouchDatabase extends SQLiteOpenHelper {
                         ShonenTouchContract.MangaColumns._ID + " INTEGER PRIMARY KEY, " +
                         ShonenTouchContract.MangaColumns.NAME + " TEXT NOT NULL UNIQUE, " +
                         ShonenTouchContract.MangaColumns.SLUG + " TEXT);";
+
+        String CREATE_SCAN =
+                "CREATE TABLE " + ShonenTouchContract.Scan.TABLE_NAME + " (" +
+                        ShonenTouchContract.ScanColumns._ID + " INTEGER PRIMARY KEY, " +
+                        ShonenTouchContract.ScanColumns.NAME + " TEXT NOT NULL UNIQUE, " +
+                        ShonenTouchContract.ScanColumns.MANGA_ID + " INTEGER," +
+                        "FOREIGN KEY (" + ShonenTouchContract.ScanColumns.MANGA_ID + ")" +
+                        "REFERENCES " + ShonenTouchContract.Manga.TABLE_NAME + " (" + ShonenTouchContract.MangaColumns._ID + ") ON DELETE CASCADE);";
+
+        String CREATE_PAGE =
+                "CREATE TABLE " + ShonenTouchContract.Page.TABLE_NAME + " (" +
+                        ShonenTouchContract.PageColumns._ID + " INTEGER PRIMARY KEY, " +
+                        ShonenTouchContract.PageColumns.PATH + " TEXT NOT NULL UNIQUE, " +
+                        ShonenTouchContract.PageColumns.MANGA_ID + " INTEGER," +
+                        ShonenTouchContract.PageColumns.SCAN_ID + " INTEGER," +
+                        "FOREIGN KEY (" + ShonenTouchContract.ScanColumns.MANGA_ID + ")" +
+                        "REFERENCES " + ShonenTouchContract.Manga.TABLE_NAME + " (" + ShonenTouchContract.MangaColumns._ID + ") ON DELETE CASCADE);";
     }
 
     public ShonenTouchDatabase(Context context){
