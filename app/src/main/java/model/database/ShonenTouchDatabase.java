@@ -35,10 +35,10 @@ public class ShonenTouchDatabase extends SQLiteOpenHelper {
                 "CREATE TABLE " + ShonenTouchContract.Page.TABLE_NAME + " (" +
                         ShonenTouchContract.PageColumns._ID + " INTEGER PRIMARY KEY, " +
                         ShonenTouchContract.PageColumns.PATH + " TEXT NOT NULL UNIQUE, " +
-                        ShonenTouchContract.PageColumns.MANGA_ID + " INTEGER," +
+//                        ShonenTouchContract.PageColumns.MANGA_ID + " INTEGER," +
                         ShonenTouchContract.PageColumns.SCAN_ID + " INTEGER," +
-                        "FOREIGN KEY (" + ShonenTouchContract.ScanColumns.MANGA_ID + ")" +
-                        "REFERENCES " + ShonenTouchContract.Manga.TABLE_NAME + " (" + ShonenTouchContract.MangaColumns._ID + ") ON DELETE CASCADE);";
+                        "FOREIGN KEY (" + ShonenTouchContract.PageColumns.SCAN_ID + ")" +
+                        "REFERENCES " + ShonenTouchContract.Scan.TABLE_NAME + " (" + ShonenTouchContract.ScanColumns._ID + ") ON DELETE CASCADE);";
     }
 
     public ShonenTouchDatabase(Context context){
@@ -47,8 +47,9 @@ public class ShonenTouchDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-//        db.setForeignKeyConstraintsEnabled(true);
         db.execSQL(Tables.CREATE_MANGA);
+        db.execSQL(Tables.CREATE_SCAN);
+        db.execSQL(Tables.CREATE_PAGE);
     }
 
     @Override

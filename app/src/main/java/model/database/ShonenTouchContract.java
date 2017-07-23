@@ -102,13 +102,13 @@ public final class ShonenTouchContract {
 
         // Define the table schema
         public static final String PATH = "path";
-        public static final String MANGA_ID = "mangaId";
+//        public static final String MANGA_ID = "mangaId";
         public static final String SCAN_ID = "scanId";
 
         String[] PROJECTION = {
                 _ID,
                 PATH,
-                MANGA_ID,
+//                MANGA_ID,
                 SCAN_ID
         };
     }

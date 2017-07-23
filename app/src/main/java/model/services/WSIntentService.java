@@ -30,8 +30,6 @@ public class WSIntentService extends IntentService {
     public static final String URL_SERVER = "http://senerh.xyz:8080/shonen-touch-api/";
     public static final String GET_ALL_MANGA = URL_SERVER + "mangas";
 
-//    public static final String PARAM_MANGA_NAMES = "mangaNames";
-//    public static final String PARAM_MANGA_SLUGS = "mangaSlugs";
     public static final String PARAM_MANGAS_LIST = "mangasList";
 
     public WSIntentService() {
@@ -55,26 +53,18 @@ public class WSIntentService extends IntentService {
         try {
             URL url = new URL(u);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-//            urlConnection.setRequestProperty("Content-Type","application/json");
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
             Scanner s = new Scanner(in).useDelimiter("\\A");
             String result = s.hasNext() ? s.next() : "";
-//            intent.putExtra("Response", result);
 
             List<Manga> mangas = new ArrayList<>();
-//            ArrayList<String> names = new ArrayList<>();
-//            ArrayList<String> slugs = new ArrayList<>();
             JSONArray tabManga = new JSONArray(result);
 
             for (int i = 0; i < tabManga.length(); i++) {
                 JSONObject currentManga = tabManga.getJSONObject(i);
-//                slugs.add(currentManga.getString("slug"));
-//                names.add(currentManga.getString("name"));
                 mangas.add(new Manga(currentManga.getString("name"), currentManga.getString("slug")));
             }
 
-//            intent.putStringArrayListExtra(PARAM_MANGA_NAMES, names);
-//            intent.putStringArrayListExtra(PARAM_MANGA_SLUGS, slugs);
             intent.putParcelableArrayListExtra(PARAM_MANGAS_LIST, (ArrayList<? extends Parcelable>) mangas);
             System.out.println("\n\n************** response ***************************\n" + result + "\n\n");
             sendBroadcast(intent);

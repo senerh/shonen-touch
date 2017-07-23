@@ -16,7 +16,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -25,12 +24,12 @@ import java.util.List;
 import controller.activities.MangaActivity;
 import io.github.senerh.shonentouch.R;
 import model.adapters.MangaAdapter;
-import model.adapters.MangaAdapterListener;
+import model.adapters.OnItemClickListener;
 import model.database.ShonenTouchContract;
 import model.entities.Manga;
 import model.services.WSIntentService;
 
-public class MangaListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,MangaAdapterListener {
+public class MangaListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,OnItemClickListener {
     // Loaders
     private static final int MANGA_LOADER = 1;
     private Cursor mCursor;
@@ -141,6 +140,13 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onMangaClick(View view, int position) {
         Intent intent = new Intent(getActivity(), MangaActivity.class);
+
+        mCursor.moveToPosition(position);
+        int mangaId = mCursor.getInt(mCursor.getColumnIndex(ShonenTouchContract.MangaColumns._ID));
+        String mangaName = mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.MangaColumns.NAME));
+
+        intent.putExtra("mangaId", mangaId);
+        intent.putExtra("mangaName", mangaName);
         startActivity(intent);
     }
 

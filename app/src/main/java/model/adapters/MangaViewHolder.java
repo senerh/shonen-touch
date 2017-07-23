@@ -4,8 +4,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import io.github.senerh.shonentouch.R;
-
 
 public class MangaViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -13,14 +11,14 @@ public class MangaViewHolder extends RecyclerView.ViewHolder implements View.OnC
     public TextView mMangaNameTextView;
 
     // Listener
-    private MangaAdapterListener mAdapterListener;
+    private OnItemClickListener mAdapterListener;
 
     public MangaViewHolder(View itemView) {
         super(itemView);
         mMangaNameTextView = (TextView) itemView.findViewById(android.R.id.text1);
     }
 
-    public MangaViewHolder(View itemView, MangaAdapterListener listener) {
+    public MangaViewHolder(View itemView, OnItemClickListener listener) {
         this(itemView);
         mAdapterListener = listener;
         itemView.setOnClickListener(this);
