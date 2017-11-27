@@ -10,6 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,19 @@ public class MangaActivity extends AppCompatActivity {
         final TabLayout tabs = (TabLayout) findViewById(R.id.tabLayout);
         tabs.setupWithViewPager(mViewPager);
     }
+
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case android.R.id.home:
+//                finish();
+//                break;
+//            default:
+//                break;
+//        }
+//
+//        return false;
+//    }
 
     private void setupViewPager(ViewPager viewPager) {
         Adapter adapter = new Adapter(getSupportFragmentManager());

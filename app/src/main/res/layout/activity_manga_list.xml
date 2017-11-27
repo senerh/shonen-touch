@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context="controller.activities.HomeActivity"
     android:orientation="vertical">
-<!--TODO : change display for large devices-->
 
     <include
         android:id="@+id/app_bar"
