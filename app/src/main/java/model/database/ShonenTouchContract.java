@@ -62,11 +62,17 @@ public final class ShonenTouchContract {
 
         // Define the table schema
         public static final String NAME = "name";
+        public static final String DOWNLOAD_TIMESTAMP = "downloadTimestamp";
+        public static final String LAST_READ_PAGE = "lastReadPage";
+        public static final String STATUS = "status";
         public static final String MANGA_ID = "mangaId";
 
         String[] PROJECTION = {
                 _ID,
                 NAME,
+                DOWNLOAD_TIMESTAMP,
+                LAST_READ_PAGE,
+                STATUS,
                 MANGA_ID
         };
     }
@@ -79,7 +85,7 @@ public final class ShonenTouchContract {
         /**
          * The table that stores mangas.
          */
-        public static final String TABLE_NAME = "manga";
+        public static final String TABLE_NAME = "scan";
         /**
          * The {@link Uri} for querying manga.
          */
@@ -102,13 +108,11 @@ public final class ShonenTouchContract {
 
         // Define the table schema
         public static final String PATH = "path";
-//        public static final String MANGA_ID = "mangaId";
         public static final String SCAN_ID = "scanId";
 
         String[] PROJECTION = {
                 _ID,
                 PATH,
-//                MANGA_ID,
                 SCAN_ID
         };
     }
@@ -121,7 +125,7 @@ public final class ShonenTouchContract {
         /**
          * The table that stores mangas.
          */
-        public static final String TABLE_NAME = "manga";
+        public static final String TABLE_NAME = "page";
         /**
          * The {@link Uri} for querying manga.
          */
