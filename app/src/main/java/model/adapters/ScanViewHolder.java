@@ -5,20 +5,20 @@ import android.view.View;
 import android.widget.TextView;
 
 
-public class MangaViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class ScanViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     // Views
-    public TextView mMangaNameTextView;
+    public TextView mScanNameTextView;
 
     // Listener
     private OnItemClickListener mAdapterListener;
 
-    public MangaViewHolder(View itemView) {
+    public ScanViewHolder(View itemView) {
         super(itemView);
-        mMangaNameTextView = (TextView) itemView.findViewById(android.R.id.text1);
+        mScanNameTextView = (TextView) itemView.findViewById(android.R.id.text1);
     }
 
-    public MangaViewHolder(View itemView, OnItemClickListener listener) {
+    public ScanViewHolder(View itemView, OnItemClickListener listener) {
         this(itemView);
         mAdapterListener = listener;
         itemView.setOnClickListener(this);

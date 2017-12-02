@@ -64,7 +64,7 @@ public class MangaOverviewFragment extends Fragment implements View.OnClickListe
 
 
     @Override
-    public void onMangaClick(View view, int position) {
+    public void onItemClick(View view, int position) {
 
     }
 }

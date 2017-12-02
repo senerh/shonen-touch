@@ -138,7 +138,7 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     @Override
-    public void onMangaClick(View view, int position) {
+    public void onItemClick(View view, int position) {
         Intent intent = new Intent(getActivity(), MangaActivity.class);
 
         mCursor.moveToPosition(position);

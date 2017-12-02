@@ -22,6 +22,18 @@ public class Scan implements Parcelable {
 
     private String mName;
 
+    private long mDownloadTimestamp;
+
+    private Status mStatus;
+
+    private int mLastReadPage;
+
+    public enum Status {
+        NOT_DOWNLOADED,
+        DOWNLOAD_IN_PROGRESS,
+        DOWNLOAD_COMPLETE
+    }
+
     public Scan() {
     }
 
@@ -49,5 +61,29 @@ public class Scan implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int i) {
         dest.writeString(mName);
+    }
+
+    public long getDownloadTimestamp() {
+        return mDownloadTimestamp;
+    }
+
+    public void setDownloadTimestamp(long downloadTimestamp) {
+        this.mDownloadTimestamp = downloadTimestamp;
+    }
+
+    public Status getStatus() {
+        return mStatus;
+    }
+
+    public void setStatus(Status status) {
+        this.mStatus = status;
+    }
+
+    public int getLastReadPage() {
+        return mLastReadPage;
+    }
+
+    public void setLastReadPage(int lastReadPage) {
+        this.mLastReadPage = lastReadPage;
     }
 }
