@@ -38,7 +38,7 @@ import model.entities.Scan;
 
 public class WSIntentService extends IntentService {
 
-    public static final String URL_SERVER = "http://senerh.xyz:8080/shonen-touch-api/";
+    public static final String URL_SERVER = "http://senerh.xyz:8080/shonen-touch-api-3/";
     public static final String GET_ALL_MANGA = URL_SERVER + "mangas";
     public static final String GET_ALL_PAGES_FOR_MANGA_AND_SCAN = "http://senerh.xyz:8080/shonen-touch-api/mangas/%1$s/scans/%2$s/pages";
     public static final String GET_ALL_SCANS_FOR_MANGA = "http://senerh.xyz:8080/shonen-touch-api/mangas/%1$s/scans";
@@ -69,8 +69,8 @@ public class WSIntentService extends IntentService {
                 }
                 break;
             case DOWNLOAD_PAGES_FOR_SCAN:
-                if (!"".equals(intent.getStringExtra(PARAM_MANGA_SLUG)) && intent.getLongExtra(PARAM_SCAN_ID, -1) != -1) {
-                    downloadPagesImagesForScan(intent.getStringExtra(PARAM_MANGA_SLUG), intent.getLongExtra(PARAM_SCAN_ID, -1));
+                if (!"".equals(intent.getStringExtra(PARAM_MANGA_SLUG)) && intent.getIntExtra(PARAM_SCAN_ID, -1) != -1) {
+                    downloadPagesImagesForScan(intent.getStringExtra(PARAM_MANGA_SLUG), intent.getIntExtra(PARAM_SCAN_ID, -1));
                 }
                 break;
             default:

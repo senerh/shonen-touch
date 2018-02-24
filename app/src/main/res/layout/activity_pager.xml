@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:indeterminate="false"
+        android:scaleY="2.5"
+        style="?android:attr/progressBarStyleHorizontal"
+         />
+    <!--style="?unknown_attr_ref: 1010078"-->
+    <controller.views.ExtendedViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/progressBar" />
+</RelativeLayout>

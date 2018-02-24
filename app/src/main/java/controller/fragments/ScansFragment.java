@@ -48,7 +48,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -61,15 +60,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import activity.PageActivity;
+import controller.activities.PageActivity;
 import io.github.senerh.shonentouch.R;
 import model.adapters.OnItemClickListener;
 import model.adapters.ScanAdapter;
 import model.database.ShonenTouchContract;
-import model.entities.Manga;
 import model.entities.Scan;
 import model.services.WSIntentService;
 
@@ -84,7 +81,7 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
 
     private RecyclerView mRecyclerView;
     private ScanAdapter mAdapter;
-    private long mMangaId;
+    private int mMangaId;
 
     private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -109,6 +106,7 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
 
                             newScan.put(ShonenTouchContract.ScanColumns.NAME, scan.getName());
                             newScan.put(ShonenTouchContract.ScanColumns.MANGA_ID, mMangaId);
+                            newScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.NOT_DOWNLOADED.name());
 
                             // persisting scan
                             getActivity().getApplicationContext().getContentResolver().insert(ShonenTouchContract.Scan.CONTENT_URI, newScan);
@@ -121,10 +119,10 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
         }
     };
 
-    public static ScansFragment newInstance(long mangaId) {
+    public static ScansFragment newInstance(int mangaId) {
         final ScansFragment fragment = new ScansFragment();
         final Bundle arguments = new Bundle();
-        arguments.putLong("mangaId", mangaId);
+        arguments.putInt("mangaId", mangaId);
         fragment.setArguments(arguments);
 
         return fragment;
@@ -138,7 +136,7 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        mMangaId = getArguments().getLong("mangaId", -1);
+        mMangaId = getArguments().getInt("mangaId", -1);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_scans);
         mAdapter = new ScanAdapter(getContext(), this);
         mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
@@ -161,17 +159,32 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
             try {
                 if (c.getCount() == 1) {
                     c.moveToFirst();
-                    Bundle b = new Bundle();
-                    b.putParcelable(ID_MANGA_PARCELABLE, new dto.Manga(c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.SLUG)), c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.NAME))));
                     mCursor.moveToPosition(position);
-                    b.putParcelable(ID_SCAN_PARCELABLE, new dto.Scan(mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.NAME))));
-                    List<dto.Scan> scanList = new ArrayList<>();
-                    for(mCursor.moveToFirst(); !mCursor.isAfterLast(); mCursor.moveToNext()) {
-                        scanList.add(new dto.Scan(mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.NAME))));
+                    switch (Scan.Status.valueOf(mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.STATUS)))) {
+                        case NOT_DOWNLOADED:
+                            Intent intent = new Intent(getActivity(), WSIntentService.class);
+                            intent.setAction(WSIntentService.DOWNLOAD_PAGES_FOR_SCAN);
+                            intent.putExtra(WSIntentService.PARAM_MANGA_SLUG, c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.SLUG)));
+                            intent.putExtra(WSIntentService.PARAM_SCAN_ID, mCursor.getInt(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns._ID)));
+                            getActivity().startService(intent);
+                            break;
+                        case DOWNLOAD_COMPLETE:
+                            Intent intentPager = new Intent(getActivity(), PageActivity.class);
+                            intentPager.putExtra(PageActivity.EXTRA_SCAN_ID, mCursor.getInt(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns._ID)));
+                            startActivity(intentPager);
+                            break;
                     }
-                    b.putParcelableArrayList(ID_SCAN_LIST, new ArrayList<>(scanList));
-                    myIntent.putExtras(b);
-                    startActivity(myIntent);
+//                    Bundle b = new Bundle();
+//                    b.putParcelable(ID_MANGA_PARCELABLE, new dto.Manga(c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.SLUG)), c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.NAME))));
+//                    mCursor.moveToPosition(position);
+//                    b.putParcelable(ID_SCAN_PARCELABLE, new dto.Scan(mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.NAME))));
+//                    List<dto.Scan> scanList = new ArrayList<>();
+//                    for(mCursor.moveToFirst(); !mCursor.isAfterLast(); mCursor.moveToNext()) {
+//                        scanList.add(new dto.Scan(mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.NAME))));
+//                    }
+//                    b.putParcelableArrayList(ID_SCAN_LIST, new ArrayList<>(scanList));
+//                    myIntent.putExtras(b);
+//                    startActivity(myIntent);
                 }
             } finally {
                 c.close();

@@ -19,13 +19,13 @@ public class ShonenTouchDatabase extends SQLiteOpenHelper {
          */
         String CREATE_MANGA =
                 "CREATE TABLE " + ShonenTouchContract.Manga.TABLE_NAME + " (" +
-                        ShonenTouchContract.MangaColumns._ID + " BIGINT PRIMARY KEY, " +
+                        ShonenTouchContract.MangaColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                         ShonenTouchContract.MangaColumns.NAME + " TEXT, " +
                         ShonenTouchContract.MangaColumns.SLUG + " TEXT UNIQUE);";
 
         String CREATE_SCAN =
                 "CREATE TABLE " + ShonenTouchContract.Scan.TABLE_NAME + " (" +
-                        ShonenTouchContract.ScanColumns._ID + " BIGINT PRIMARY KEY, " +
+                        ShonenTouchContract.ScanColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                         ShonenTouchContract.ScanColumns.NAME + " TEXT, " +
                         ShonenTouchContract.ScanColumns.DOWNLOAD_TIMESTAMP + " BIGINT, " +
                         ShonenTouchContract.ScanColumns.LAST_READ_PAGE + " INTEGER, " +
@@ -36,7 +36,7 @@ public class ShonenTouchDatabase extends SQLiteOpenHelper {
 
         String CREATE_PAGE =
                 "CREATE TABLE " + ShonenTouchContract.Page.TABLE_NAME + " (" +
-                        ShonenTouchContract.PageColumns._ID + " BIGINT PRIMARY KEY, " +
+                        ShonenTouchContract.PageColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                         ShonenTouchContract.PageColumns.PATH + " TEXT UNIQUE, " +
                         ShonenTouchContract.PageColumns.SCAN_ID + " BIGINT," +
                         "FOREIGN KEY (" + ShonenTouchContract.PageColumns.SCAN_ID + ")" +
