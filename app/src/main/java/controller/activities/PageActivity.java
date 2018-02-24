@@ -84,7 +84,7 @@ public class PageActivity extends AppCompatActivity {
 
     class ImagePagerAdapter extends PagerAdapter {
         List<String> imageList;
-        PhotoView photoView;
+        TouchImageView photoView;
 
         ImagePagerAdapter(List<String> imageList) {
             this.imageList = imageList;
@@ -99,10 +99,16 @@ public class PageActivity extends AppCompatActivity {
         }
 
         public View instantiateItem(ViewGroup container, int position) {
-            photoView = new PhotoView(container.getContext());
+
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                photoView.setAdjustViewBounds(true);
+                photoView = new TouchImageView(container.getContext(), true);
+//                photoView.setAdjustViewBounds(true);
                 photoView.setScaleType(ScaleType.CENTER_CROP);
+//                System.out.println("##########scroll x : " + photoView.getScrollX());
+//                System.out.println("##########scroll y : " + photoView.getScrollY());
+//                photoView.setScrollY(0);
+            } else {
+                photoView = new TouchImageView(container.getContext(), false);
             }
             Options options = new Options();
             options.inPreferredConfig = Config.ARGB_8888;
