@@ -1,5 +1,6 @@
 package controller.activities;
 
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
@@ -21,11 +22,13 @@ import io.github.senerh.shonentouch.R;
 import model.database.ShonenTouchContract;
 import model.database.ShonenTouchContract.PageColumns;
 import model.entities.Page;
+import uk.co.senab.photoview.PhotoView;
 
 public class PageActivity extends AppCompatActivity {
     public static final String EXTRA_SCAN_ID = "EXTRA_SCAN_ID";
     private ExtendedViewPager extendedViewPager;
     private ProgressBar mProgressBar;
+    private ImagePagerAdapter mImagePagerAdapter;
     private List<Page> pagesList;
 
 
@@ -54,7 +57,8 @@ public class PageActivity extends AppCompatActivity {
         decorView.setBackgroundColor(ViewCompat.MEASURED_STATE_MASK);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         extendedViewPager = (ExtendedViewPager) findViewById(R.id.view_pager);
-        extendedViewPager.setAdapter(new ImagePagerAdapter(pathsImages));
+        mImagePagerAdapter = new ImagePagerAdapter(pathsImages);
+        extendedViewPager.setAdapter(mImagePagerAdapter);
     }
 
     protected void onResume() {
@@ -64,8 +68,23 @@ public class PageActivity extends AppCompatActivity {
         decorView.setBackgroundColor(ViewCompat.MEASURED_STATE_MASK);
     }
 
+//    @Override
+//    public void onConfigurationChanged(Configuration newConfig) {
+//        super.onConfigurationChanged(newConfig);
+//
+//        // Checks the orientation of the screen
+//        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//            mImagePagerAdapter.photoView.setAdjustViewBounds(true);
+//            mImagePagerAdapter.photoView.setScaleType(ScaleType.CENTER_CROP);
+//        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+//            mImagePagerAdapter.photoView.setAdjustViewBounds(false);
+//            mImagePagerAdapter.photoView.setScaleType(ScaleType.FIT_XY);
+//        }
+//    }
+
     class ImagePagerAdapter extends PagerAdapter {
         List<String> imageList;
+        PhotoView photoView;
 
         ImagePagerAdapter(List<String> imageList) {
             this.imageList = imageList;
@@ -80,9 +99,11 @@ public class PageActivity extends AppCompatActivity {
         }
 
         public View instantiateItem(ViewGroup container, int position) {
-            TouchImageView photoView = new TouchImageView(container.getContext());
-            photoView.setAdjustViewBounds(true);
-            photoView.setScaleType(ScaleType.CENTER_CROP);
+            photoView = new PhotoView(container.getContext());
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                photoView.setAdjustViewBounds(true);
+                photoView.setScaleType(ScaleType.CENTER_CROP);
+            }
             Options options = new Options();
             options.inPreferredConfig = Config.ARGB_8888;
             photoView.setImageBitmap(BitmapFactory.decodeFile(imageList.get(position), options));
