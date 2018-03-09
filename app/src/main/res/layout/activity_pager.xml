@@ -13,7 +13,7 @@
         style="?android:attr/progressBarStyleHorizontal"
          />
     <!--style="?unknown_attr_ref: 1010078"-->
-    <controller.views.ExtendedViewPager
+    <ui.views.ExtendedViewPager
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
