@@ -29,6 +29,7 @@ import java.util.Scanner;
 
 import model.database.ShonenTouchContract;
 import model.entities.Manga;
+import model.entities.Page;
 import model.entities.Scan;
 
 
@@ -40,8 +41,8 @@ public class WSIntentService extends IntentService {
 
     public static final String URL_SERVER = "http://senerh.xyz:8080/shonen-touch-api-3/";
     public static final String GET_ALL_MANGA = URL_SERVER + "mangas";
-    public static final String GET_ALL_PAGES_FOR_MANGA_AND_SCAN = "http://senerh.xyz:8080/shonen-touch-api/mangas/%1$s/scans/%2$s/pages";
-    public static final String GET_ALL_SCANS_FOR_MANGA = "http://senerh.xyz:8080/shonen-touch-api/mangas/%1$s/scans";
+    public static final String GET_ALL_PAGES_FOR_MANGA_AND_SCAN = URL_SERVER + "mangas/%1$s/scans/%2$s/pages";
+    public static final String GET_ALL_SCANS_FOR_MANGA = URL_SERVER + "mangas/%1$s/scans";
     public static final String GET_URL_FOR_PAGE = "http://senerh.xyz:8080/shonen-touch-api/mangas/%1$s/scans/%2$s/pages/%3$s/image";
     public static final String DOWNLOAD_PAGES_FOR_SCAN = "DOWNLOAD_PAGES_FOR_SCAN";
 
@@ -131,8 +132,9 @@ public class WSIntentService extends IntentService {
     public void downloadPagesImagesForScan(String mangaSlug, long scanId) {
         ContentValues updatedScan= new ContentValues();
         updatedScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.DOWNLOAD_IN_PROGRESS.name());
-        getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, "_id=?", new String[]{String.valueOf(scanId)});
-        Cursor c = getContentResolver().query(ShonenTouchContract.Scan.CONTENT_URI, null, "_id=?", new String[]{String.valueOf(scanId)}, null);
+        updatedScan.put(ShonenTouchContract.ScanColumns.DOWNLOAD_STATUS, "Téléchargement des url des pages...");
+        getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
+        Cursor c = getContentResolver().query(ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)}, null);
         if (c != null) {
             try {
                 if (c.getCount() == 1) {
@@ -141,37 +143,34 @@ public class WSIntentService extends IntentService {
                     HttpURLConnection urlConnection = (HttpURLConnection) new URL(String.format(GET_ALL_PAGES_FOR_MANGA_AND_SCAN, mangaSlug, scanName)).openConnection();
                     Scanner s = new Scanner(new BufferedInputStream(urlConnection.getInputStream())).useDelimiter("\\A");
                     String result = s.hasNext() ? s.next() : "";
-                    System.out.println("\n\n************** response ***************************\n" + result + "\n\n");
-                    List<String> pages = new ArrayList<>();
-                    JSONArray jSONArray = new JSONArray(result);
-                    for (int i = 0; i < jSONArray.length(); i++) {
-                        pages.add(jSONArray.getJSONObject(i).getString("num"));
+                    List<Page> pages = new ArrayList<>();
+                    JSONArray pagesJSONArray = new JSONArray(result);
+                    for (int i = 0; i < pagesJSONArray.length(); i++) {
+                        pages.add(new Page(pagesJSONArray.getJSONObject(i).getString("num"), pagesJSONArray.getJSONObject(i).getString("url")));
                     }
-                    List<String> pagesUrls = new ArrayList<>();
+
+
                     for (int i = 0; i < pages.size(); i++) {
-                        Scanner sPage = new Scanner(new BufferedInputStream(new URL(String.format(GET_URL_FOR_PAGE, mangaSlug, scanName, pages.get(i))).openConnection().getInputStream())).useDelimiter("\\A");
-                        String resultPage = sPage.hasNext() ? sPage.next() : "";
-                        System.out.println("\n\n************** response ***************************\n" + resultPage + "\n\n");
-                        pagesUrls.add(new JSONObject(resultPage).getString("url"));
-                    }
-                    for (int i = 0; i < pagesUrls.size(); i++) {
-                        if (!(pagesUrls.get(i)).contains("__")) {
-                            Bitmap downloadedBitmap = BitmapFactory.decodeStream(new URL(pagesUrls.get(i)).openStream());
-                            if (downloadedBitmap != null) {
-                                File imageFile = new File(new ContextWrapper(this).getDir(IMAGES_FOLDER_NAME, 0), mangaSlug + HelpFormatter.DEFAULT_OPT_PREFIX + scanId + HelpFormatter.DEFAULT_OPT_PREFIX + i);
-                                OutputStream fileOutputStream = new FileOutputStream(imageFile);
-                                downloadedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
-                                fileOutputStream.close();
-                                ContentValues newPage = new ContentValues();
-                                newPage.put(ShonenTouchContract.PageColumns.PATH, imageFile.getAbsolutePath());
-                                newPage.put(ShonenTouchContract.PageColumns.SCAN_ID, scanId);
-                                getContentResolver().insert(ShonenTouchContract.Page.CONTENT_URI, newPage);
-                            }
+                        Bitmap downloadedBitmap = BitmapFactory.decodeStream(new URL(pages.get(i).getPath()).openStream());
+                        if (downloadedBitmap != null) {
+                            File imageFile = new File(new ContextWrapper(this).getDir(IMAGES_FOLDER_NAME, 0), mangaSlug + HelpFormatter.DEFAULT_OPT_PREFIX + scanId + HelpFormatter.DEFAULT_OPT_PREFIX + i);
+                            OutputStream fileOutputStream = new FileOutputStream(imageFile);
+                            downloadedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                            fileOutputStream.close();
+                            ContentValues newPage = new ContentValues();
+                            newPage.put(ShonenTouchContract.PageColumns.PATH, imageFile.getAbsolutePath());
+                            newPage.put(ShonenTouchContract.PageColumns.SCAN_ID, scanId);
+                            getContentResolver().insert(ShonenTouchContract.Page.CONTENT_URI, newPage);
+
+                            updatedScan = new ContentValues();
+                            updatedScan.put(ShonenTouchContract.ScanColumns.DOWNLOAD_STATUS, "Téléchargement page " + (i+1) + "/" + pages.size());
+                            getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
                         }
                     }
                     updatedScan = new ContentValues();
                     updatedScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.DOWNLOAD_COMPLETE.name());
                     updatedScan.put(ShonenTouchContract.ScanColumns.DOWNLOAD_TIMESTAMP, System.currentTimeMillis() / 1000);
+                    updatedScan.put(ShonenTouchContract.ScanColumns.DOWNLOAD_STATUS, "Téléchargement terminé, disponible hors connexion");
                     getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
                     urlConnection.disconnect();
                 }

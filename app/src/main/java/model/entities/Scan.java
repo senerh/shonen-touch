@@ -26,6 +26,8 @@ public class Scan implements Parcelable {
 
     private Status mStatus;
 
+    private String mDownloadStatus;
+
     private int mLastReadPage;
 
     public enum Status {
@@ -85,5 +87,13 @@ public class Scan implements Parcelable {
 
     public void setLastReadPage(int lastReadPage) {
         this.mLastReadPage = lastReadPage;
+    }
+
+    public String getDownloadStatus() {
+        return mDownloadStatus;
+    }
+
+    public void setDownloadStatus(String downloadStatus) {
+        this.mDownloadStatus = downloadStatus;
     }
 }

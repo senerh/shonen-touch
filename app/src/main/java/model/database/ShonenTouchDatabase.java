@@ -30,6 +30,7 @@ public class ShonenTouchDatabase extends SQLiteOpenHelper {
                         ShonenTouchContract.ScanColumns.DOWNLOAD_TIMESTAMP + " BIGINT, " +
                         ShonenTouchContract.ScanColumns.LAST_READ_PAGE + " INTEGER, " +
                         ShonenTouchContract.ScanColumns.STATUS + " TEXT NOT NULL, " +
+                        ShonenTouchContract.ScanColumns.DOWNLOAD_STATUS + " TEXT, " +
                         ShonenTouchContract.ScanColumns.MANGA_ID + " BIGINT," +
                         "FOREIGN KEY (" + ShonenTouchContract.ScanColumns.MANGA_ID + ")" +
                         "REFERENCES " + ShonenTouchContract.Manga.TABLE_NAME + " (" + ShonenTouchContract.MangaColumns._ID + ") ON DELETE CASCADE);";

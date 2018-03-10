@@ -65,6 +65,7 @@ public final class ShonenTouchContract {
         public static final String DOWNLOAD_TIMESTAMP = "downloadTimestamp";
         public static final String LAST_READ_PAGE = "lastReadPage";
         public static final String STATUS = "status";
+        public static final String DOWNLOAD_STATUS = "downloadStatus";
         public static final String MANGA_ID = "mangaId";
 
         String[] PROJECTION = {
@@ -73,6 +74,7 @@ public final class ShonenTouchContract {
                 DOWNLOAD_TIMESTAMP,
                 LAST_READ_PAGE,
                 STATUS,
+                DOWNLOAD_STATUS,
                 MANGA_ID
         };
     }

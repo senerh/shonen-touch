@@ -20,25 +20,37 @@ public class Page implements Parcelable {
         }
     };
 
+    private String mName;
+
     private String mPath;
 
     public Page() {
     }
 
-    public Page(String name, String slug) {
-        mPath = name;
+    public Page(String name, String path) {
+        mPath = path;
+        mName = name;
     }
 
     protected Page(Parcel in) {
         mPath = in.readString();
+        mName = in.readString();
     }
 
-    public String getName() {
+    public String getPath() {
         return mPath;
     }
 
+    public void setPath(String path) {
+        mPath = path;
+    }
+
+    public String getName() {
+        return mName;
+    }
+
     public void setName(String name) {
-        mPath = name;
+        mName = name;
     }
 
     @Override
@@ -49,5 +61,6 @@ public class Page implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int i) {
         dest.writeString(mPath);
+        dest.writeString(mName);
     }
 }

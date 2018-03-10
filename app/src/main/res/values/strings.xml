@@ -34,4 +34,8 @@
     <string name="continueLastScan">Reprendre la lecture du scan %1$s</string>
     <string name="emptyFavortiteText"><![CDATA[Sélectionnez vos favoris depuis le menu Réglages > Favoris]]></string>
 
+    // dialogs
+    <string name="dialog_delete_scan_title">Suppression d\'un scan</string>
+    <string name="dialog_delete_scan_message">Voulez-vous supprimer toutes les pages de ce scan ?</string>
+
 </resources>
