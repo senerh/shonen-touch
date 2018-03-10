@@ -84,9 +84,11 @@ public class PageActivity extends AppCompatActivity {
     class ImagePagerAdapter extends PagerAdapter {
         List<String> imageList;
         TouchImageView photoView;
+        int currentPosition;
 
         ImagePagerAdapter(List<String> imageList) {
             this.imageList = imageList;
+            currentPosition = 0;
         }
 
         public int getCount() {
@@ -99,21 +101,25 @@ public class PageActivity extends AppCompatActivity {
 
         public View instantiateItem(ViewGroup container, int position) {
 
+            if (position >= currentPosition) {
+                currentPosition = position;
+            } else {
+                currentPosition--;
+            }
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 photoView = new TouchImageView(container.getContext(), true);
-//                photoView.setAdjustViewBounds(true);
                 photoView.setScaleType(ScaleType.CENTER_CROP);
-//                System.out.println("##########scroll x : " + photoView.getScrollX());
-//                System.out.println("##########scroll y : " + photoView.getScrollY());
-//                photoView.setScrollY(0);
             } else {
                 photoView = new TouchImageView(container.getContext(), false);
             }
             Options options = new Options();
             options.inPreferredConfig = Config.ARGB_8888;
             photoView.setImageBitmap(BitmapFactory.decodeFile(imageList.get(position), options));
-            mProgressBar.setProgress((position * 100) / imageList.size());
-            if (position == imageList.size()) {
+            System.out.println("position " + position);
+            System.out.println("value " + (currentPosition * 100) / imageList.size());
+            int value = (currentPosition * 100) / imageList.size();
+            mProgressBar.setProgress((currentPosition * 100) / imageList.size());
+            if (currentPosition == imageList.size()) {
                 mProgressBar.setProgress(100);
             }
             container.addView(photoView, -1, -1);
