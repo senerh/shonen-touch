@@ -55,4 +55,6 @@ public class MangaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         mCursorAdapter.swapCursor(cursor);
         notifyDataSetChanged();
     }
+
+    
 }

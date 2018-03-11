@@ -29,8 +29,8 @@ card_view:cardCornerRadius="4dp">
 
     <ImageView
         android:id="@+id/image_view_manga_icon"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         card_view:srcCompat="@drawable/ic_not_interested_black_24dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true" />

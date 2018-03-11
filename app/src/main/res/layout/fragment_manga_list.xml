@@ -5,6 +5,12 @@
     tools:context="ui.fragments.MangaListFragment"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <android.support.v7.widget.SearchView
+        android:id="@+id/search_view_manga"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_manga"
@@ -12,6 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
+        android:layout_below="@id/search_view_manga"
         />
 
     <android.support.design.widget.CoordinatorLayout

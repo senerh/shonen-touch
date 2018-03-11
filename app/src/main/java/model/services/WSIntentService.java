@@ -174,21 +174,25 @@ public class WSIntentService extends IntentService {
                     }
 
                     for (int i = 0; i < pages.size(); i++) {
-                        Bitmap downloadedBitmap = BitmapFactory.decodeStream(new URL(pages.get(i).getPath()).openStream());
-                        if (downloadedBitmap != null) {
-                            File imageFile = new File(new ContextWrapper(this).getDir(IMAGES_FOLDER_NAME, 0), mangaSlug + HelpFormatter.DEFAULT_OPT_PREFIX + scanId + HelpFormatter.DEFAULT_OPT_PREFIX + i);
-                            OutputStream fileOutputStream = new FileOutputStream(imageFile);
-                            downloadedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
-                            fileOutputStream.close();
-                            ContentValues newPage = new ContentValues();
-                            newPage.put(ShonenTouchContract.PageColumns.PATH, imageFile.getAbsolutePath());
-                            newPage.put(ShonenTouchContract.PageColumns.SCAN_ID, scanId);
-                            getContentResolver().insert(ShonenTouchContract.Page.CONTENT_URI, newPage);
+                        try {
+                            Bitmap downloadedBitmap = BitmapFactory.decodeStream(new URL(pages.get(i).getPath()).openStream());
+                            if (downloadedBitmap != null) {
+                                File imageFile = new File(new ContextWrapper(this).getDir(IMAGES_FOLDER_NAME, 0), mangaSlug + HelpFormatter.DEFAULT_OPT_PREFIX + scanId + HelpFormatter.DEFAULT_OPT_PREFIX + i);
+                                OutputStream fileOutputStream = new FileOutputStream(imageFile);
+                                downloadedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                                fileOutputStream.close();
+                                ContentValues newPage = new ContentValues();
+                                newPage.put(ShonenTouchContract.PageColumns.PATH, imageFile.getAbsolutePath());
+                                newPage.put(ShonenTouchContract.PageColumns.SCAN_ID, scanId);
+                                getContentResolver().insert(ShonenTouchContract.Page.CONTENT_URI, newPage);
+                                updatedScan = new ContentValues();
+                                updatedScan.put(ShonenTouchContract.ScanColumns.DOWNLOAD_STATUS, "Téléchargement page " + (i+1) + "/" + pages.size());
+                                getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
+                            }
+                        } catch (FileNotFoundException e) {
 
-                            updatedScan = new ContentValues();
-                            updatedScan.put(ShonenTouchContract.ScanColumns.DOWNLOAD_STATUS, "Téléchargement page " + (i+1) + "/" + pages.size());
-                            getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
                         }
+
                     }
                     updatedScan = new ContentValues();
                     updatedScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.DOWNLOAD_COMPLETE.name());
