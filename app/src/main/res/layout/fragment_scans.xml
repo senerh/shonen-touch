@@ -5,26 +5,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
+    <TextView
+        android:id="@+id/text_view_empty_state"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:text="Téléchargement des noms des scans pour ce manga
+Veuillez patienter..."
+        android:textAlignment="center"
 
+        android:layout_centerInParent="true"
+        />
 
     <ProgressBar
         android:id="@+id/progress_bar_empty_state"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:indeterminate="true"
-        android:layout_centerInParent="true"
+        android:layout_marginTop="30dp"
+        android:layout_below="@id/text_view_empty_state"
+        android:layout_centerHorizontal="true"
         />
 
-    <TextView
-        android:id="@+id/text_view_empty_state"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_below="@id/progress_bar_empty_state"
-        android:text="Téléchargement des noms des scans pour ce manga
-Veuillez patienter..."
-        android:textAlignment="center"
-        android:layout_marginTop="30dp"
-        android:layout_centerHorizontal="true"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_scans"

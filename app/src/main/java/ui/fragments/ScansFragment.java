@@ -163,13 +163,13 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                 if (c.getCount() >= 1) {
                     mEmptyStateProgressBar.setVisibility(View.GONE);
                     mEmptyStateTextView.setVisibility(View.GONE);
+                } else if (c.getCount() == 0) {
+                    fetchScans();
                 }
             } finally {
                 c.close();
             }
         }
-
-        fetchScans();
 
         super.onViewCreated(view, savedInstanceState);
     }

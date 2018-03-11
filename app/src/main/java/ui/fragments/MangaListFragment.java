@@ -21,6 +21,8 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -41,6 +43,8 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
     private MangaAdapter mAdapter;
     private String mCursorFilter;
     private SearchView mMangaSearchView;
+    private ProgressBar mEmptyStateProgressBar;
+    private TextView mEmptyStateTextView;
 
     private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -72,7 +76,9 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
                             getActivity().getApplicationContext().getContentResolver().insert(ShonenTouchContract.Manga.CONTENT_URI, newManga);
                         }
                     }
-
+                    mEmptyStateProgressBar.setVisibility(View.GONE);
+                    mEmptyStateTextView.setVisibility(View.GONE);
+                    mMangaSearchView.setVisibility(View.VISIBLE);
                     break;
                 default :
                     break;
@@ -90,6 +96,8 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 //        getActivity().getApplicationContext().deleteDatabase("Manga.db");
 
+        mEmptyStateProgressBar = (ProgressBar) view.findViewById(R.id.progress_bar_empty_state);
+        mEmptyStateTextView = (TextView) view.findViewById(R.id.text_view_empty_state);
         mCursorFilter = "";
         mMangaSearchView = (SearchView) view.findViewById(R.id.search_view_manga);
         mMangaSearchView.setOnQueryTextListener(this);
@@ -104,7 +112,11 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
         Cursor c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Manga.CONTENT_URI, null, null, null, null);
         if (c != null) {
             try {
-                if (c.getCount() == 0) {
+                if (c.getCount() >= 1) {
+                    mEmptyStateProgressBar.setVisibility(View.GONE);
+                    mEmptyStateTextView.setVisibility(View.GONE);
+                    mMangaSearchView.setVisibility(View.VISIBLE);
+                } else if (c.getCount() == 0) {
                     fetchMangas();
                 }
             } finally {
@@ -117,34 +129,6 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-//        Uri baseUri;
-//        if (mCursorFilter != null) {
-//            baseUri = Uri.withAppendedPath(ShonenTouchContract.Manga.CONTENT_URI,
-//                    Uri.encode(mCursorFilter));
-//        } else {
-//            baseUri = ShonenTouchContract.Manga.CONTENT_URI;
-//        }
-//
-//        String select = "((" + Contacts.DISPLAY_NAME + " NOTNULL) AND ("
-//                + Contacts.HAS_PHONE_NUMBER + "=1) AND ("
-//                + Contacts.DISPLAY_NAME + " != '' ))";
-//
-//        String[] projection = new String[] {
-//                Contacts._ID,
-//                Contacts.DISPLAY_NAME,
-//                Contacts.CONTACT_STATUS,
-//                Contacts.CONTACT_PRESENCE,
-//                Contacts.PHOTO_ID,
-//                Contacts.LOOKUP_KEY,
-//        };
-//
-//        CursorLoader cursorLoader = new CursorLoader(
-//                MainActivity.this,
-//                baseUri,
-//                projection,
-//                select,
-//                null,
-//                Contacts.DISPLAY_NAME);
         if (id == MANGA_LOADER) {
             if (mCursorFilter == null || mCursorFilter.equals("")) {
                 return new CursorLoader(getContext().getApplicationContext(), ShonenTouchContract.Manga.CONTENT_URI, null, null, null, null);
@@ -181,7 +165,6 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public boolean onQueryTextSubmit(String arg0) {
-        // TODO Auto-generated method stub
         return false;
     }
 
