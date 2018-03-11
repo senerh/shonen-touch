@@ -1,11 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+<android.support.v7.widget.CardView
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:card_view="http://schemas.android.com/apk/res-auto"
+android:id="@+id/card_view_manga"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_gravity="center"
+android:layout_margin="10dp"
+card_view:cardBackgroundColor="@color/cardview_light_background"
+card_view:cardCornerRadius="4dp">
+
+<RelativeLayout
+    android:id="@+id/relative_layout_manga"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp">
 
     <TextView
         android:id="@+id/text_view_manga_name"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"/>
+        android:layout_width="wrap_content" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/text_view_last_scan"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_below="@id/text_view_manga_name"/>
+
+    <ImageView
+        android:id="@+id/image_view_manga_icon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        card_view:srcCompat="@drawable/ic_not_interested_black_24dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true" />
+
+</RelativeLayout>
+
+</android.support.v7.widget.CardView>

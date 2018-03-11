@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -94,7 +95,24 @@ public class WSIntentService extends IntentService {
 
             for (int i = 0; i < tabManga.length(); i++) {
                 JSONObject currentManga = tabManga.getJSONObject(i);
-                mangas.add(new Manga(currentManga.getString("name"), currentManga.getString("slug")));
+                mangas.add(new Manga(currentManga.getString("name"), currentManga.getString("slug"), currentManga.getString("lastScan"), currentManga.getString("url")));
+            }
+
+            // download icons for the mangas
+            for (int i = 0; i < mangas.size(); i++) {
+                try {
+                    Bitmap downloadedBitmap = BitmapFactory.decodeStream(new URL(mangas.get(i).getIconPath()).openStream());
+                    if (downloadedBitmap != null) {
+                        File imageFile = new File(new ContextWrapper(this).getDir(IMAGES_FOLDER_NAME, 0), mangas.get(i).getSlug() + HelpFormatter.DEFAULT_OPT_PREFIX + "icon");
+                        OutputStream fileOutputStream = new FileOutputStream(imageFile);
+                        downloadedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                        fileOutputStream.close();
+                        mangas.get(i).setIconPath(imageFile.getAbsolutePath());
+                    }
+                } catch (FileNotFoundException e) {
+                    mangas.get(i).setIconPath("");
+                }
+
             }
 
             intent.putParcelableArrayListExtra(PARAM_MANGAS_LIST, (ArrayList<? extends Parcelable>) mangas);
@@ -130,6 +148,12 @@ public class WSIntentService extends IntentService {
     }
 
     public void downloadPagesImagesForScan(String mangaSlug, long scanId) {
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//            }
+//        }).start();
         ContentValues updatedScan= new ContentValues();
         updatedScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.DOWNLOAD_IN_PROGRESS.name());
         updatedScan.put(ShonenTouchContract.ScanColumns.DOWNLOAD_STATUS, "Téléchargement des url des pages...");
@@ -148,7 +172,6 @@ public class WSIntentService extends IntentService {
                     for (int i = 0; i < pagesJSONArray.length(); i++) {
                         pages.add(new Page(pagesJSONArray.getJSONObject(i).getString("num"), pagesJSONArray.getJSONObject(i).getString("url")));
                     }
-
 
                     for (int i = 0; i < pages.size(); i++) {
                         Bitmap downloadedBitmap = BitmapFactory.decodeStream(new URL(pages.get(i).getPath()).openStream());

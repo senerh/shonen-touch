@@ -2,20 +2,27 @@ package model.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import io.github.senerh.shonentouch.R;
 
 
 public class MangaViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     // Views
     public TextView mMangaNameTextView;
+    public TextView mLastScanTextView;
+    public ImageView mMangaIconImageView;
 
     // Listener
     private OnItemClickListener mAdapterListener;
 
     public MangaViewHolder(View itemView) {
         super(itemView);
-        mMangaNameTextView = (TextView) itemView.findViewById(android.R.id.text1);
+        mMangaNameTextView = (TextView) itemView.findViewById(R.id.text_view_manga_name);
+        mLastScanTextView = (TextView) itemView.findViewById(R.id.text_view_last_scan);
+        mMangaIconImageView = (ImageView) itemView.findViewById(R.id.image_view_manga_icon);
     }
 
     public MangaViewHolder(View itemView, OnItemClickListener listener) {

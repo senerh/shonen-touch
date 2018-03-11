@@ -23,11 +23,15 @@ public final class ShonenTouchContract {
         // Define the table schema
         public static final String NAME = "name";
         public static final String SLUG = "slug";
+        public static final String LAST_SCAN = "lastScan";
+        public static final String ICON_PATH = "iconPath";
 
         String[] PROJECTION = {
                 _ID,
                 NAME,
-                SLUG
+                SLUG,
+                LAST_SCAN,
+                ICON_PATH
         };
     }
 

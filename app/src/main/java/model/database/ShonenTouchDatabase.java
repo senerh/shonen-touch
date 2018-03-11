@@ -12,15 +12,16 @@ public class ShonenTouchDatabase extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "Manga.db";
 
-    // Tables
     private interface Tables {
         /**
-         * The SQL statement that creates the plug table.
+         * The SQL statement that creates the manga table.
          */
         String CREATE_MANGA =
                 "CREATE TABLE " + ShonenTouchContract.Manga.TABLE_NAME + " (" +
                         ShonenTouchContract.MangaColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                         ShonenTouchContract.MangaColumns.NAME + " TEXT, " +
+                        ShonenTouchContract.MangaColumns.LAST_SCAN + " TEXT, " +
+                        ShonenTouchContract.MangaColumns.ICON_PATH + " TEXT, " +
                         ShonenTouchContract.MangaColumns.SLUG + " TEXT UNIQUE);";
 
         String CREATE_SCAN =

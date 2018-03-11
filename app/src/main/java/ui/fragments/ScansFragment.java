@@ -60,6 +60,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.io.File;
 import java.util.List;
@@ -83,6 +85,8 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
 
     public static final String EXTRA_SCAN_ID = "EXTRA_SCAN_ID";
 
+    private ProgressBar mEmptyStateProgressBar;
+    private TextView mEmptyStateTextView;
     private RecyclerView mRecyclerView;
     private ScanAdapter mAdapter;
     private int mMangaId;
@@ -116,6 +120,8 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                             getActivity().getApplicationContext().getContentResolver().insert(ShonenTouchContract.Scan.CONTENT_URI, newScan);
                         }
                     }
+                    mEmptyStateProgressBar.setVisibility(View.GONE);
+                    mEmptyStateTextView.setVisibility(View.GONE);
                     break;
                 default :
                     break;
@@ -141,6 +147,8 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mMangaId = getArguments().getInt("mangaId", -1);
+        mEmptyStateProgressBar = (ProgressBar) view.findViewById(R.id.progress_bar_empty_state);
+        mEmptyStateTextView = (TextView) view.findViewById(R.id.text_view_empty_state);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_scans);
         mAdapter = new ScanAdapter(getContext(), this, this);
         mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
@@ -148,6 +156,18 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
         mRecyclerView.setAdapter(mAdapter);
 
         getLoaderManager().initLoader(SCAN_LOADER, null, this);
+
+        Cursor c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns.MANGA_ID + "=?", new String[]{ String.valueOf(mMangaId) }, null);
+        if (c != null) {
+            try {
+                if (c.getCount() >= 1) {
+                    mEmptyStateProgressBar.setVisibility(View.GONE);
+                    mEmptyStateTextView.setVisibility(View.GONE);
+                }
+            } finally {
+                c.close();
+            }
+        }
 
         fetchScans();
 

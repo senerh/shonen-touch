@@ -60,6 +60,8 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
 
                             newManga.put(ShonenTouchContract.MangaColumns.NAME, manga.getName());
                             newManga.put(ShonenTouchContract.MangaColumns.SLUG, manga.getSlug());
+                            newManga.put(ShonenTouchContract.MangaColumns.LAST_SCAN, manga.getLastScan());
+                            newManga.put(ShonenTouchContract.MangaColumns.ICON_PATH, manga.getIconPath());
 
                             // persisting manga
                             getActivity().getApplicationContext().getContentResolver().insert(ShonenTouchContract.Manga.CONTENT_URI, newManga);
@@ -91,7 +93,18 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
 
         getLoaderManager().initLoader(MANGA_LOADER, null, this);
 
-        fetchMangas();
+//        fetchMangas();
+        Cursor c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Manga.CONTENT_URI, null, null, null, null);
+        if (c != null) {
+            try {
+                if (c.getCount() == 0) {
+                    fetchMangas();
+                }
+            } finally {
+                c.close();
+            }
+        }
+
         super.onViewCreated(view, savedInstanceState);
     }
 

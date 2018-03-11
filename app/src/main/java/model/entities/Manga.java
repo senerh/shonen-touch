@@ -24,17 +24,25 @@ public class Manga implements Parcelable {
 
     private String mName;
 
+    private String mLastScan;
+
+    private String mIconPath;
+
     public Manga() {
     }
 
-    public Manga(String name, String slug) {
+    public Manga(String name, String slug, String lastScan, String iconPath) {
         mSlug = slug;
         mName = name;
+        mLastScan = lastScan;
+        mIconPath = iconPath;
     }
 
     protected Manga(Parcel in) {
         mSlug = in.readString();
         mName = in.readString();
+        mLastScan = in.readString();
+        mIconPath = in.readString();
     }
 
     public String getName() {
@@ -53,6 +61,22 @@ public class Manga implements Parcelable {
         mSlug = slug;
     }
 
+    public String getLastScan() {
+        return mLastScan;
+    }
+
+    public void setLastScan(String lastScan) {
+        this.mLastScan = lastScan;
+    }
+
+    public String getIconPath() {
+        return mIconPath;
+    }
+
+    public void setIconPath(String iconPath) {
+        this.mIconPath = iconPath;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -62,5 +86,7 @@ public class Manga implements Parcelable {
     public void writeToParcel(Parcel dest, int i) {
         dest.writeString(mSlug);
         dest.writeString(mName);
+        dest.writeString(mLastScan);
+        dest.writeString(mIconPath);
     }
 }

@@ -28,7 +28,6 @@ public class PageActivity extends AppCompatActivity {
     private ExtendedViewPager extendedViewPager;
     private ProgressBar mProgressBar;
     private ImagePagerAdapter mImagePagerAdapter;
-    private List<Page> pagesList;
 
 
 
@@ -66,20 +65,6 @@ public class PageActivity extends AppCompatActivity {
         decorView.setSystemUiVisibility(3846);
         decorView.setBackgroundColor(ViewCompat.MEASURED_STATE_MASK);
     }
-
-//    @Override
-//    public void onConfigurationChanged(Configuration newConfig) {
-//        super.onConfigurationChanged(newConfig);
-//
-//        // Checks the orientation of the screen
-//        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            mImagePagerAdapter.photoView.setAdjustViewBounds(true);
-//            mImagePagerAdapter.photoView.setScaleType(ScaleType.CENTER_CROP);
-//        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
-//            mImagePagerAdapter.photoView.setAdjustViewBounds(false);
-//            mImagePagerAdapter.photoView.setScaleType(ScaleType.FIT_XY);
-//        }
-//    }
 
     class ImagePagerAdapter extends PagerAdapter {
         List<String> imageList;

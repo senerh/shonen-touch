@@ -2,10 +2,13 @@ package model.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
+import io.github.senerh.shonentouch.R;
 import model.database.ShonenTouchContract;
 
 public class MangaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -17,13 +20,11 @@ public class MangaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         super();
         mContext = context;
         mOnItemClickListener = itemClickListener;
-        mCursorAdapter = new SimpleCursorAdapter(context, android.R.layout.simple_list_item_1, null, new String[] { }, new int[] {  }, 0);
+        mCursorAdapter = new SimpleCursorAdapter(context, R.layout.manga_recycler_view_item, null, new String[] { }, new int[] {  }, 0);
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-//        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.manga_recycler_view_item, parent, false);
-//        return new MangaViewHolder(itemView, mOnItemClickListener);
         return new MangaViewHolder(mCursorAdapter.newView(mContext, mCursorAdapter.getCursor(), parent), mOnItemClickListener);
     }
 
@@ -34,6 +35,14 @@ public class MangaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (c != null) {
             c.moveToPosition(position);
             ((MangaViewHolder) holder).mMangaNameTextView.setText(c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.NAME)));
+            ((MangaViewHolder) holder).mLastScanTextView.setText(mContext.getString(R.string.lastScan, c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.LAST_SCAN))));
+            String filePath = c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.ICON_PATH));
+            if (!"".equals(filePath)) {
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                ((MangaViewHolder) holder).mMangaIconImageView.setImageBitmap(BitmapFactory.decodeFile(filePath, options));
+            }
+
         }
     }
 

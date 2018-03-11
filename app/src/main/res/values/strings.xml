@@ -38,4 +38,6 @@
     <string name="dialog_delete_scan_title">Suppression d\'un scan</string>
     <string name="dialog_delete_scan_message">Voulez-vous supprimer toutes les pages de ce scan ?</string>
 
+    <string name="lastScan">Dernier scan : %1$s</string>
+
 </resources>
