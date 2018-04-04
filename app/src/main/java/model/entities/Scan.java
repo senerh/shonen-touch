@@ -33,6 +33,7 @@ public class Scan implements Parcelable {
     public enum Status {
         NOT_DOWNLOADED,
         DOWNLOAD_IN_PROGRESS,
+        DOWNLOAD_STOPPED,
         DOWNLOAD_COMPLETE
     }
 

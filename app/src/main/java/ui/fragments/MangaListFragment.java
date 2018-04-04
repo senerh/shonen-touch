@@ -34,7 +34,7 @@ import model.database.ShonenTouchContract;
 import model.entities.Manga;
 import model.services.WSIntentService;
 
-public class MangaListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,OnItemClickListener, SearchView.OnQueryTextListener {
+public class MangaListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,OnItemClickListener, SearchView.OnQueryTextListener, View.OnClickListener {
     // Loaders
     private static final int MANGA_LOADER = 1;
     private Cursor mCursor;
@@ -101,6 +101,7 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
         mCursorFilter = "";
         mMangaSearchView = (SearchView) view.findViewById(R.id.search_view_manga);
         mMangaSearchView.setOnQueryTextListener(this);
+        mMangaSearchView.setOnClickListener(this);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_manga);
         mAdapter = new MangaAdapter(getContext(), this);
         mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
@@ -203,5 +204,16 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
 
         intent.setAction(WSIntentService.GET_ALL_MANGA);
         getActivity().startService(intent);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.search_view_manga:
+                mMangaSearchView.setIconified(false);
+                break;
+            default:
+                break;
+        }
     }
 }

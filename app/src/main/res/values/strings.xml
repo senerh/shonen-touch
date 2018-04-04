@@ -1,42 +1,15 @@
 <resources>
     <string name="app_name">Shonen Touch</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="action_settings">Settings</string>
-    <string name="scan">Scan %1$s</string>
-
-    <string name="menu_item_home" id="home">Accueil</string>
-    <string name="menu_item_favorites">Favoris</string>
-    <string name="menu_item_chat">Chat</string>
-    <string name="menu_item_history">Historique</string>
-    <string name="menu_item_prefs">Réglages</string>
-    <string name="menu_item_about">À propos</string>
-    <string name="menu_item_accueil">Accueil</string>
-
-    <string name="validate">Valider</string>
-    <string name="cancel">Annuler</string>
-
-    <string name="chat">Chat</string>
-    <string name="username">Pseudonyme</string>
-    <string name="about_footer">Codée avec le </string>
-    <string name="about_content">
-        L’application a été réalisée dans le cadre des études à l’école de Polytech Lyon par l’équipe suivante :
-    </string>
-    <string name="about_authors">
-        Nathan FRANCOIS\n
-        Franck LACASTAIGNERATTE\n
-        <a href="https://senerh.github.io">Hakan SENER</a>
-    </string>
-    <string name="updateFavoritesText">Modifier</string>
-    <string name="updateFavoritesDescriptionText">Sélectionnez vos mangas favoris qui apparaitrons sur l\'accueil</string>
-    <string name="emptyHistoryText">L\'historique ne contient aucun élément.</string>
-    <string name="continueLastScan">Reprendre la lecture du scan %1$s</string>
-    <string name="emptyFavortiteText"><![CDATA[Sélectionnez vos favoris depuis le menu Réglages > Favoris]]></string>
-
     // dialogs
     <string name="dialog_delete_scan_title">Suppression d\'un scan</string>
-    <string name="dialog_delete_scan_message">Voulez-vous supprimer toutes les pages de ce scan ?</string>
+    <string name="dialog_delete_scan_message">Voulez-vous supprimer toutes les pages du scan %1$s ?</string>
+    <string name="dialog_stop_download_title">Interruption du téléchargement</string>
+    <string name="dialog_stop_download_message">Voulez-vous interrompre le téléchargement des pages du scan %1$s ?</string>
+    <string name="dialog_resume_or_delete_download_title">Téléchargement interrompu</string>
+    <string name="dialog_resume_or_delete_download_message">Voulez-vous supprimer le contenu téléchargé ou reprendre le téléchargement du scan %1$s ?</string>
+    <string name="dialog_resume_or_delete_download_delete_button">Supprimer</string>
+    <string name="dialog_resume_or_delete_download_resume_button">Reprendre</string>
 
     <string name="lastScan">Dernier scan : %1$s</string>
 

@@ -39,19 +39,17 @@ import model.entities.Scan;
  */
 
 public class WSIntentService extends IntentService {
-
+    public static volatile boolean shouldContinue = true;
     public static final String URL_SERVER = "http://senerh.xyz:8080/shonen-touch-api-3/";
     public static final String GET_ALL_MANGA = URL_SERVER + "mangas";
     public static final String GET_ALL_PAGES_FOR_MANGA_AND_SCAN = URL_SERVER + "mangas/%1$s/scans/%2$s/pages";
     public static final String GET_ALL_SCANS_FOR_MANGA = URL_SERVER + "mangas/%1$s/scans";
-    public static final String GET_URL_FOR_PAGE = "http://senerh.xyz:8080/shonen-touch-api/mangas/%1$s/scans/%2$s/pages/%3$s/image";
     public static final String DOWNLOAD_PAGES_FOR_SCAN = "DOWNLOAD_PAGES_FOR_SCAN";
 
     private static final String IMAGES_FOLDER_NAME = "shonentouch";
 
     public static final String PARAM_MANGAS_LIST = "mangasList";
     public static final String PARAM_MANGA_SLUG = "mangaSlug";
-    public static final String PARAM_PAGES_LIST = "pagesList";
     public static final String PARAM_SCANS_LIST = "scansList";
     public static final String PARAM_SCAN_ID = "scanId";
 
@@ -154,16 +152,27 @@ public class WSIntentService extends IntentService {
 //
 //            }
 //        }).start();
-        ContentValues updatedScan= new ContentValues();
+        boolean isResume = false;
+        int initialIndex = 0;
+        ContentValues updatedScan = new ContentValues();
         updatedScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.DOWNLOAD_IN_PROGRESS.name());
-        updatedScan.put(ShonenTouchContract.ScanColumns.DOWNLOAD_STATUS, "Téléchargement des url des pages...");
-        getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
         Cursor c = getContentResolver().query(ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)}, null);
         if (c != null) {
             try {
                 if (c.getCount() == 1) {
                     c.moveToFirst();
                     String scanName = c.getString(c.getColumnIndex(ShonenTouchContract.ScanColumns.NAME));
+                    // get the information to know if this download has been stopped and resumed
+                    if (Scan.Status.valueOf(c.getString(c.getColumnIndex(ShonenTouchContract.ScanColumns.STATUS))) == Scan.Status.DOWNLOAD_STOPPED) {
+                        // in this case, we are resuming download
+                        updatedScan.put(ShonenTouchContract.ScanColumns.DOWNLOAD_STATUS, "Reprise du téléchargement...");
+                        isResume = true;
+                    } else {
+                        // in this case, it's the first time we try to download the scan
+                        updatedScan.put(ShonenTouchContract.ScanColumns.DOWNLOAD_STATUS, "Téléchargement des url des pages...");
+                    }
+                    getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
+
                     HttpURLConnection urlConnection = (HttpURLConnection) new URL(String.format(GET_ALL_PAGES_FOR_MANGA_AND_SCAN, mangaSlug, scanName)).openConnection();
                     Scanner s = new Scanner(new BufferedInputStream(urlConnection.getInputStream())).useDelimiter("\\A");
                     String result = s.hasNext() ? s.next() : "";
@@ -173,7 +182,21 @@ public class WSIntentService extends IntentService {
                         pages.add(new Page(pagesJSONArray.getJSONObject(i).getString("num"), pagesJSONArray.getJSONObject(i).getString("url")));
                     }
 
-                    for (int i = 0; i < pages.size(); i++) {
+                    if (isResume) {
+                        // read all pages in the table page, related to this scan
+                        Cursor pagesCursor = getApplicationContext().getContentResolver().query(ShonenTouchContract.Page.CONTENT_URI, null, ShonenTouchContract.PageColumns.SCAN_ID + "=?", new String[]{ String.valueOf(scanId) }, null);
+                        if (pagesCursor != null) {
+                            try {
+                                for(pagesCursor.moveToFirst(); !pagesCursor.isAfterLast(); pagesCursor.moveToNext()) {
+                                    initialIndex++;
+                                }
+                            } finally {
+                                pagesCursor.close();
+                            }
+                        }
+                    }
+
+                    for (int i = initialIndex; i < pages.size(); i++) {
                         try {
                             Bitmap downloadedBitmap = BitmapFactory.decodeStream(new URL(pages.get(i).getPath()).openStream());
                             if (downloadedBitmap != null) {
@@ -188,6 +211,14 @@ public class WSIntentService extends IntentService {
                                 updatedScan = new ContentValues();
                                 updatedScan.put(ShonenTouchContract.ScanColumns.DOWNLOAD_STATUS, "Téléchargement page " + (i+1) + "/" + pages.size());
                                 getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
+                                if (!shouldContinue) {
+                                    updatedScan = new ContentValues();
+                                    updatedScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.DOWNLOAD_STOPPED.name());
+                                    getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
+                                    // do not block other tasks in queue
+                                    shouldContinue = true;
+                                    return;
+                                }
                             }
                         } catch (FileNotFoundException e) {
 

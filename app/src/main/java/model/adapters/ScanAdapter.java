@@ -50,6 +50,10 @@ public class ScanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     ((ScanViewHolder) holder).mScanCardView.setBackgroundColor(Color.parseColor("#85ee0b"));
                     ((ScanViewHolder) holder).mDownloadStatusImageView.setImageResource(R.drawable.ic_check_circle_black_24dp);
                     return;
+                case DOWNLOAD_STOPPED:
+                    ((ScanViewHolder) holder).mScanCardView.setBackgroundColor(Color.parseColor("#fc0352"));
+                    ((ScanViewHolder) holder).mDownloadStatusImageView.setImageResource(R.drawable.ic_cancel_black_24dp);
+                    return;
                 default:
             }
         }

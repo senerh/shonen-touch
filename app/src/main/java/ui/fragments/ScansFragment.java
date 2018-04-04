@@ -1,44 +1,3 @@
-//package controller.fragments;
-//
-//import android.os.Bundle;
-//import android.support.annotation.Nullable;
-//import android.support.v4.app.Fragment;
-//import android.view.LayoutInflater;
-//import android.view.View;
-//import android.view.ViewGroup;
-//
-//import io.github.senerh.shonentouch.R;
-//
-//public class ScansFragment extends Fragment implements View.OnClickListener {
-//    public static ScansFragment newInstance(int mangaId) {
-//        final ScansFragment fragment = new ScansFragment();
-//        final Bundle arguments = new Bundle();
-//        arguments.putInt("mangaId", mangaId);
-//        fragment.setArguments(arguments);
-//
-//        return fragment;
-//    }
-//
-//    @Nullable
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-//        return inflater.inflate(R.layout.fragment_scans, null, false);
-//    }
-//
-//    @Override
-//    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-//        super.onViewCreated(view, savedInstanceState);
-//    }
-//
-//    @Override
-//    public void onClick(View v) {
-//        switch (v.getId())
-//        {
-//            default :
-//                break;
-//        }
-//    }
-//}
 package ui.fragments;
 
 import android.app.Activity;
@@ -82,8 +41,11 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
     private Cursor mCursor;
 
     private static final int REQUEST_DELETE_SCAN_DIALOG = 0;
+    private static final int REQUEST_STOP_DOWNLOAD_DIALOG = 1;
+    private static final int REQUEST_RESUME_OR_DELETE_DOWNLOAD_DIALOG = 2;
 
     public static final String EXTRA_SCAN_ID = "EXTRA_SCAN_ID";
+    public static final String EXTRA_MANGA_ID = "EXTRA_MANGA_ID";
 
     private ProgressBar mEmptyStateProgressBar;
     private TextView mEmptyStateTextView;
@@ -182,18 +144,32 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                 if (c.getCount() == 1) {
                     c.moveToFirst();
                     mCursor.moveToPosition(position);
+                    Intent intent = new Intent();
                     switch (Scan.Status.valueOf(mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.STATUS)))) {
                         case NOT_DOWNLOADED:
-                            Intent intent = new Intent(getActivity(), WSIntentService.class);
+                            intent = new Intent(getActivity(), WSIntentService.class);
                             intent.setAction(WSIntentService.DOWNLOAD_PAGES_FOR_SCAN);
                             intent.putExtra(WSIntentService.PARAM_MANGA_SLUG, c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.SLUG)));
                             intent.putExtra(WSIntentService.PARAM_SCAN_ID, mCursor.getInt(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns._ID)));
                             getActivity().startService(intent);
                             break;
                         case DOWNLOAD_COMPLETE:
-                            Intent intentPager = new Intent(getActivity(), PageActivity.class);
-                            intentPager.putExtra(PageActivity.EXTRA_SCAN_ID, mCursor.getInt(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns._ID)));
-                            startActivity(intentPager);
+                            intent = new Intent(getActivity(), PageActivity.class);
+                            intent.putExtra(PageActivity.EXTRA_SCAN_ID, mCursor.getInt(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns._ID)));
+                            startActivity(intent);
+                            break;
+                        case DOWNLOAD_STOPPED:
+                            intent.putExtra(EXTRA_SCAN_ID, mCursor.getInt(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns._ID)));
+                            intent.putExtra(EXTRA_MANGA_ID, mMangaId);
+                            AlertDialogFragment alertDialogFragment = AlertDialogFragment.newInstance(getString(R.string.dialog_resume_or_delete_download_title), getString(R.string.dialog_resume_or_delete_download_message, mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.NAME))),
+                                    intent, true, true, true, R.string.dialog_resume_or_delete_download_delete_button, R.string.dialog_resume_or_delete_download_resume_button);
+                            alertDialogFragment.setTargetFragment(this, REQUEST_RESUME_OR_DELETE_DOWNLOAD_DIALOG);
+                            alertDialogFragment.show(getFragmentManager(), AlertDialogFragment.TAG);
+                            break;
+                        case DOWNLOAD_IN_PROGRESS:
+                            alertDialogFragment = AlertDialogFragment.newInstance(getString(R.string.dialog_stop_download_title), getString(R.string.dialog_stop_download_message, mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.NAME))), intent, true, true);
+                            alertDialogFragment.setTargetFragment(this, REQUEST_STOP_DOWNLOAD_DIALOG);
+                            alertDialogFragment.show(getFragmentManager(), AlertDialogFragment.TAG);
                             break;
                     }
                 }
@@ -211,11 +187,12 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                 if (c.getCount() == 1) {
                     c.moveToFirst();
                     mCursor.moveToPosition(position);
+                    Intent intent = new Intent();
+                    AlertDialogFragment alertDialogFragment;
                     switch (Scan.Status.valueOf(mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.STATUS)))) {
                         case DOWNLOAD_COMPLETE:
-                            Intent intent = new Intent();
                             intent.putExtra(EXTRA_SCAN_ID, mCursor.getInt(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns._ID)));
-                            AlertDialogFragment alertDialogFragment = AlertDialogFragment.newInstance(R.string.dialog_delete_scan_title, R.string.dialog_delete_scan_message, intent, true, true);
+                            alertDialogFragment = AlertDialogFragment.newInstance(getString(R.string.dialog_delete_scan_title), getString(R.string.dialog_delete_scan_message, mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.NAME))), intent, true, true);
                             alertDialogFragment.setTargetFragment(this, REQUEST_DELETE_SCAN_DIALOG);
                             alertDialogFragment.show(getFragmentManager(), AlertDialogFragment.TAG);
                             break;
@@ -257,11 +234,65 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                                 }
                             }
                         }
-//                        String selection = PlugContract.PlugColumns._ID + " LIKE ?";
-//                        String[] selectionArgs = { String.valueOf(mPlugId) };
-//                        int nbRowsDeleted = getActivity().getApplicationContext().getContentResolver().delete(PlugContract.Plug.CONTENT_URI, selection, selectionArgs);
-//
-//                        getActivity().finish();
+                        break;
+                }
+                break;
+            case REQUEST_STOP_DOWNLOAD_DIALOG:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        WSIntentService.shouldContinue = false;
+                        break;
+                }
+                break;
+            case REQUEST_RESUME_OR_DELETE_DOWNLOAD_DIALOG:
+                int scanId, mangaId;
+                Cursor c;
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        // resume download
+                        mangaId = data.getIntExtra(EXTRA_MANGA_ID, -1);
+                        c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Manga.CONTENT_URI, null, ShonenTouchContract.MangaColumns._ID + "=?", new String[]{ String.valueOf(mangaId) }, null);
+                        if (c != null) {
+                            try {
+                                if (c.getCount() == 1) {
+                                    c.moveToFirst();
+                                    scanId = data.getIntExtra(EXTRA_SCAN_ID, -1);
+                                    Intent intent = new Intent(getActivity(), WSIntentService.class);
+                                    intent.setAction(WSIntentService.DOWNLOAD_PAGES_FOR_SCAN);
+                                    intent.putExtra(WSIntentService.PARAM_MANGA_SLUG, c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.SLUG)));
+                                    intent.putExtra(WSIntentService.PARAM_SCAN_ID, scanId);
+                                    getActivity().startService(intent);
+                                }
+                            } finally {
+                                c.close();
+                            }
+                        }
+                        break;
+                    case AlertDialogFragment.RESULT_NEUTRAL:
+                        // delete all pages of this scan
+                        scanId = data.getIntExtra(EXTRA_SCAN_ID, -1);
+                        if (scanId != -1) {
+                            c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Page.CONTENT_URI, null, ShonenTouchContract.PageColumns.SCAN_ID + "=?", new String[]{ String.valueOf(scanId) }, null);
+                            if (c != null) {
+                                try {
+                                    for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+                                        File imageFile = new File(c.getString(c.getColumnIndex(ShonenTouchContract.PageColumns.PATH)));
+                                        boolean fileDeleted = imageFile.delete();
+                                        if (fileDeleted) {
+                                            String selection = ShonenTouchContract.PageColumns._ID + " = ?";
+                                            String[] selectionArgs = { c.getString(c.getColumnIndex(ShonenTouchContract.PageColumns._ID)) };
+                                            getActivity().getApplicationContext().getContentResolver().delete(ShonenTouchContract.Page.CONTENT_URI, selection, selectionArgs);
+                                        }
+                                        ContentValues updatedScan= new ContentValues();
+                                        updatedScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.NOT_DOWNLOADED.name());
+                                        updatedScan.put(ShonenTouchContract.ScanColumns.DOWNLOAD_STATUS, "");
+                                        getActivity().getApplicationContext().getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
+                                    }
+                                } finally {
+                                    c.close();
+                                }
+                            }
+                        }
                         break;
                 }
                 break;
@@ -328,8 +359,6 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
             } finally {
                 c.close();
             }
-
         }
-
     }
 }

@@ -15,12 +15,18 @@ public class AlertDialogFragment extends DialogFragment implements DialogInterfa
     private static Intent mIntent;
 
     public static final String TAG = AlertDialogFragment.class.getSimpleName();
+    public static final int RESULT_NEUTRAL = 555;
 
     // Arguments received
-    private static final String KEY_TITLE_RES_ID = "title";
-    private static final String KEY_MESSAGE_RES_ID = "message";
+    private static final String KEY_TITLE_RES_ID = "titleResId";
+    private static final String KEY_MESSAGE_RES_ID = "messageResId";
+    private static final String KEY_TITLE_STRING = "title";
+    private static final String KEY_MESSAGE_STRING = "message";
     private static final String KEY_NOT_CANCELABLE = "cancelable";
     private static final String KEY_HAS_CANCEL_BUTTON = "hasCancelButton";
+    private static final String KEY_HAS_NEUTRAL_BUTTON = "hasNeutralButton";
+    private static final String KEY_NEUTRAL_BUTTON_TEXT_RES_ID = "neutralButtonTextResId";
+    private static final String KEY_POSITIVE_BUTTON_TEXT_RES_ID = "positiveButtonTextResId";
 
     public static AlertDialogFragment newInstance(int titleResId, int messageResId, Intent intent, boolean cancelable) {
         mIntent = intent;
@@ -45,6 +51,34 @@ public class AlertDialogFragment extends DialogFragment implements DialogInterfa
         return fragment;
     }
 
+    public static AlertDialogFragment newInstance(String title, String message, Intent intent, boolean cancelable, boolean hasCancelButton) {
+        mIntent = intent;
+        final AlertDialogFragment fragment = new AlertDialogFragment();
+        final Bundle arguments = new Bundle();
+        arguments.putString(KEY_TITLE_STRING, title);
+        arguments.putString(KEY_MESSAGE_STRING, message);
+        arguments.putBoolean(KEY_NOT_CANCELABLE, cancelable);
+        arguments.putBoolean(KEY_HAS_CANCEL_BUTTON, hasCancelButton);
+        fragment.setArguments(arguments);
+        return fragment;
+    }
+
+    public static AlertDialogFragment newInstance(String title, String message, Intent intent, boolean cancelable, boolean hasCancelButton, boolean hasNeutralButton,
+                                                  int neutralButtonTextResId, int positiveButtonTextResId) {
+        mIntent = intent;
+        final AlertDialogFragment fragment = new AlertDialogFragment();
+        final Bundle arguments = new Bundle();
+        arguments.putString(KEY_TITLE_STRING, title);
+        arguments.putString(KEY_MESSAGE_STRING, message);
+        arguments.putBoolean(KEY_NOT_CANCELABLE, cancelable);
+        arguments.putBoolean(KEY_HAS_CANCEL_BUTTON, hasCancelButton);
+        arguments.putBoolean(KEY_HAS_NEUTRAL_BUTTON, hasNeutralButton);
+        arguments.putInt(KEY_NEUTRAL_BUTTON_TEXT_RES_ID, neutralButtonTextResId);
+        arguments.putInt(KEY_POSITIVE_BUTTON_TEXT_RES_ID, positiveButtonTextResId);
+        fragment.setArguments(arguments);
+        return fragment;
+    }
+
     public static AlertDialogFragment newInstance(int titleResId, int messageResId, Intent intent) {
         mIntent = intent;
         final AlertDialogFragment fragment = new AlertDialogFragment();
@@ -65,13 +99,24 @@ public class AlertDialogFragment extends DialogFragment implements DialogInterfa
         }
         if (arguments.getInt(KEY_TITLE_RES_ID) != 0) {
             builder.setTitle(arguments.getInt(KEY_TITLE_RES_ID));
+        } else if (arguments.getString(KEY_TITLE_STRING) != null && !"".equals(arguments.getString(KEY_TITLE_STRING))) {
+            builder.setTitle(arguments.getString(KEY_TITLE_STRING));
         }
         if (arguments.getInt(KEY_MESSAGE_RES_ID) != 0) {
             builder.setMessage(arguments.getInt(KEY_MESSAGE_RES_ID));
+        } else if (arguments.getString(KEY_MESSAGE_STRING) != null && !"".equals(arguments.getString(KEY_MESSAGE_STRING))) {
+            builder.setMessage(arguments.getString(KEY_MESSAGE_STRING));
         }
-        builder.setPositiveButton(android.R.string.ok, this);
+        if (arguments.getInt(KEY_POSITIVE_BUTTON_TEXT_RES_ID) != 0) {
+            builder.setPositiveButton(arguments.getInt(KEY_POSITIVE_BUTTON_TEXT_RES_ID), this);
+        } else {
+            builder.setPositiveButton(android.R.string.ok, this);
+        }
         if (arguments.getBoolean(KEY_HAS_CANCEL_BUTTON)) {
             builder.setNegativeButton(android.R.string.cancel, this);
+        }
+        if (arguments.getBoolean(KEY_HAS_NEUTRAL_BUTTON) && arguments.getInt(KEY_NEUTRAL_BUTTON_TEXT_RES_ID) != -1) {
+            builder.setNeutralButton(arguments.getInt(KEY_NEUTRAL_BUTTON_TEXT_RES_ID), this);
         }
 
         return builder.create();
@@ -85,6 +130,8 @@ public class AlertDialogFragment extends DialogFragment implements DialogInterfa
                 targetFragment.onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, mIntent);
             } else if (which == DialogInterface.BUTTON_NEGATIVE) {
                 targetFragment.onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, mIntent);
+            } else if (which == DialogInterface.BUTTON_NEUTRAL) {
+                targetFragment.onActivityResult(getTargetRequestCode(), RESULT_NEUTRAL, mIntent);
             }
         }
     }
