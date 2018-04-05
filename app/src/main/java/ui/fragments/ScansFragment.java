@@ -26,6 +26,7 @@ import java.io.File;
 import java.util.List;
 
 import model.adapters.OnItemLongClickListener;
+import model.services.HeavyActionsIntentService;
 import ui.activities.PageActivity;
 import io.github.senerh.shonentouch.R;
 import model.adapters.OnItemClickListener;
@@ -212,28 +213,10 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         int scanId = data.getIntExtra(EXTRA_SCAN_ID, -1);
-                        if (scanId != -1) {
-                            Cursor c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Page.CONTENT_URI, null, ShonenTouchContract.PageColumns.SCAN_ID + "=?", new String[]{ String.valueOf(scanId) }, null);
-                            if (c != null) {
-                                try {
-                                    for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-                                        File imageFile = new File(c.getString(c.getColumnIndex(ShonenTouchContract.PageColumns.PATH)));
-                                        boolean fileDeleted = imageFile.delete();
-                                        if (fileDeleted) {
-                                            String selection = ShonenTouchContract.PageColumns._ID + " = ?";
-                                            String[] selectionArgs = { c.getString(c.getColumnIndex(ShonenTouchContract.PageColumns._ID)) };
-                                            getActivity().getApplicationContext().getContentResolver().delete(ShonenTouchContract.Page.CONTENT_URI, selection, selectionArgs);
-                                        }
-                                        ContentValues updatedScan= new ContentValues();
-                                        updatedScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.NOT_DOWNLOADED.name());
-                                        updatedScan.put(ShonenTouchContract.ScanColumns.DOWNLOAD_STATUS, "");
-                                        getActivity().getApplicationContext().getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
-                                    }
-                                } finally {
-                                    c.close();
-                                }
-                            }
-                        }
+                        Intent intent = new Intent(getActivity(), HeavyActionsIntentService.class);
+                        intent.setAction(HeavyActionsIntentService.DELETE_SCAN_PAGES);
+                        intent.putExtra(HeavyActionsIntentService.EXTRA_SCAN_ID, scanId);
+                        getActivity().startService(intent);
                         break;
                 }
                 break;
@@ -271,28 +254,10 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                     case AlertDialogFragment.RESULT_NEUTRAL:
                         // delete all pages of this scan
                         scanId = data.getIntExtra(EXTRA_SCAN_ID, -1);
-                        if (scanId != -1) {
-                            c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Page.CONTENT_URI, null, ShonenTouchContract.PageColumns.SCAN_ID + "=?", new String[]{ String.valueOf(scanId) }, null);
-                            if (c != null) {
-                                try {
-                                    for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-                                        File imageFile = new File(c.getString(c.getColumnIndex(ShonenTouchContract.PageColumns.PATH)));
-                                        boolean fileDeleted = imageFile.delete();
-                                        if (fileDeleted) {
-                                            String selection = ShonenTouchContract.PageColumns._ID + " = ?";
-                                            String[] selectionArgs = { c.getString(c.getColumnIndex(ShonenTouchContract.PageColumns._ID)) };
-                                            getActivity().getApplicationContext().getContentResolver().delete(ShonenTouchContract.Page.CONTENT_URI, selection, selectionArgs);
-                                        }
-                                        ContentValues updatedScan= new ContentValues();
-                                        updatedScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.NOT_DOWNLOADED.name());
-                                        updatedScan.put(ShonenTouchContract.ScanColumns.DOWNLOAD_STATUS, "");
-                                        getActivity().getApplicationContext().getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
-                                    }
-                                } finally {
-                                    c.close();
-                                }
-                            }
-                        }
+                        Intent intent = new Intent(getActivity(), HeavyActionsIntentService.class);
+                        intent.setAction(HeavyActionsIntentService.DELETE_SCAN_PAGES);
+                        intent.putExtra(HeavyActionsIntentService.EXTRA_SCAN_ID, scanId);
+                        getActivity().startService(intent);
                         break;
                 }
                 break;

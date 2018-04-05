@@ -162,8 +162,11 @@ public class WSIntentService extends IntentService {
                 if (c.getCount() == 1) {
                     c.moveToFirst();
                     String scanName = c.getString(c.getColumnIndex(ShonenTouchContract.ScanColumns.NAME));
-                    // get the information to know if this download has been stopped and resumed
-                    if (Scan.Status.valueOf(c.getString(c.getColumnIndex(ShonenTouchContract.ScanColumns.STATUS))) == Scan.Status.DOWNLOAD_STOPPED) {
+                    // if download has already been done, don't do it again
+                    if (Scan.Status.valueOf(c.getString(c.getColumnIndex(ShonenTouchContract.ScanColumns.STATUS))) == Scan.Status.DOWNLOAD_COMPLETE) {
+                        return;
+                    } else if (Scan.Status.valueOf(c.getString(c.getColumnIndex(ShonenTouchContract.ScanColumns.STATUS))) == Scan.Status.DOWNLOAD_STOPPED) {
+                        // get the information to know if this download has been stopped and resumed
                         // in this case, we are resuming download
                         updatedScan.put(ShonenTouchContract.ScanColumns.DOWNLOAD_STATUS, "Reprise du téléchargement...");
                         isResume = true;
@@ -221,7 +224,9 @@ public class WSIntentService extends IntentService {
                                 }
                             }
                         } catch (FileNotFoundException e) {
-
+                            updatedScan = new ContentValues();
+                            updatedScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.DOWNLOAD_STOPPED.name());
+                            getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
                         }
 
                     }
@@ -233,6 +238,9 @@ public class WSIntentService extends IntentService {
                     urlConnection.disconnect();
                 }
             } catch (IOException | JSONException e) {
+                updatedScan = new ContentValues();
+                updatedScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.DOWNLOAD_STOPPED.name());
+                getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
                 e.printStackTrace();
             } finally {
                 c.close();
