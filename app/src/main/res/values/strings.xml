@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Shonen Touch</string>
 
-    // dialogs
+    <!--Dialogs-->
     <string name="dialog_delete_scan_title">Suppression d\'un scan</string>
     <string name="dialog_delete_scan_message">Voulez-vous supprimer toutes les pages du scan %1$s ?</string>
     <string name="dialog_stop_download_title">Interruption du téléchargement</string>

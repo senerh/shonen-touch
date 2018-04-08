@@ -2,11 +2,14 @@ package model.services;
 
 import android.app.IntentService;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
@@ -33,18 +36,18 @@ import model.entities.Manga;
 import model.entities.Page;
 import model.entities.Scan;
 
-
 /**
  * Created by Thibaut SORIANO on 28/03/2017.
  */
-
 public class WSIntentService extends IntentService {
-    public static volatile boolean shouldContinue = true;
-    public static final String URL_SERVER = "http://senerh.xyz:8080/shonen-touch-api-3/";
-    public static final String GET_ALL_MANGA = URL_SERVER + "mangas";
-    public static final String GET_ALL_PAGES_FOR_MANGA_AND_SCAN = URL_SERVER + "mangas/%1$s/scans/%2$s/pages";
-    public static final String GET_ALL_SCANS_FOR_MANGA = URL_SERVER + "mangas/%1$s/scans";
+    public static final String GET_ALL_MANGA = "GET_ALL_MANGA";
+    public static final String GET_ALL_SCANS_FOR_MANGA = "GET_ALL_SCANS_FOR_MANGA";
     public static final String DOWNLOAD_PAGES_FOR_SCAN = "DOWNLOAD_PAGES_FOR_SCAN";
+
+    private static final String URL_SERVER = "http://senerh.xyz:8080/shonen-touch-api-3/";
+    private static final String URL_ALL_MANGA = URL_SERVER + "mangas";
+    private static final String URL_ALL_SCANS_FOR_MANGA = URL_SERVER + "mangas/%1$s/scans";
+    private static final String URL_ALL_PAGES_FOR_MANGA_AND_SCAN = URL_SERVER + "mangas/%1$s/scans/%2$s/pages";
 
     private static final String IMAGES_FOLDER_NAME = "shonentouch";
 
@@ -52,6 +55,13 @@ public class WSIntentService extends IntentService {
     public static final String PARAM_MANGA_SLUG = "mangaSlug";
     public static final String PARAM_SCANS_LIST = "scansList";
     public static final String PARAM_SCAN_ID = "scanId";
+
+    public static final String EXTRA_RESULT_CODE = "EXTRA_RESULT_CODE";
+
+    public static final int RESULT_OK = 200;
+    public static final int RESULT_ERROR_NO_INTERNET = 400;
+    public static final int RESULT_ERROR_TIMEOUT = 404;
+    public static final int RESULT_ERROR_BAD_RESPONSE = 500;
 
     public WSIntentService() {
         super("WSIntentService");
@@ -81,8 +91,14 @@ public class WSIntentService extends IntentService {
     public void getAllManga() {
         final Intent intent = new Intent(GET_ALL_MANGA);
 
+        if (!isConnected()) {
+            intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_NO_INTERNET);
+            sendBroadcast(intent);
+            return;
+        }
+
         try {
-            URL url = new URL(GET_ALL_MANGA);
+            URL url = new URL(URL_ALL_MANGA);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
             Scanner s = new Scanner(in).useDelimiter("\\A");
@@ -114,19 +130,26 @@ public class WSIntentService extends IntentService {
             }
 
             intent.putParcelableArrayListExtra(PARAM_MANGAS_LIST, (ArrayList<? extends Parcelable>) mangas);
-            System.out.println("\n\n************** response ***************************\n" + result + "\n\n");
+            intent.putExtra(EXTRA_RESULT_CODE, RESULT_OK);
             sendBroadcast(intent);
 
             urlConnection.disconnect();
-        } catch (IOException | JSONException e) {
+        } catch (IOException e) {
+            intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_TIMEOUT);
+            sendBroadcast(intent);
+            e.printStackTrace();
+        } catch (JSONException e) {
+            intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_BAD_RESPONSE);
+            sendBroadcast(intent);
             e.printStackTrace();
         }
     }
 
     public void getAllScansForManga(String mangaSlug) {
         Intent intent = new Intent(GET_ALL_SCANS_FOR_MANGA);
+
         try {
-            HttpURLConnection urlConnection = (HttpURLConnection) new URL(String.format(GET_ALL_SCANS_FOR_MANGA, mangaSlug)).openConnection();
+            HttpURLConnection urlConnection = (HttpURLConnection) new URL(String.format(URL_ALL_SCANS_FOR_MANGA, mangaSlug)).openConnection();
             Scanner s = new Scanner(new BufferedInputStream(urlConnection.getInputStream())).useDelimiter("\\A");
             String result = s.hasNext() ? s.next() : "";
             List<Scan> scans = new ArrayList<>();
@@ -135,23 +158,14 @@ public class WSIntentService extends IntentService {
                 scans.add(new Scan(tabScan.getJSONObject(i).getString("num")));
             }
             intent.putParcelableArrayListExtra(PARAM_SCANS_LIST, (ArrayList<? extends Parcelable>) scans);
-            System.out.println("\n\n************** response ***************************\n" + result + "\n\n");
             sendBroadcast(intent);
             urlConnection.disconnect();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
+        } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
     }
 
-    public void downloadPagesImagesForScan(String mangaSlug, long scanId) {
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//            }
-//        }).start();
+    public void downloadPagesImagesForScan(String mangaSlug, int scanId) {
         boolean isResume = false;
         int initialIndex = 0;
         ContentValues updatedScan = new ContentValues();
@@ -176,7 +190,7 @@ public class WSIntentService extends IntentService {
                     }
                     getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
 
-                    HttpURLConnection urlConnection = (HttpURLConnection) new URL(String.format(GET_ALL_PAGES_FOR_MANGA_AND_SCAN, mangaSlug, scanName)).openConnection();
+                    HttpURLConnection urlConnection = (HttpURLConnection) new URL(String.format(URL_ALL_PAGES_FOR_MANGA_AND_SCAN, mangaSlug, scanName)).openConnection();
                     Scanner s = new Scanner(new BufferedInputStream(urlConnection.getInputStream())).useDelimiter("\\A");
                     String result = s.hasNext() ? s.next() : "";
                     List<Page> pages = new ArrayList<>();
@@ -203,6 +217,9 @@ public class WSIntentService extends IntentService {
                         try {
                             Bitmap downloadedBitmap = BitmapFactory.decodeStream(new URL(pages.get(i).getPath()).openStream());
                             if (downloadedBitmap != null) {
+                                if (!isAllowedToKeepDownloading(scanId)) {
+                                    return;
+                                }
                                 File imageFile = new File(new ContextWrapper(this).getDir(IMAGES_FOLDER_NAME, 0), mangaSlug + HelpFormatter.DEFAULT_OPT_PREFIX + scanId + HelpFormatter.DEFAULT_OPT_PREFIX + i);
                                 OutputStream fileOutputStream = new FileOutputStream(imageFile);
                                 downloadedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
@@ -214,14 +231,6 @@ public class WSIntentService extends IntentService {
                                 updatedScan = new ContentValues();
                                 updatedScan.put(ShonenTouchContract.ScanColumns.DOWNLOAD_STATUS, "Téléchargement page " + (i+1) + "/" + pages.size());
                                 getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
-                                if (!shouldContinue) {
-                                    updatedScan = new ContentValues();
-                                    updatedScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.DOWNLOAD_STOPPED.name());
-                                    getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
-                                    // do not block other tasks in queue
-                                    shouldContinue = true;
-                                    return;
-                                }
                             }
                         } catch (FileNotFoundException e) {
                             updatedScan = new ContentValues();
@@ -246,5 +255,35 @@ public class WSIntentService extends IntentService {
                 c.close();
             }
         }
+    }
+
+    private boolean isAllowedToKeepDownloading(int scanId) {
+        Cursor c = getContentResolver().query(ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)}, null);
+        if (c != null) {
+            try {
+                if (c.getCount() == 1) {
+                    c.moveToFirst();
+                    if (Scan.Status.valueOf(c.getString(c.getColumnIndex(ShonenTouchContract.ScanColumns.STATUS))) == Scan.Status.DOWNLOAD_STOPPED) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+            } finally {
+                c.close();
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Indicates whether network connectivity exists.
+     * @return true if network connectivity exists, false otherwise.
+     */
+    public boolean isConnected() {
+        final ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

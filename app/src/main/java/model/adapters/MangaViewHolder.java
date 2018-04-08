@@ -12,7 +12,6 @@ public class MangaViewHolder extends RecyclerView.ViewHolder implements View.OnC
 
     // Views
     public TextView mMangaNameTextView;
-    public TextView mLastScanTextView;
     public ImageView mMangaIconImageView;
 
     // Listener
@@ -21,7 +20,6 @@ public class MangaViewHolder extends RecyclerView.ViewHolder implements View.OnC
     public MangaViewHolder(View itemView) {
         super(itemView);
         mMangaNameTextView = (TextView) itemView.findViewById(R.id.text_view_manga_name);
-        mLastScanTextView = (TextView) itemView.findViewById(R.id.text_view_last_scan);
         mMangaIconImageView = (ImageView) itemView.findViewById(R.id.image_view_manga_icon);
     }
 

@@ -6,13 +6,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +23,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -34,7 +37,7 @@ import model.database.ShonenTouchContract;
 import model.entities.Manga;
 import model.services.WSIntentService;
 
-public class MangaListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,OnItemClickListener, SearchView.OnQueryTextListener, View.OnClickListener {
+public class MangaListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,OnItemClickListener, SearchView.OnQueryTextListener, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
     // Loaders
     private static final int MANGA_LOADER = 1;
     private Cursor mCursor;
@@ -44,41 +47,79 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
     private String mCursorFilter;
     private SearchView mMangaSearchView;
     private ProgressBar mEmptyStateProgressBar;
-    private TextView mEmptyStateTextView;
+    private TextView mFirstTimeTextView;
+    private CoordinatorLayout mSnackbarCoordinatorLayout;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private ImageView mEmptyStateImageView;
 
     private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Snackbar snackbar;
             switch (intent.getAction()) {
                 case WSIntentService.GET_ALL_MANGA:
-                    List<Manga> mangas = intent.getParcelableArrayListExtra(WSIntentService.PARAM_MANGAS_LIST);
+                    switch (intent.getIntExtra(WSIntentService.EXTRA_RESULT_CODE, 0)) {
+                        case WSIntentService.RESULT_OK:
+                            List<Manga> mangas = intent.getParcelableArrayListExtra(WSIntentService.PARAM_MANGAS_LIST);
 
-                    // persist all new mangas in db
-                    for (Manga manga : mangas) {
-                        boolean alreadyExists = false;
+                            // persist all new mangas in db
+                            for (Manga manga : mangas) {
+                                boolean alreadyExists = false;
 
-                        for(mCursor.moveToFirst(); !mCursor.isAfterLast(); mCursor.moveToNext()) {
-                            if (manga.getName().equals(mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.MangaColumns.NAME)))) {
-                                alreadyExists = true;
+                                for(mCursor.moveToFirst(); !mCursor.isAfterLast(); mCursor.moveToNext()) {
+                                    if (manga.getName().equals(mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.MangaColumns.NAME)))) {
+                                        alreadyExists = true;
+                                    }
+                                }
+
+                                // persist
+                                if (!alreadyExists) {
+                                    ContentValues newManga = new ContentValues();
+
+                                    newManga.put(ShonenTouchContract.MangaColumns.NAME, manga.getName());
+                                    newManga.put(ShonenTouchContract.MangaColumns.SLUG, manga.getSlug());
+                                    newManga.put(ShonenTouchContract.MangaColumns.LAST_SCAN, manga.getLastScan());
+                                    newManga.put(ShonenTouchContract.MangaColumns.ICON_PATH, manga.getIconPath());
+
+                                    // persisting manga
+                                    getActivity().getApplicationContext().getContentResolver().insert(ShonenTouchContract.Manga.CONTENT_URI, newManga);
+                                }
+                                // todo compare last scan maybe
                             }
-                        }
+                            mEmptyStateProgressBar.setVisibility(View.GONE);
+                            mFirstTimeTextView.setVisibility(View.GONE);
+                            mMangaSearchView.setVisibility(View.VISIBLE);
+                            mEmptyStateImageView.setVisibility(View.GONE);
+                            if (mSwipeRefreshLayout.isRefreshing()) {
+                                snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Liste de mangas récupérée", Snackbar.LENGTH_LONG);
 
-                        // persist
-                        if (!alreadyExists) {
-                            ContentValues newManga = new ContentValues();
+                                snackbar.show();
+                            }
+                            break;
+                        case WSIntentService.RESULT_ERROR_NO_INTERNET:
+                            mEmptyStateProgressBar.setVisibility(View.GONE);
+                            mFirstTimeTextView.setVisibility(View.GONE);
+                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Aucune connexion internet", Snackbar.LENGTH_LONG);
 
-                            newManga.put(ShonenTouchContract.MangaColumns.NAME, manga.getName());
-                            newManga.put(ShonenTouchContract.MangaColumns.SLUG, manga.getSlug());
-                            newManga.put(ShonenTouchContract.MangaColumns.LAST_SCAN, manga.getLastScan());
-                            newManga.put(ShonenTouchContract.MangaColumns.ICON_PATH, manga.getIconPath());
+                            snackbar.show();
+                            break;
+                        case WSIntentService.RESULT_ERROR_BAD_RESPONSE:
+                        case WSIntentService.RESULT_ERROR_TIMEOUT:
+                            mEmptyStateProgressBar.setVisibility(View.GONE);
+                            mFirstTimeTextView.setVisibility(View.GONE);
+                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Erreur de communication avec le serveur", Snackbar.LENGTH_LONG);
 
-                            // persisting manga
-                            getActivity().getApplicationContext().getContentResolver().insert(ShonenTouchContract.Manga.CONTENT_URI, newManga);
-                        }
+                            snackbar.show();
+                            break;
+                        default:
+                            break;
                     }
-                    mEmptyStateProgressBar.setVisibility(View.GONE);
-                    mEmptyStateTextView.setVisibility(View.GONE);
-                    mMangaSearchView.setVisibility(View.VISIBLE);
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    if (mCursor.getCount() <= 0) {
+                        mEmptyStateImageView.setVisibility(View.VISIBLE);
+                    } else {
+                        mEmptyStateImageView.setVisibility(View.GONE);
+                    }
                     break;
                 default :
                     break;
@@ -97,7 +138,7 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
 //        getActivity().getApplicationContext().deleteDatabase("Manga.db");
 
         mEmptyStateProgressBar = (ProgressBar) view.findViewById(R.id.progress_bar_empty_state);
-        mEmptyStateTextView = (TextView) view.findViewById(R.id.text_view_empty_state);
+        mFirstTimeTextView = (TextView) view.findViewById(R.id.text_view_first_time);
         mCursorFilter = "";
         mMangaSearchView = (SearchView) view.findViewById(R.id.search_view_manga);
         mMangaSearchView.setOnQueryTextListener(this);
@@ -107,6 +148,10 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
         mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
+        mSnackbarCoordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.coordinator_layout_snackbar);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mEmptyStateImageView = (ImageView) view.findViewById(R.id.image_view_empty_state);
 
         getLoaderManager().initLoader(MANGA_LOADER, null, this);
 
@@ -115,7 +160,7 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
             try {
                 if (c.getCount() >= 1) {
                     mEmptyStateProgressBar.setVisibility(View.GONE);
-                    mEmptyStateTextView.setVisibility(View.GONE);
+                    mFirstTimeTextView.setVisibility(View.GONE);
                     mMangaSearchView.setVisibility(View.VISIBLE);
                 } else if (c.getCount() == 0) {
                     fetchMangas();
@@ -199,13 +244,6 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
         startActivity(intent);
     }
 
-    private void fetchMangas() {
-        final Intent intent = new Intent(getActivity(), WSIntentService.class);
-
-        intent.setAction(WSIntentService.GET_ALL_MANGA);
-        getActivity().startService(intent);
-    }
-
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -215,5 +253,17 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
             default:
                 break;
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        fetchMangas();
+    }
+
+    private void fetchMangas() {
+        final Intent intent = new Intent(getActivity(), WSIntentService.class);
+
+        intent.setAction(WSIntentService.GET_ALL_MANGA);
+        getActivity().startService(intent);
     }
 }

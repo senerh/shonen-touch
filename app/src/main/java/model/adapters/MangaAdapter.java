@@ -35,7 +35,6 @@ public class MangaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (c != null) {
             c.moveToPosition(position);
             ((MangaViewHolder) holder).mMangaNameTextView.setText(c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.NAME)));
-            ((MangaViewHolder) holder).mLastScanTextView.setText(mContext.getString(R.string.lastScan, c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.LAST_SCAN))));
             String filePath = c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.ICON_PATH));
             if (!"".equals(filePath)) {
                 BitmapFactory.Options options = new BitmapFactory.Options();

@@ -16,13 +16,14 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.io.File;
 import java.util.List;
 
 import model.adapters.OnItemLongClickListener;
@@ -36,7 +37,7 @@ import model.entities.Scan;
 import model.services.WSIntentService;
 import ui.dialogs.AlertDialogFragment;
 
-public class ScansFragment extends Fragment implements OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>, OnItemLongClickListener {
+public class ScansFragment extends Fragment implements OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>, OnItemLongClickListener, SearchView.OnQueryTextListener, View.OnClickListener {
     // Loaders
     private static final int SCAN_LOADER = 1;
     private Cursor mCursor;
@@ -52,7 +53,9 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
     private TextView mEmptyStateTextView;
     private RecyclerView mRecyclerView;
     private ScanAdapter mAdapter;
+    private SearchView mScansSearchView;
     private int mMangaId;
+    private String mCursorFilter;
 
     private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -72,6 +75,7 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                         }
 
                         // persist
+                        // todo : better comparison
                         if (!alreadyExists) {
                             ContentValues newScan = new ContentValues();
 
@@ -85,6 +89,7 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                     }
                     mEmptyStateProgressBar.setVisibility(View.GONE);
                     mEmptyStateTextView.setVisibility(View.GONE);
+                    mScansSearchView.setVisibility(View.VISIBLE);
                     break;
                 default :
                     break;
@@ -111,12 +116,16 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mMangaId = getArguments().getInt("mangaId", -1);
         mEmptyStateProgressBar = (ProgressBar) view.findViewById(R.id.progress_bar_empty_state);
-        mEmptyStateTextView = (TextView) view.findViewById(R.id.text_view_empty_state);
+        mEmptyStateTextView = (TextView) view.findViewById(R.id.text_view_first_time);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_scans);
         mAdapter = new ScanAdapter(getContext(), this, this);
         mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
+        mCursorFilter = "";
+        mScansSearchView = (SearchView) view.findViewById(R.id.search_view_scans);
+        mScansSearchView.setOnQueryTextListener(this);
+        mScansSearchView.setOnClickListener(this);
 
         getLoaderManager().initLoader(SCAN_LOADER, null, this);
 
@@ -126,6 +135,7 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                 if (c.getCount() >= 1) {
                     mEmptyStateProgressBar.setVisibility(View.GONE);
                     mEmptyStateTextView.setVisibility(View.GONE);
+                    mScansSearchView.setVisibility(View.VISIBLE);
                 } else if (c.getCount() == 0) {
                     fetchScans();
                 }
@@ -168,6 +178,7 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                             alertDialogFragment.show(getFragmentManager(), AlertDialogFragment.TAG);
                             break;
                         case DOWNLOAD_IN_PROGRESS:
+                            intent.putExtra(EXTRA_SCAN_ID, mCursor.getInt(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns._ID)));
                             alertDialogFragment = AlertDialogFragment.newInstance(getString(R.string.dialog_stop_download_title), getString(R.string.dialog_stop_download_message, mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.NAME))), intent, true, true);
                             alertDialogFragment.setTargetFragment(this, REQUEST_STOP_DOWNLOAD_DIALOG);
                             alertDialogFragment.show(getFragmentManager(), AlertDialogFragment.TAG);
@@ -223,7 +234,10 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
             case REQUEST_STOP_DOWNLOAD_DIALOG:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        WSIntentService.shouldContinue = false;
+                        int scanId = data.getIntExtra(EXTRA_SCAN_ID, -1);
+                        ContentValues updatedScan = new ContentValues();
+                        updatedScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.DOWNLOAD_STOPPED.name());
+                        getActivity().getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
                         break;
                 }
                 break;
@@ -270,7 +284,14 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (id == SCAN_LOADER) {
-            return new CursorLoader(getContext().getApplicationContext(), ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns.MANGA_ID + "=?", new String[]{ String.valueOf(mMangaId)}, null);
+            if (mCursorFilter == null || mCursorFilter.equals("")) {
+                return new CursorLoader(getContext().getApplicationContext(), ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns.MANGA_ID + "=?", new String[]{ String.valueOf(mMangaId)}, ShonenTouchContract.ScanColumns._ID + " DESC");
+            } else {
+                return new CursorLoader(getContext().getApplicationContext(), ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns.MANGA_ID + "=?" + " AND " + ShonenTouchContract.ScanColumns.NAME + " LIKE ?",
+                        new String[]{ String.valueOf(mMangaId), "%" + mCursorFilter + "%" }, ShonenTouchContract.ScanColumns._ID + " DESC");
+            }
+//            return new CursorLoader(getContext().getApplicationContext(), ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns.MANGA_ID + "=?", new String[]{ String.valueOf(mMangaId)},
+//                    ShonenTouchContract.ScanColumns._ID + " DESC");
         }
 
         return null;
@@ -324,6 +345,29 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
             } finally {
                 c.close();
             }
+        }
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        mCursorFilter = !TextUtils.isEmpty(newText) ? newText : null;
+        getLoaderManager().restartLoader(SCAN_LOADER, null, this);
+        return true;
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.search_view_scans:
+                mScansSearchView.setIconified(false);
+                break;
+            default:
+                break;
         }
     }
 }
