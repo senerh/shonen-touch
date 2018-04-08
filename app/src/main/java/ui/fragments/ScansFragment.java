@@ -9,10 +9,13 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,7 +40,7 @@ import model.entities.Scan;
 import model.services.WSIntentService;
 import ui.dialogs.AlertDialogFragment;
 
-public class ScansFragment extends Fragment implements OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>, OnItemLongClickListener, SearchView.OnQueryTextListener, View.OnClickListener {
+public class ScansFragment extends Fragment implements OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>, OnItemLongClickListener, SearchView.OnQueryTextListener, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
     // Loaders
     private static final int SCAN_LOADER = 1;
     private Cursor mCursor;
@@ -50,46 +53,92 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
     public static final String EXTRA_MANGA_ID = "EXTRA_MANGA_ID";
 
     private ProgressBar mEmptyStateProgressBar;
-    private TextView mEmptyStateTextView;
+    private TextView mEmptyStateTextView, mNewScanTextView;
     private RecyclerView mRecyclerView;
     private ScanAdapter mAdapter;
     private SearchView mScansSearchView;
     private int mMangaId;
     private String mCursorFilter;
+    private CoordinatorLayout mSnackbarCoordinatorLayout;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Snackbar snackbar;
             switch (intent.getAction()) {
                 case WSIntentService.GET_ALL_SCANS_FOR_MANGA:
-                    List<Scan> scans = intent.getParcelableArrayListExtra(WSIntentService.PARAM_SCANS_LIST);
+                    switch (intent.getIntExtra(WSIntentService.EXTRA_RESULT_CODE, 0)) {
+                        case WSIntentService.RESULT_OK:
+                            List<Scan> scans = intent.getParcelableArrayListExtra(WSIntentService.PARAM_SCANS_LIST);
 
-                    // persist all new scans in db
-                    for (Scan scan : scans) {
-                        boolean alreadyExists = false;
+                            // persist all new scans in db
+                            for (Scan scan : scans) {
+                                boolean alreadyExists = false;
 
-                        for(mCursor.moveToFirst(); !mCursor.isAfterLast(); mCursor.moveToNext()) {
-                            if (scan.getName().equals(mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.NAME)))) {
-                                alreadyExists = true;
+                                for(mCursor.moveToFirst(); !mCursor.isAfterLast(); mCursor.moveToNext()) {
+                                    if (scan.getName().equals(mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.NAME)))) {
+                                        alreadyExists = true;
+                                    }
+                                }
+
+                                // persist
+                                if (!alreadyExists) {
+                                    ContentValues newScan = new ContentValues();
+
+                                    newScan.put(ShonenTouchContract.ScanColumns.NAME, scan.getName());
+                                    newScan.put(ShonenTouchContract.ScanColumns.MANGA_ID, mMangaId);
+                                    newScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.NOT_DOWNLOADED.name());
+
+                                    // persisting scan
+                                    getActivity().getApplicationContext().getContentResolver().insert(ShonenTouchContract.Scan.CONTENT_URI, newScan);
+                                }
                             }
-                        }
+                            mEmptyStateProgressBar.setVisibility(View.GONE);
+                            mEmptyStateTextView.setVisibility(View.GONE);
+                            mScansSearchView.setVisibility(View.VISIBLE);
+                            mNewScanTextView.setVisibility(View.GONE);
+                            if (mSwipeRefreshLayout.isRefreshing()) {
+                                snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Liste de scans récupérée", Snackbar.LENGTH_LONG);
 
-                        // persist
-                        // todo : better comparison
-                        if (!alreadyExists) {
-                            ContentValues newScan = new ContentValues();
+                                snackbar.show();
+                            }
+                            break;
+                        case WSIntentService.RESULT_ERROR_NO_INTERNET:
+                            mEmptyStateProgressBar.setVisibility(View.GONE);
+                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Aucune connexion internet", Snackbar.LENGTH_LONG);
 
-                            newScan.put(ShonenTouchContract.ScanColumns.NAME, scan.getName());
-                            newScan.put(ShonenTouchContract.ScanColumns.MANGA_ID, mMangaId);
-                            newScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.NOT_DOWNLOADED.name());
+                            snackbar.show();
+                            break;
+                        case WSIntentService.RESULT_ERROR_BAD_RESPONSE:
+                        case WSIntentService.RESULT_ERROR_TIMEOUT:
+                            mEmptyStateProgressBar.setVisibility(View.GONE);
+                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Erreur de communication avec le serveur", Snackbar.LENGTH_LONG);
 
-                            // persisting scan
-                            getActivity().getApplicationContext().getContentResolver().insert(ShonenTouchContract.Scan.CONTENT_URI, newScan);
+                            snackbar.show();
+                            break;
+                        default:
+                            break;
+                    }
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    break;
+                case WSIntentService.CHECK_LAST_SCAN:
+                    String lastScan = intent.getStringExtra(WSIntentService.PARAM_LAST_SCAN);
+
+                    Cursor c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Manga.CONTENT_URI, null, ShonenTouchContract.MangaColumns._ID + "=?", new String[]{ String.valueOf(mMangaId) }, null);
+                    if (c != null) {
+                        try {
+                            if (c.getCount() == 1) {
+                                c.moveToFirst();
+                                if (!c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.LAST_SCAN)).equals(lastScan)) {
+                                    // new scan available to download, inform user
+                                    mNewScanTextView.setVisibility(View.VISIBLE);
+                                }
+                            }
+                        } finally {
+                            c.close();
                         }
                     }
-                    mEmptyStateProgressBar.setVisibility(View.GONE);
-                    mEmptyStateTextView.setVisibility(View.GONE);
-                    mScansSearchView.setVisibility(View.VISIBLE);
                     break;
                 default :
                     break;
@@ -126,6 +175,10 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
         mScansSearchView = (SearchView) view.findViewById(R.id.search_view_scans);
         mScansSearchView.setOnQueryTextListener(this);
         mScansSearchView.setOnClickListener(this);
+        mNewScanTextView = (TextView) view.findViewById(R.id.text_view_new_scan);
+        mSnackbarCoordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.coordinator_layout_snackbar);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
 
         getLoaderManager().initLoader(SCAN_LOADER, null, this);
 
@@ -290,8 +343,6 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                 return new CursorLoader(getContext().getApplicationContext(), ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns.MANGA_ID + "=?" + " AND " + ShonenTouchContract.ScanColumns.NAME + " LIKE ?",
                         new String[]{ String.valueOf(mMangaId), "%" + mCursorFilter + "%" }, ShonenTouchContract.ScanColumns._ID + " DESC");
             }
-//            return new CursorLoader(getContext().getApplicationContext(), ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns.MANGA_ID + "=?", new String[]{ String.valueOf(mMangaId)},
-//                    ShonenTouchContract.ScanColumns._ID + " DESC");
         }
 
         return null;
@@ -318,6 +369,7 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
         IntentFilter filter = new IntentFilter();
 
         filter.addAction(WSIntentService.GET_ALL_SCANS_FOR_MANGA);
+        filter.addAction(WSIntentService.CHECK_LAST_SCAN);
 
         getActivity().registerReceiver(mBroadcastReceiver, filter);
 
@@ -328,24 +380,6 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
     public void onPause() {
         getActivity().unregisterReceiver(mBroadcastReceiver);
         super.onPause();
-    }
-
-    private void fetchScans() {
-        final Intent intent = new Intent(getActivity(), WSIntentService.class);
-
-        intent.setAction(WSIntentService.GET_ALL_SCANS_FOR_MANGA);
-        Cursor c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Manga.CONTENT_URI, null, ShonenTouchContract.MangaColumns._ID + "=?", new String[]{ String.valueOf(mMangaId) }, null);
-        if (c != null) {
-            try {
-                if (c.getCount() == 1) {
-                    c.moveToFirst();
-                    intent.putExtra(WSIntentService.PARAM_MANGA_SLUG, c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.SLUG)));
-                    getActivity().startService(intent);
-                }
-            } finally {
-                c.close();
-            }
-        }
     }
 
     @Override
@@ -368,6 +402,47 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                 break;
             default:
                 break;
+        }
+    }
+
+    @Override
+    public void onRefresh() {
+        fetchScans();
+    }
+
+    private void fetchScans() {
+        final Intent intent = new Intent(getActivity(), WSIntentService.class);
+
+        intent.setAction(WSIntentService.GET_ALL_SCANS_FOR_MANGA);
+        Cursor c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Manga.CONTENT_URI, null, ShonenTouchContract.MangaColumns._ID + "=?", new String[]{ String.valueOf(mMangaId) }, null);
+        if (c != null) {
+            try {
+                if (c.getCount() == 1) {
+                    c.moveToFirst();
+                    intent.putExtra(WSIntentService.PARAM_MANGA_SLUG, c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.SLUG)));
+                    getActivity().startService(intent);
+                }
+            } finally {
+                c.close();
+            }
+        }
+    }
+
+    private void checkLastScan() {
+        final Intent intent = new Intent(getActivity(), WSIntentService.class);
+
+        intent.setAction(WSIntentService.CHECK_LAST_SCAN);
+        Cursor c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Manga.CONTENT_URI, null, ShonenTouchContract.MangaColumns._ID + "=?", new String[]{ String.valueOf(mMangaId) }, null);
+        if (c != null) {
+            try {
+                if (c.getCount() == 1) {
+                    c.moveToFirst();
+                    intent.putExtra(WSIntentService.PARAM_MANGA_SLUG, c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.SLUG)));
+                    getActivity().startService(intent);
+                }
+            } finally {
+                c.close();
+            }
         }
     }
 }

@@ -43,11 +43,13 @@ public class WSIntentService extends IntentService {
     public static final String GET_ALL_MANGA = "GET_ALL_MANGA";
     public static final String GET_ALL_SCANS_FOR_MANGA = "GET_ALL_SCANS_FOR_MANGA";
     public static final String DOWNLOAD_PAGES_FOR_SCAN = "DOWNLOAD_PAGES_FOR_SCAN";
+    public static final String CHECK_LAST_SCAN = "CHECK_LAST_SCAN";
 
     private static final String URL_SERVER = "http://senerh.xyz:8080/shonen-touch-api-3/";
     private static final String URL_ALL_MANGA = URL_SERVER + "mangas";
     private static final String URL_ALL_SCANS_FOR_MANGA = URL_SERVER + "mangas/%1$s/scans";
     private static final String URL_ALL_PAGES_FOR_MANGA_AND_SCAN = URL_SERVER + "mangas/%1$s/scans/%2$s/pages";
+    private static final String URL_SPECIFIC_MANGA = URL_SERVER + "mangas/%1$s";
 
     private static final String IMAGES_FOLDER_NAME = "shonentouch";
 
@@ -55,6 +57,7 @@ public class WSIntentService extends IntentService {
     public static final String PARAM_MANGA_SLUG = "mangaSlug";
     public static final String PARAM_SCANS_LIST = "scansList";
     public static final String PARAM_SCAN_ID = "scanId";
+    public static final String PARAM_LAST_SCAN = "lastScan";
 
     public static final String EXTRA_RESULT_CODE = "EXTRA_RESULT_CODE";
 
@@ -81,6 +84,11 @@ public class WSIntentService extends IntentService {
             case DOWNLOAD_PAGES_FOR_SCAN:
                 if (!"".equals(intent.getStringExtra(PARAM_MANGA_SLUG)) && intent.getIntExtra(PARAM_SCAN_ID, -1) != -1) {
                     downloadPagesImagesForScan(intent.getStringExtra(PARAM_MANGA_SLUG), intent.getIntExtra(PARAM_SCAN_ID, -1));
+                }
+                break;
+            case CHECK_LAST_SCAN:
+                if (!"".equals(intent.getStringExtra(PARAM_MANGA_SLUG))) {
+                    checkLastScan(intent.getStringExtra(PARAM_MANGA_SLUG));
                 }
                 break;
             default:
@@ -148,6 +156,12 @@ public class WSIntentService extends IntentService {
     public void getAllScansForManga(String mangaSlug) {
         Intent intent = new Intent(GET_ALL_SCANS_FOR_MANGA);
 
+        if (!isConnected()) {
+            intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_NO_INTERNET);
+            sendBroadcast(intent);
+            return;
+        }
+
         try {
             HttpURLConnection urlConnection = (HttpURLConnection) new URL(String.format(URL_ALL_SCANS_FOR_MANGA, mangaSlug)).openConnection();
             Scanner s = new Scanner(new BufferedInputStream(urlConnection.getInputStream())).useDelimiter("\\A");
@@ -158,9 +172,16 @@ public class WSIntentService extends IntentService {
                 scans.add(new Scan(tabScan.getJSONObject(i).getString("num")));
             }
             intent.putParcelableArrayListExtra(PARAM_SCANS_LIST, (ArrayList<? extends Parcelable>) scans);
+            intent.putExtra(EXTRA_RESULT_CODE, RESULT_OK);
             sendBroadcast(intent);
             urlConnection.disconnect();
-        } catch (IOException | JSONException e) {
+        } catch (IOException e) {
+            intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_TIMEOUT);
+            sendBroadcast(intent);
+            e.printStackTrace();
+        } catch (JSONException e) {
+            intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_BAD_RESPONSE);
+            sendBroadcast(intent);
             e.printStackTrace();
         }
     }
@@ -257,6 +278,36 @@ public class WSIntentService extends IntentService {
         }
     }
 
+    private void checkLastScan(String mangaSlug) {
+        Intent intent = new Intent(CHECK_LAST_SCAN);
+
+        if (!isConnected()) {
+            intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_NO_INTERNET);
+            sendBroadcast(intent);
+            return;
+        }
+
+        try {
+            HttpURLConnection urlConnection = (HttpURLConnection) new URL(String.format(URL_SPECIFIC_MANGA, mangaSlug)).openConnection();
+            Scanner s = new Scanner(new BufferedInputStream(urlConnection.getInputStream())).useDelimiter("\\A");
+            String result = s.hasNext() ? s.next() : "";
+            JSONObject manga = new JSONObject(result);
+
+            intent.putExtra(PARAM_LAST_SCAN, manga.getString("lastScan"));
+            intent.putExtra(EXTRA_RESULT_CODE, RESULT_OK);
+            sendBroadcast(intent);
+            urlConnection.disconnect();
+        } catch (IOException e) {
+            intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_TIMEOUT);
+            sendBroadcast(intent);
+            e.printStackTrace();
+        } catch (JSONException e) {
+            intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_BAD_RESPONSE);
+            sendBroadcast(intent);
+            e.printStackTrace();
+        }
+    }
+
     private boolean isAllowedToKeepDownloading(int scanId) {
         Cursor c = getContentResolver().query(ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)}, null);
         if (c != null) {
@@ -281,7 +332,7 @@ public class WSIntentService extends IntentService {
      * Indicates whether network connectivity exists.
      * @return true if network connectivity exists, false otherwise.
      */
-    public boolean isConnected() {
+    private boolean isConnected() {
         final ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
