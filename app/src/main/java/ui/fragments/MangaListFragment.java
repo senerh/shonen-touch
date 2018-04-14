@@ -21,6 +21,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -29,6 +30,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import ui.activities.HelpActivity;
 import ui.activities.MangaActivity;
 import io.github.senerh.shonentouch.R;
 import model.adapters.MangaAdapter;
@@ -130,6 +132,7 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_manga_list, null, false);
     }
 
@@ -258,6 +261,20 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onRefresh() {
         fetchMangas();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_help:
+                Intent intent = new Intent(getActivity(), HelpActivity.class);
+                startActivity(intent);
+                break;
+            default:
+                break;
+        }
+
+        return true;
     }
 
     private void fetchMangas() {

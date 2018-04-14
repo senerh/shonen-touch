@@ -1,0 +1,105 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_view_download"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            card_view:cardBackgroundColor="@color/cardview_light_background"
+            card_view:cardCornerRadius="4dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/text_view_download_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:elevation="5dp"
+                    android:text="Téléchargement"
+                    android:textSize="22sp"
+                    android:layout_marginBottom="10dp"/>
+
+                <ImageButton
+                    android:id="@+id/image_button_download_extend"
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentEnd="true"
+                    app:srcCompat="@drawable/ic_keyboard_arrow_down_black_24dp"
+                    android:background="#00000000"/>
+
+                <TextView
+                    android:id="@+id/text_view_download_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/text_view_download_title"
+                    android:visibility="gone"
+                    android:text="Pour lire un scan, vous devez d'abord le télécharger."/>
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_view_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            card_view:cardBackgroundColor="@color/cardview_light_background"
+            card_view:cardCornerRadius="4dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/text_view_refresh_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:elevation="5dp"
+                    android:text="Rafraîchissement"
+                    android:textSize="22sp"
+                    android:layout_marginBottom="10dp"/>
+
+                <ImageButton
+                    android:id="@+id/image_button_refresh_extend"
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentEnd="true"
+                    app:srcCompat="@drawable/ic_keyboard_arrow_down_black_24dp"
+                    android:background="#00000000"/>
+
+                <TextView
+                    android:id="@+id/text_view_refresh_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/text_view_refresh_title"
+                    android:visibility="gone"
+                    android:text="Sur les vues des mangas et scans, vous pouvez actualiser la liste en glissant le doigt vers le bas."/>
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+    </LinearLayout>
+
+</ScrollView>
