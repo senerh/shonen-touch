@@ -117,11 +117,12 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
                             break;
                     }
                     mSwipeRefreshLayout.setRefreshing(false);
-                    if (mCursor.getCount() <= 0) {
-                        mEmptyStateImageView.setVisibility(View.VISIBLE);
-                    } else {
-                        mEmptyStateImageView.setVisibility(View.GONE);
-                    }
+//                    if (mCursor.getCount() <= 0) {
+//                        mEmptyStateImageView.setVisibility(View.VISIBLE);
+//                    } else {
+//                        mEmptyStateImageView.setVisibility(View.GONE);
+//                    }
+                    mEmptyStateImageView.setVisibility(View.GONE);
                     break;
                 default :
                     break;

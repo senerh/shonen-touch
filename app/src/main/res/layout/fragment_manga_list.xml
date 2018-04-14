@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
-        android:text="Téléchargement des noms des manga et de leurs icônes
+        android:text="Téléchargement des mangas
 Veuillez patienter..."
         android:textAlignment="center"
         android:layout_centerInParent="true" />

@@ -25,7 +25,8 @@
 
         <activity
             android:name="ui.activities.MangaActivity"
-            android:parentActivityName="ui.activities.HomeActivity"/>
+            android:parentActivityName="ui.activities.HomeActivity"
+            android:screenOrientation="portrait" />
 
         <activity
         android:name="ui.activities.PageActivity"

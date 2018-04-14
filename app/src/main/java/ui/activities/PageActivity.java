@@ -12,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView.ScaleType;
 import android.widget.ProgressBar;
 import ui.views.ExtendedViewPager;
@@ -54,11 +55,19 @@ public class PageActivity extends AppCompatActivity {
         extendedViewPager.setAdapter(mImagePagerAdapter);
         extendedViewPager.addOnPageChangeListener(new DetailOnPageChangeListener());
         mProgressBar.setProgress(100 / mImagesPathsList.size());
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     protected void onResume() {
         super.onResume();
         setImmersiveScreen();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     private void setImmersiveScreen() {

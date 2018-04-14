@@ -189,6 +189,7 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                     mEmptyStateProgressBar.setVisibility(View.GONE);
                     mEmptyStateTextView.setVisibility(View.GONE);
                     mScansSearchView.setVisibility(View.VISIBLE);
+                    checkLastScan();
                 } else if (c.getCount() == 0) {
                     fetchScans();
                 }
@@ -226,13 +227,13 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                             intent.putExtra(EXTRA_SCAN_ID, mCursor.getInt(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns._ID)));
                             intent.putExtra(EXTRA_MANGA_ID, mMangaId);
                             AlertDialogFragment alertDialogFragment = AlertDialogFragment.newInstance(getString(R.string.dialog_resume_or_delete_download_title), getString(R.string.dialog_resume_or_delete_download_message, mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.NAME))),
-                                    intent, true, true, true, R.string.dialog_resume_or_delete_download_delete_button, R.string.dialog_resume_or_delete_download_resume_button);
+                                    intent, false, true, true, R.string.dialog_resume_or_delete_download_cancel_button, R.string.dialog_resume_or_delete_download_resume_button, R.string.dialog_resume_or_delete_download_delete_button);
                             alertDialogFragment.setTargetFragment(this, REQUEST_RESUME_OR_DELETE_DOWNLOAD_DIALOG);
                             alertDialogFragment.show(getFragmentManager(), AlertDialogFragment.TAG);
                             break;
                         case DOWNLOAD_IN_PROGRESS:
                             intent.putExtra(EXTRA_SCAN_ID, mCursor.getInt(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns._ID)));
-                            alertDialogFragment = AlertDialogFragment.newInstance(getString(R.string.dialog_stop_download_title), getString(R.string.dialog_stop_download_message, mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.NAME))), intent, true, true);
+                            alertDialogFragment = AlertDialogFragment.newInstance(getString(R.string.dialog_stop_download_title), getString(R.string.dialog_stop_download_message, mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.NAME))), intent, false, true);
                             alertDialogFragment.setTargetFragment(this, REQUEST_STOP_DOWNLOAD_DIALOG);
                             alertDialogFragment.show(getFragmentManager(), AlertDialogFragment.TAG);
                             break;
@@ -257,7 +258,7 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                     switch (Scan.Status.valueOf(mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.STATUS)))) {
                         case DOWNLOAD_COMPLETE:
                             intent.putExtra(EXTRA_SCAN_ID, mCursor.getInt(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns._ID)));
-                            alertDialogFragment = AlertDialogFragment.newInstance(getString(R.string.dialog_delete_scan_title), getString(R.string.dialog_delete_scan_message, mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.NAME))), intent, true, true);
+                            alertDialogFragment = AlertDialogFragment.newInstance(getString(R.string.dialog_delete_scan_title), getString(R.string.dialog_delete_scan_message, mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.NAME))), intent, false, true);
                             alertDialogFragment.setTargetFragment(this, REQUEST_DELETE_SCAN_DIALOG);
                             alertDialogFragment.show(getFragmentManager(), AlertDialogFragment.TAG);
                             break;
@@ -318,7 +319,7 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                             }
                         }
                         break;
-                    case AlertDialogFragment.RESULT_NEUTRAL:
+                    case AlertDialogFragment.RESULT_NEGATIVE:
                         // delete all pages of this scan
                         scanId = data.getIntExtra(EXTRA_SCAN_ID, -1);
                         Intent intent = new Intent(getActivity(), HeavyActionsIntentService.class);

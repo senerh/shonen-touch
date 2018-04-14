@@ -10,6 +10,7 @@
     <string name="dialog_resume_or_delete_download_message">Voulez-vous supprimer le contenu téléchargé ou reprendre le téléchargement du scan %1$s ?</string>
     <string name="dialog_resume_or_delete_download_delete_button">Supprimer</string>
     <string name="dialog_resume_or_delete_download_resume_button">Reprendre</string>
+    <string name="dialog_resume_or_delete_download_cancel_button">Ne rien faire</string>
 
     <string name="lastScan">Dernier scan : %1$s</string>
 
