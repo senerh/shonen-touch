@@ -12,6 +12,22 @@
     <string name="dialog_resume_or_delete_download_resume_button">Reprendre</string>
     <string name="dialog_resume_or_delete_download_cancel_button">Ne rien faire</string>
 
+    <!--Help-->
+    <string name="help_title_what_is_a_scan">Qu\'est-ce qu\'un scan ?</string>
+    <string name="help_content_what_is_a_scan">Un scan fait référence à un manga qui a été numérisé (scanné) et traduit par des fans depuis sa langue originale vers une autre.</string>
+    <string name="help_title_scan_missing">Pourquoi manque-t-il certains scans ?</string>
+    <string name="help_content_scan_missing">Pour inciter les lecteurs à acheter l\'oeuvre originale une fois que celle-ci est disponible en France.</string>
+    <string name="help_title_add_manga">Pouvez-vous ajouter un manga ?</string>
+    <string name="help_content_add_manga">Seuls les mangas présents sur le site lirescan.net peuvent être disponibles sur l\'application.</string>
+    <string name="help_title_download">Téléchargement</string>
+    <string name="help_content_download">Pour lire un scan, vous devez d\'abord le télécharger. Vous pouvez télécharger un seul scan à la fois.\nLorsqu\'un scan est téléchargé, toutes ses pages (images png) sont enregistrées dans l\'espace de stockage de votre périphérique.\nVeillez à supprimer les scans déjà lus pour optimiser votre espace.</string>
+    <string name="help_title_refresh">Rafraîchissement</string>
+    <string name="help_content_refresh">Sur les vues des mangas et scans, vous pouvez actualiser la liste en glissant le doigt vers le bas.</string>
+    <string name="help_title_contact_us">Comment nous contacter ?</string>
+    <string name="help_content_contact_us">En publiant (ou en modifiant) un commentaire sur la page Playstore de l\'application.</string>
+    <string name="help_version">Version : Shonen Touch 2.0</string>
+    <string name="help_by">Par : Hakan SENER et Thibaut SORIANO</string>
+
     <string name="lastScan">Dernier scan : %1$s</string>
 
 </resources>

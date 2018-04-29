@@ -11,6 +11,141 @@
         android:orientation="vertical">
 
         <android.support.v7.widget.CardView
+            android:id="@+id/card_view_what_is_a_scan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            card_view:cardBackgroundColor="@color/cardview_light_background"
+            card_view:cardCornerRadius="4dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/text_view_what_is_a_scan_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@id/image_button_what_is_a_scan_extend"
+                    android:text="@string/help_title_what_is_a_scan"
+                    android:textSize="22sp"
+                    android:layout_marginBottom="10dp"/>
+
+                <ImageButton
+                    android:id="@+id/image_button_what_is_a_scan_extend"
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentEnd="true"
+                    app:srcCompat="@drawable/ic_keyboard_arrow_down_black_24dp"
+                    android:background="#00000000"/>
+
+                <TextView
+                    android:id="@+id/text_view_what_is_a_scan_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/text_view_what_is_a_scan_title"
+                    android:visibility="gone"
+                    android:text="@string/help_content_what_is_a_scan"/>
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_view_scan_missing"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            card_view:cardBackgroundColor="@color/cardview_light_background"
+            card_view:cardCornerRadius="4dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/text_view_scan_missing_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@id/image_button_scan_missing_extend"
+                    android:text="@string/help_title_scan_missing"
+                    android:textSize="22sp"
+                    android:layout_marginBottom="10dp"/>
+
+                <ImageButton
+                    android:id="@+id/image_button_scan_missing_extend"
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentEnd="true"
+                    app:srcCompat="@drawable/ic_keyboard_arrow_down_black_24dp"
+                    android:background="#00000000"/>
+
+                <TextView
+                    android:id="@+id/text_view_scan_missing_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/text_view_scan_missing_title"
+                    android:visibility="gone"
+                    android:text="@string/help_content_scan_missing"/>
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_view_add_manga"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            card_view:cardBackgroundColor="@color/cardview_light_background"
+            card_view:cardCornerRadius="4dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/text_view_add_manga_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@id/image_button_add_manga_extend"
+                    android:text="@string/help_title_add_manga"
+                    android:textSize="22sp"
+                    android:layout_marginBottom="10dp"/>
+
+                <ImageButton
+                    android:id="@+id/image_button_add_manga_extend"
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentEnd="true"
+                    app:srcCompat="@drawable/ic_keyboard_arrow_down_black_24dp"
+                    android:background="#00000000"/>
+
+                <TextView
+                    android:id="@+id/text_view_add_manga_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/text_view_add_manga_title"
+                    android:visibility="gone"
+                    android:text="@string/help_content_add_manga"/>
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
             android:id="@+id/card_view_download"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,9 +164,9 @@
                     android:id="@+id/text_view_download_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:elevation="5dp"
-                    android:text="Téléchargement"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@id/image_button_download_extend"
+                    android:text="@string/help_title_download"
                     android:textSize="22sp"
                     android:layout_marginBottom="10dp"/>
 
@@ -49,7 +184,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/text_view_download_title"
                     android:visibility="gone"
-                    android:text="Pour lire un scan, vous devez d'abord le télécharger."/>
+                    android:text="@string/help_content_download"/>
 
             </RelativeLayout>
 
@@ -74,9 +209,9 @@
                     android:id="@+id/text_view_refresh_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:elevation="5dp"
-                    android:text="Rafraîchissement"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@id/image_button_refresh_extend"
+                    android:text="@string/help_title_refresh"
                     android:textSize="22sp"
                     android:layout_marginBottom="10dp"/>
 
@@ -94,11 +229,74 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/text_view_refresh_title"
                     android:visibility="gone"
-                    android:text="Sur les vues des mangas et scans, vous pouvez actualiser la liste en glissant le doigt vers le bas."/>
+                    android:text="@string/help_content_refresh"/>
 
             </RelativeLayout>
 
         </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_view_contact_us"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            card_view:cardBackgroundColor="@color/cardview_light_background"
+            card_view:cardCornerRadius="4dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/text_view_contact_us_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@id/image_button_contact_us_extend"
+                    android:text="@string/help_title_contact_us"
+                    android:textSize="22sp"
+                    android:layout_marginBottom="10dp"/>
+
+                <ImageButton
+                    android:id="@+id/image_button_contact_us_extend"
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentEnd="true"
+                    app:srcCompat="@drawable/ic_keyboard_arrow_down_black_24dp"
+                    android:background="#00000000"/>
+
+                <TextView
+                    android:id="@+id/text_view_contact_us_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/text_view_contact_us_title"
+                    android:visibility="gone"
+                    android:text="@string/help_content_contact_us"/>
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <TextView
+            android:id="@+id/text_view_version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="@string/help_version"
+            android:textSize="22sp"
+            android:layout_marginBottom="10dp"/>
+
+        <TextView
+            android:id="@+id/text_view_by"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="@string/help_by"
+            android:textSize="22sp"
+            android:layout_marginBottom="10dp"/>
 
     </LinearLayout>
 

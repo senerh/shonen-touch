@@ -20,10 +20,12 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -54,6 +56,7 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
 
     private ProgressBar mEmptyStateProgressBar;
     private TextView mEmptyStateTextView, mNewScanTextView;
+    private ImageView mNewScanImageView;
     private RecyclerView mRecyclerView;
     private ScanAdapter mAdapter;
     private SearchView mScansSearchView;
@@ -98,6 +101,7 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                             mEmptyStateTextView.setVisibility(View.GONE);
                             mScansSearchView.setVisibility(View.VISIBLE);
                             mNewScanTextView.setVisibility(View.GONE);
+                            mNewScanImageView.setVisibility(View.GONE);
                             if (mSwipeRefreshLayout.isRefreshing()) {
                                 snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Liste de scans récupérée", Snackbar.LENGTH_LONG);
 
@@ -133,6 +137,7 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                                 if (!c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.LAST_SCAN)).equals(lastScan)) {
                                     // new scan available to download, inform user
                                     mNewScanTextView.setVisibility(View.VISIBLE);
+                                    mNewScanImageView.setVisibility(View.VISIBLE);
                                 }
                             }
                         } finally {
@@ -176,6 +181,7 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
         mScansSearchView.setOnQueryTextListener(this);
         mScansSearchView.setOnClickListener(this);
         mNewScanTextView = (TextView) view.findViewById(R.id.text_view_new_scan);
+        mNewScanImageView = (ImageView) view.findViewById(R.id.image_view_toolbar_new_scan);
         mSnackbarCoordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.coordinator_layout_snackbar);
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(this);

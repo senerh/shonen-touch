@@ -37,7 +37,8 @@ public class MangaActivity extends AppCompatActivity {
 
         Intent i = getIntent();
         mMangaId = i.getIntExtra("mangaId", -1);
-        setTitle(i.getStringExtra("mangaName"));
+//        setTitle(i.getStringExtra("mangaName"));
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
