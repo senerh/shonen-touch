@@ -16,6 +16,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -56,7 +57,6 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
 
     private ProgressBar mEmptyStateProgressBar;
     private TextView mEmptyStateTextView, mNewScanTextView;
-    private ImageView mNewScanImageView;
     private RecyclerView mRecyclerView;
     private ScanAdapter mAdapter;
     private SearchView mScansSearchView;
@@ -97,11 +97,16 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                                     getActivity().getApplicationContext().getContentResolver().insert(ShonenTouchContract.Scan.CONTENT_URI, newScan);
                                 }
                             }
+
+                            ContentValues updatedManga = new ContentValues();
+                            updatedManga.put(ShonenTouchContract.MangaColumns.LAST_SCAN, scans.get(scans.size() - 1).getName());
+                            getActivity().getContentResolver().update(ShonenTouchContract.Manga.CONTENT_URI, updatedManga, ShonenTouchContract.MangaColumns._ID + "=?", new String[]{String.valueOf(mMangaId)});
+
                             mEmptyStateProgressBar.setVisibility(View.GONE);
                             mEmptyStateTextView.setVisibility(View.GONE);
                             mScansSearchView.setVisibility(View.VISIBLE);
                             mNewScanTextView.setVisibility(View.GONE);
-                            mNewScanImageView.setVisibility(View.GONE);
+                            ((AppCompatActivity) getActivity()).getSupportActionBar().setLogo(null);
                             if (mSwipeRefreshLayout.isRefreshing()) {
                                 snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Liste de scans récupérée", Snackbar.LENGTH_LONG);
 
@@ -137,12 +142,28 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                                 if (!c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.LAST_SCAN)).equals(lastScan)) {
                                     // new scan available to download, inform user
                                     mNewScanTextView.setVisibility(View.VISIBLE);
-                                    mNewScanImageView.setVisibility(View.VISIBLE);
+                                    ((AppCompatActivity) getActivity()).getSupportActionBar().setLogo(R.drawable.ic_fiber_new_blue_24dp);
                                 }
                             }
                         } finally {
                             c.close();
                         }
+                    }
+                    break;
+                case WSIntentService.DOWNLOAD_PAGES_FOR_SCAN:
+                    switch (intent.getIntExtra(WSIntentService.EXTRA_RESULT_CODE, 0)) {
+                        case WSIntentService.RESULT_ERROR_NO_INTERNET:
+                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Aucune connexion internet", Snackbar.LENGTH_LONG);
+
+                            snackbar.show();
+                            break;
+                        case WSIntentService.RESULT_ERROR_ALREADY_DOWNLOADING:
+                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Téléchargement d'un scan déjà en cours", Snackbar.LENGTH_LONG);
+
+                            snackbar.show();
+                            break;
+                        default:
+                            break;
                     }
                     break;
                 default :
@@ -181,7 +202,6 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
         mScansSearchView.setOnQueryTextListener(this);
         mScansSearchView.setOnClickListener(this);
         mNewScanTextView = (TextView) view.findViewById(R.id.text_view_new_scan);
-        mNewScanImageView = (ImageView) view.findViewById(R.id.image_view_toolbar_new_scan);
         mSnackbarCoordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.coordinator_layout_snackbar);
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -278,7 +298,6 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         switch (requestCode) {
             case REQUEST_DELETE_SCAN_DIALOG:
                 switch (resultCode) {
@@ -377,6 +396,7 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
 
         filter.addAction(WSIntentService.GET_ALL_SCANS_FOR_MANGA);
         filter.addAction(WSIntentService.CHECK_LAST_SCAN);
+        filter.addAction(WSIntentService.DOWNLOAD_PAGES_FOR_SCAN);
 
         getActivity().registerReceiver(mBroadcastReceiver, filter);
 

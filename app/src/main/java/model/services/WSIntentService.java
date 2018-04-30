@@ -63,32 +63,65 @@ public class WSIntentService extends IntentService {
 
     public static final int RESULT_OK = 200;
     public static final int RESULT_ERROR_NO_INTERNET = 400;
+    public static final int RESULT_ERROR_ALREADY_DOWNLOADING = 444;
     public static final int RESULT_ERROR_TIMEOUT = 404;
     public static final int RESULT_ERROR_BAD_RESPONSE = 500;
+
+    private static Thread mDownloadThread;
 
     public WSIntentService() {
         super("WSIntentService");
     }
 
     @Override
-    protected void onHandleIntent(@Nullable Intent intent) {
+    protected void onHandleIntent(@Nullable final Intent intent) {
         switch (intent.getAction()) {
             case GET_ALL_MANGA:
                 getAllManga();
                 break;
             case GET_ALL_SCANS_FOR_MANGA:
                 if (!"".equals(intent.getStringExtra(PARAM_MANGA_SLUG))) {
-                    getAllScansForManga(intent.getStringExtra(PARAM_MANGA_SLUG));
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            getAllScansForManga(intent.getStringExtra(PARAM_MANGA_SLUG));
+                        }
+                    }).start();
                 }
                 break;
             case DOWNLOAD_PAGES_FOR_SCAN:
                 if (!"".equals(intent.getStringExtra(PARAM_MANGA_SLUG)) && intent.getIntExtra(PARAM_SCAN_ID, -1) != -1) {
-                    downloadPagesImagesForScan(intent.getStringExtra(PARAM_MANGA_SLUG), intent.getIntExtra(PARAM_SCAN_ID, -1));
+                    Intent broadcastIntent = new Intent(DOWNLOAD_PAGES_FOR_SCAN);
+
+                    if (!isConnected()) {
+                        broadcastIntent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_NO_INTERNET);
+                        sendBroadcast(broadcastIntent);
+                        return;
+                    }
+
+                    if (mDownloadThread == null || !mDownloadThread.isAlive()) {
+                        mDownloadThread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                downloadPagesImagesForScan(intent.getStringExtra(PARAM_MANGA_SLUG), intent.getIntExtra(PARAM_SCAN_ID, -1));
+                            }
+                        });
+                        mDownloadThread.start();
+                    } else {
+                        broadcastIntent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_ALREADY_DOWNLOADING);
+                        intent.putExtra(WSIntentService.PARAM_SCAN_ID, intent.getIntExtra(PARAM_SCAN_ID, -1));
+                        sendBroadcast(broadcastIntent);
+                    }
                 }
                 break;
             case CHECK_LAST_SCAN:
                 if (!"".equals(intent.getStringExtra(PARAM_MANGA_SLUG))) {
-                    checkLastScan(intent.getStringExtra(PARAM_MANGA_SLUG));
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            checkLastScan(intent.getStringExtra(PARAM_MANGA_SLUG));
+                        }
+                    }).start();
                 }
                 break;
             default:

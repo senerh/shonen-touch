@@ -117,6 +117,7 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
                             break;
                     }
                     mSwipeRefreshLayout.setRefreshing(false);
+                    // todo : find a better empty state
 //                    if (mCursor.getCount() <= 0) {
 //                        mEmptyStateImageView.setVisibility(View.VISIBLE);
 //                    } else {
