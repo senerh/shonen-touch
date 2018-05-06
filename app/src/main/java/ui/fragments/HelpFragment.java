@@ -26,6 +26,8 @@ public class HelpFragment extends Fragment implements View.OnClickListener {
     private TextView mRefreshDescriptionTextView;
     private ImageButton mExtendContactUsImageButton;
     private TextView mContactUsDescriptionTextView;
+    private ImageButton mExtendCreditsImageButton;
+    private TextView mCreditsDescriptionTextView;
 
     private boolean mIsWhatIsAScanCardExtended = false;
     private boolean mIsScanMissingCardExtended = false;
@@ -33,6 +35,7 @@ public class HelpFragment extends Fragment implements View.OnClickListener {
     private boolean mIsDownloadCardExtended = false;
     private boolean mIsRefreshCardExtended = false;
     private boolean mIsContactUsCardExtended = false;
+    private boolean mIsCreditsCardExtended = false;
 
     @Nullable
     @Override
@@ -54,6 +57,8 @@ public class HelpFragment extends Fragment implements View.OnClickListener {
         mExtendRefreshImageButton.setOnClickListener(this);
         mExtendContactUsImageButton = (ImageButton) view.findViewById(R.id.image_button_contact_us_extend);
         mExtendContactUsImageButton.setOnClickListener(this);
+        mExtendCreditsImageButton = (ImageButton) view.findViewById(R.id.image_button_credits_extend);
+        mExtendCreditsImageButton.setOnClickListener(this);
 
         mWhatIsAScanDescriptionTextView = (TextView) view.findViewById(R.id.text_view_what_is_a_scan_content);
         mScanMissingDescriptionTextView = (TextView) view.findViewById(R.id.text_view_scan_missing_content);
@@ -61,6 +66,7 @@ public class HelpFragment extends Fragment implements View.OnClickListener {
         mDownloadDescriptionTextView = (TextView) view.findViewById(R.id.text_view_download_description);
         mRefreshDescriptionTextView = (TextView) view.findViewById(R.id.text_view_refresh_description);
         mContactUsDescriptionTextView = (TextView) view.findViewById(R.id.text_view_contact_us_description);
+        mCreditsDescriptionTextView = (TextView) view.findViewById(R.id.text_view_credits_description);
 
         super.onViewCreated(view, savedInstanceState);
     }
@@ -85,6 +91,9 @@ public class HelpFragment extends Fragment implements View.OnClickListener {
                 break;
             case (R.id.image_button_contact_us_extend) :
                 mIsContactUsCardExtended = extendOrCloseCard(mIsContactUsCardExtended, mExtendContactUsImageButton, mContactUsDescriptionTextView);
+                break;
+            case (R.id.image_button_credits_extend) :
+                mIsCreditsCardExtended = extendOrCloseCard(mIsCreditsCardExtended, mExtendCreditsImageButton, mCreditsDescriptionTextView);
                 break;
             default:
                 break;

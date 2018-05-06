@@ -20,13 +20,13 @@
     <string name="help_title_add_manga">Pouvez-vous ajouter un manga ?</string>
     <string name="help_content_add_manga">Seuls les mangas présents sur le site lirescan.net peuvent être disponibles sur l\'application.</string>
     <string name="help_title_download">Téléchargement</string>
-    <string name="help_content_download">Pour lire un scan, vous devez d\'abord le télécharger. Vous pouvez télécharger un seul scan à la fois.\nLorsqu\'un scan est téléchargé, toutes ses pages (images png) sont enregistrées dans l\'espace de stockage de votre périphérique.\nVeillez à supprimer les scans déjà lus pour optimiser votre espace.</string>
+    <string name="help_content_download">Pour lire un scan, vous devez d\'abord le télécharger. Vous pouvez télécharger un seul scan à la fois.\nLorsqu\'un scan est téléchargé, toutes ses pages (images png) sont enregistrées dans l\'espace de stockage de votre périphérique.\nPour supprimer un scan, appuyez longtemps dessus.\nVeillez à supprimer les scans déjà lus pour optimiser votre espace.</string>
     <string name="help_title_refresh">Rafraîchissement</string>
     <string name="help_content_refresh">Sur les vues des mangas et scans, vous pouvez actualiser la liste en glissant le doigt vers le bas.</string>
     <string name="help_title_contact_us">Comment nous contacter ?</string>
     <string name="help_content_contact_us">En publiant (ou en modifiant) un commentaire sur la page Playstore de l\'application.</string>
-    <string name="help_version">Version : Shonen Touch 2.0</string>
-    <string name="help_by">Par : Hakan SENER et Thibaut SORIANO</string>
+    <string name="help_title_credits">Crédits</string>
+    <string name="help_content_credits">Version : Shonen Touch 2.0\nPar : Hakan SENER et Thibaut SORIANO</string>
 
     <string name="lastScan">Dernier scan : %1$s</string>
 
