@@ -73,44 +73,51 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                 case WSIntentService.GET_ALL_SCANS_FOR_MANGA:
                     switch (intent.getIntExtra(WSIntentService.EXTRA_RESULT_CODE, 0)) {
                         case WSIntentService.RESULT_OK:
-                            List<Scan> scans = intent.getParcelableArrayListExtra(WSIntentService.PARAM_SCANS_LIST);
+                            Cursor c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns.MANGA_ID + "=?", new String[]{ String.valueOf(mMangaId) }, null);
+                            if (c != null) {
+                                try {
+                                    List<Scan> scans = intent.getParcelableArrayListExtra(WSIntentService.PARAM_SCANS_LIST);
 
-                            // persist all new scans in db
-                            for (Scan scan : scans) {
-                                boolean alreadyExists = false;
+                                    // persist all new scans in db
+                                    for (Scan scan : scans) {
+                                        boolean alreadyExists = false;
 
-                                for(mCursor.moveToFirst(); !mCursor.isAfterLast(); mCursor.moveToNext()) {
-                                    if (scan.getName().equals(mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.NAME)))) {
-                                        alreadyExists = true;
+                                        for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+                                            if (scan.getName().equals(c.getString(c.getColumnIndex(ShonenTouchContract.ScanColumns.NAME)))) {
+                                                alreadyExists = true;
+                                            }
+                                        }
+
+                                        // persist
+                                        if (!alreadyExists) {
+                                            ContentValues newScan = new ContentValues();
+
+                                            newScan.put(ShonenTouchContract.ScanColumns.NAME, scan.getName());
+                                            newScan.put(ShonenTouchContract.ScanColumns.MANGA_ID, mMangaId);
+                                            newScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.NOT_DOWNLOADED.name());
+
+                                            // persisting scan
+                                            getActivity().getApplicationContext().getContentResolver().insert(ShonenTouchContract.Scan.CONTENT_URI, newScan);
+                                        }
                                     }
+
+                                    ContentValues updatedManga = new ContentValues();
+                                    updatedManga.put(ShonenTouchContract.MangaColumns.LAST_SCAN, scans.get(scans.size() - 1).getName());
+                                    getActivity().getContentResolver().update(ShonenTouchContract.Manga.CONTENT_URI, updatedManga, ShonenTouchContract.MangaColumns._ID + "=?", new String[]{String.valueOf(mMangaId)});
+
+                                    mEmptyStateProgressBar.setVisibility(View.GONE);
+                                    mEmptyStateTextView.setVisibility(View.GONE);
+                                    mScansSearchView.setVisibility(View.VISIBLE);
+                                    mNewScanTextView.setVisibility(View.GONE);
+                                    ((AppCompatActivity) getActivity()).getSupportActionBar().setLogo(null);
+                                    if (mSwipeRefreshLayout.isRefreshing()) {
+                                        snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Liste de scans récupérée", Snackbar.LENGTH_LONG);
+
+                                        snackbar.show();
+                                    }
+                                } finally {
+                                    c.close();
                                 }
-
-                                // persist
-                                if (!alreadyExists) {
-                                    ContentValues newScan = new ContentValues();
-
-                                    newScan.put(ShonenTouchContract.ScanColumns.NAME, scan.getName());
-                                    newScan.put(ShonenTouchContract.ScanColumns.MANGA_ID, mMangaId);
-                                    newScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.NOT_DOWNLOADED.name());
-
-                                    // persisting scan
-                                    getActivity().getApplicationContext().getContentResolver().insert(ShonenTouchContract.Scan.CONTENT_URI, newScan);
-                                }
-                            }
-
-                            ContentValues updatedManga = new ContentValues();
-                            updatedManga.put(ShonenTouchContract.MangaColumns.LAST_SCAN, scans.get(scans.size() - 1).getName());
-                            getActivity().getContentResolver().update(ShonenTouchContract.Manga.CONTENT_URI, updatedManga, ShonenTouchContract.MangaColumns._ID + "=?", new String[]{String.valueOf(mMangaId)});
-
-                            mEmptyStateProgressBar.setVisibility(View.GONE);
-                            mEmptyStateTextView.setVisibility(View.GONE);
-                            mScansSearchView.setVisibility(View.VISIBLE);
-                            mNewScanTextView.setVisibility(View.GONE);
-                            ((AppCompatActivity) getActivity()).getSupportActionBar().setLogo(null);
-                            if (mSwipeRefreshLayout.isRefreshing()) {
-                                snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Liste de scans récupérée", Snackbar.LENGTH_LONG);
-
-                                snackbar.show();
                             }
                             break;
                         case WSIntentService.RESULT_ERROR_NO_INTERNET:

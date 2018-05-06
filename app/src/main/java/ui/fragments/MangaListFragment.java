@@ -62,40 +62,47 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
                 case WSIntentService.GET_ALL_MANGA:
                     switch (intent.getIntExtra(WSIntentService.EXTRA_RESULT_CODE, 0)) {
                         case WSIntentService.RESULT_OK:
-                            List<Manga> mangas = intent.getParcelableArrayListExtra(WSIntentService.PARAM_MANGAS_LIST);
+                            Cursor c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Manga.CONTENT_URI, null, null, null, null);
+                            if (c != null) {
+                                try {
+                                    List<Manga> mangas = intent.getParcelableArrayListExtra(WSIntentService.PARAM_MANGAS_LIST);
 
-                            // persist all new mangas in db
-                            for (Manga manga : mangas) {
-                                boolean alreadyExists = false;
+                                    // persist all new mangas in db
+                                    for (Manga manga : mangas) {
+                                        boolean alreadyExists = false;
 
-                                for(mCursor.moveToFirst(); !mCursor.isAfterLast(); mCursor.moveToNext()) {
-                                    if (manga.getName().equals(mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.MangaColumns.NAME)))) {
-                                        alreadyExists = true;
+                                        for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+                                            if (manga.getName().equals(c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.NAME)))) {
+                                                alreadyExists = true;
+                                            }
+                                        }
+
+                                        // persist
+                                        if (!alreadyExists) {
+                                            ContentValues newManga = new ContentValues();
+
+                                            newManga.put(ShonenTouchContract.MangaColumns.NAME, manga.getName());
+                                            newManga.put(ShonenTouchContract.MangaColumns.SLUG, manga.getSlug());
+                                            newManga.put(ShonenTouchContract.MangaColumns.LAST_SCAN, manga.getLastScan());
+                                            newManga.put(ShonenTouchContract.MangaColumns.ICON_PATH, manga.getIconPath());
+
+                                            // persisting manga
+                                            getActivity().getApplicationContext().getContentResolver().insert(ShonenTouchContract.Manga.CONTENT_URI, newManga);
+                                        }
+                                        // todo compare last scan maybe
                                     }
+                                    mEmptyStateProgressBar.setVisibility(View.GONE);
+                                    mFirstTimeTextView.setVisibility(View.GONE);
+                                    mMangaSearchView.setVisibility(View.VISIBLE);
+                                    mEmptyStateImageView.setVisibility(View.GONE);
+                                    if (mSwipeRefreshLayout.isRefreshing()) {
+                                        snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Liste de mangas récupérée", Snackbar.LENGTH_LONG);
+
+                                        snackbar.show();
+                                    }
+                                } finally {
+                                    c.close();
                                 }
-
-                                // persist
-                                if (!alreadyExists) {
-                                    ContentValues newManga = new ContentValues();
-
-                                    newManga.put(ShonenTouchContract.MangaColumns.NAME, manga.getName());
-                                    newManga.put(ShonenTouchContract.MangaColumns.SLUG, manga.getSlug());
-                                    newManga.put(ShonenTouchContract.MangaColumns.LAST_SCAN, manga.getLastScan());
-                                    newManga.put(ShonenTouchContract.MangaColumns.ICON_PATH, manga.getIconPath());
-
-                                    // persisting manga
-                                    getActivity().getApplicationContext().getContentResolver().insert(ShonenTouchContract.Manga.CONTENT_URI, newManga);
-                                }
-                                // todo compare last scan maybe
-                            }
-                            mEmptyStateProgressBar.setVisibility(View.GONE);
-                            mFirstTimeTextView.setVisibility(View.GONE);
-                            mMangaSearchView.setVisibility(View.VISIBLE);
-                            mEmptyStateImageView.setVisibility(View.GONE);
-                            if (mSwipeRefreshLayout.isRefreshing()) {
-                                snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Liste de mangas récupérée", Snackbar.LENGTH_LONG);
-
-                                snackbar.show();
                             }
                             break;
                         case WSIntentService.RESULT_ERROR_NO_INTERNET:
