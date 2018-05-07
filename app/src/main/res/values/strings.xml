@@ -28,6 +28,19 @@
     <string name="help_title_credits">Crédits</string>
     <string name="help_content_credits">Version : Shonen Touch 2.0\nPar : Hakan SENER et Thibaut SORIANO</string>
 
+    <!--Fragments-->
     <string name="lastScan">Dernier scan : %1$s</string>
+    <string name="fragment_manga_list_loading">Téléchargement des mangas\nVeuillez patienter…</string>
+    <string name="fragment_manga_list_empty_state">Echec de la récupération des manga\nVeuillez réessayer</string>
+    <string name="fragment_scans_loading">Chargement en cours\nVeuillez patienter…</string>
+    <string name="fragment_scans_empty_state">Echec de la récupération des scans\nVeuillez réessayer</string>
+
+    <!--Snackbars-->
+    <string name="snackbar_no_internet">Aucune connexion internet</string>
+    <string name="snackbar_server_error">Erreur de communication avec le serveur</string>
+    <string name="snackbar_scans_received">Liste de scans récupérée</string>
+    <string name="snackbar_mangas_received">Liste de mangas récupérée</string>
+    <string name="snackbar_new_scans_available">Nouveau(x) scan(s) disponible(s)</string>
+    <string name="snackbar_scan_download_already_in_progress">Téléchargement d\'un scan déjà en cours</string>
 
 </resources>

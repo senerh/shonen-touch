@@ -21,12 +21,10 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -55,9 +53,8 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
     public static final String EXTRA_SCAN_ID = "EXTRA_SCAN_ID";
     public static final String EXTRA_MANGA_ID = "EXTRA_MANGA_ID";
 
-    private ProgressBar mEmptyStateProgressBar;
-    private TextView mEmptyStateTextView, mNewScanTextView;
-    private RecyclerView mRecyclerView;
+    private ProgressBar mLoadingProgressBar;
+    private TextView mLoadingTextView, mEmptyStateTextView;
     private ScanAdapter mAdapter;
     private SearchView mScansSearchView;
     private int mMangaId;
@@ -69,11 +66,12 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
         @Override
         public void onReceive(Context context, Intent intent) {
             Snackbar snackbar;
+            Cursor c;
             switch (intent.getAction()) {
                 case WSIntentService.GET_ALL_SCANS_FOR_MANGA:
                     switch (intent.getIntExtra(WSIntentService.EXTRA_RESULT_CODE, 0)) {
                         case WSIntentService.RESULT_OK:
-                            Cursor c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns.MANGA_ID + "=?", new String[]{ String.valueOf(mMangaId) }, null);
+                            c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns.MANGA_ID + "=?", new String[]{ String.valueOf(mMangaId) }, null);
                             if (c != null) {
                                 try {
                                     List<Scan> scans = intent.getParcelableArrayListExtra(WSIntentService.PARAM_SCANS_LIST);
@@ -105,13 +103,10 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                                     updatedManga.put(ShonenTouchContract.MangaColumns.LAST_SCAN, scans.get(scans.size() - 1).getName());
                                     getActivity().getContentResolver().update(ShonenTouchContract.Manga.CONTENT_URI, updatedManga, ShonenTouchContract.MangaColumns._ID + "=?", new String[]{String.valueOf(mMangaId)});
 
-                                    mEmptyStateProgressBar.setVisibility(View.GONE);
-                                    mEmptyStateTextView.setVisibility(View.GONE);
                                     mScansSearchView.setVisibility(View.VISIBLE);
-                                    mNewScanTextView.setVisibility(View.GONE);
                                     ((AppCompatActivity) getActivity()).getSupportActionBar().setLogo(null);
                                     if (mSwipeRefreshLayout.isRefreshing()) {
-                                        snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Liste de scans récupérée", Snackbar.LENGTH_LONG);
+                                        snackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_scans_received), Snackbar.LENGTH_LONG);
 
                                         snackbar.show();
                                     }
@@ -121,51 +116,84 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                             }
                             break;
                         case WSIntentService.RESULT_ERROR_NO_INTERNET:
-                            mEmptyStateProgressBar.setVisibility(View.GONE);
-                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Aucune connexion internet", Snackbar.LENGTH_LONG);
+                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_no_internet), Snackbar.LENGTH_LONG);
 
                             snackbar.show();
                             break;
                         case WSIntentService.RESULT_ERROR_BAD_RESPONSE:
                         case WSIntentService.RESULT_ERROR_TIMEOUT:
-                            mEmptyStateProgressBar.setVisibility(View.GONE);
-                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Erreur de communication avec le serveur", Snackbar.LENGTH_LONG);
+                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_server_error), Snackbar.LENGTH_LONG);
 
                             snackbar.show();
                             break;
                         default:
                             break;
                     }
+                    mLoadingProgressBar.setVisibility(View.GONE);
+                    mLoadingTextView.setVisibility(View.GONE);
                     mSwipeRefreshLayout.setRefreshing(false);
-                    break;
-                case WSIntentService.CHECK_LAST_SCAN:
-                    String lastScan = intent.getStringExtra(WSIntentService.PARAM_LAST_SCAN);
-
-                    Cursor c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Manga.CONTENT_URI, null, ShonenTouchContract.MangaColumns._ID + "=?", new String[]{ String.valueOf(mMangaId) }, null);
+                    c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns.MANGA_ID + "=?", new String[]{ String.valueOf(mMangaId) }, null);
                     if (c != null) {
                         try {
-                            if (c.getCount() == 1) {
-                                c.moveToFirst();
-                                if (!c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.LAST_SCAN)).equals(lastScan)) {
-                                    // new scan available to download, inform user
-                                    mNewScanTextView.setVisibility(View.VISIBLE);
-                                    ((AppCompatActivity) getActivity()).getSupportActionBar().setLogo(R.drawable.ic_fiber_new_blue_24dp);
-                                }
+                            if (c.getCount() <= 0) {
+                                mEmptyStateTextView.setVisibility(View.VISIBLE);
+                            } else {
+                                mEmptyStateTextView.setVisibility(View.GONE);
                             }
                         } finally {
                             c.close();
                         }
                     }
                     break;
+                case WSIntentService.CHECK_LAST_SCAN:
+                    switch (intent.getIntExtra(WSIntentService.EXTRA_RESULT_CODE, 0)) {
+                        case WSIntentService.RESULT_OK:
+                            String lastScan = intent.getStringExtra(WSIntentService.PARAM_LAST_SCAN);
+
+                            c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Manga.CONTENT_URI, null, ShonenTouchContract.MangaColumns._ID + "=?", new String[]{ String.valueOf(mMangaId) }, null);
+                            if (c != null) {
+                                try {
+                                    if (c.getCount() == 1) {
+                                        c.moveToFirst();
+                                        if (!c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.LAST_SCAN)).equals(lastScan)) {
+                                            // new scan available to download, inform user
+                                            ((AppCompatActivity) getActivity()).getSupportActionBar().setLogo(R.drawable.ic_fiber_new_blue_24dp);
+                                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_new_scans_available), Snackbar.LENGTH_LONG);
+
+                                            snackbar.show();
+                                        }
+                                    }
+                                } finally {
+                                    c.close();
+                                }
+                            }
+                            break;
+                        case WSIntentService.RESULT_ERROR_NO_INTERNET:
+                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_no_internet), Snackbar.LENGTH_LONG);
+
+                            snackbar.show();
+                            break;
+                        case WSIntentService.RESULT_ERROR_BAD_RESPONSE:
+                        case WSIntentService.RESULT_ERROR_TIMEOUT:
+                            mLoadingProgressBar.setVisibility(View.GONE);
+                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_server_error), Snackbar.LENGTH_LONG);
+
+                            snackbar.show();
+                            break;
+                        default:
+                            break;
+                    }
+
+                    break;
                 case WSIntentService.DOWNLOAD_PAGES_FOR_SCAN:
                     switch (intent.getIntExtra(WSIntentService.EXTRA_RESULT_CODE, 0)) {
                         case WSIntentService.RESULT_ERROR_NO_INTERNET:
-                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Aucune connexion internet", Snackbar.LENGTH_LONG);
+                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_no_internet), Snackbar.LENGTH_LONG);
 
                             snackbar.show();
                             break;
                         case WSIntentService.RESULT_ERROR_ALREADY_DOWNLOADING:
-                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, "Téléchargement d'un scan déjà en cours", Snackbar.LENGTH_LONG);
+                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_scan_download_already_in_progress), Snackbar.LENGTH_LONG);
 
                             snackbar.show();
                             break;
@@ -197,18 +225,18 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mMangaId = getArguments().getInt("mangaId", -1);
-        mEmptyStateProgressBar = (ProgressBar) view.findViewById(R.id.progress_bar_empty_state);
-        mEmptyStateTextView = (TextView) view.findViewById(R.id.text_view_first_time);
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_scans);
+        mLoadingProgressBar = (ProgressBar) view.findViewById(R.id.progress_bar_loading);
+        mLoadingTextView = (TextView) view.findViewById(R.id.text_view_loading);
+        mEmptyStateTextView = (TextView) view.findViewById(R.id.text_view_empty_state);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_scans);
         mAdapter = new ScanAdapter(getContext(), this, this);
-        mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setAdapter(mAdapter);
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
         mCursorFilter = "";
         mScansSearchView = (SearchView) view.findViewById(R.id.search_view_scans);
         mScansSearchView.setOnQueryTextListener(this);
         mScansSearchView.setOnClickListener(this);
-        mNewScanTextView = (TextView) view.findViewById(R.id.text_view_new_scan);
         mSnackbarCoordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.coordinator_layout_snackbar);
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -219,8 +247,8 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
         if (c != null) {
             try {
                 if (c.getCount() >= 1) {
-                    mEmptyStateProgressBar.setVisibility(View.GONE);
-                    mEmptyStateTextView.setVisibility(View.GONE);
+                    mLoadingProgressBar.setVisibility(View.GONE);
+                    mLoadingTextView.setVisibility(View.GONE);
                     mScansSearchView.setVisibility(View.VISIBLE);
                     checkLastScan();
                 } else if (c.getCount() == 0) {
