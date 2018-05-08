@@ -13,8 +13,10 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -23,6 +25,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -61,11 +65,11 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
     private String mCursorFilter;
     private CoordinatorLayout mSnackbarCoordinatorLayout;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private Snackbar mSnackbar;
 
     private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Snackbar snackbar;
             Cursor c;
             switch (intent.getAction()) {
                 case WSIntentService.GET_ALL_SCANS_FOR_MANGA:
@@ -106,9 +110,9 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                                     mScansSearchView.setVisibility(View.VISIBLE);
                                     ((AppCompatActivity) getActivity()).getSupportActionBar().setLogo(null);
                                     if (mSwipeRefreshLayout.isRefreshing()) {
-                                        snackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_scans_received), Snackbar.LENGTH_LONG);
+                                        mSnackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_scans_received), Snackbar.LENGTH_LONG);
 
-                                        snackbar.show();
+                                        mSnackbar.show();
                                     }
                                 } finally {
                                     c.close();
@@ -116,15 +120,15 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                             }
                             break;
                         case WSIntentService.RESULT_ERROR_NO_INTERNET:
-                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_no_internet), Snackbar.LENGTH_LONG);
+                            mSnackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_no_internet), Snackbar.LENGTH_LONG);
 
-                            snackbar.show();
+                            mSnackbar.show();
                             break;
                         case WSIntentService.RESULT_ERROR_BAD_RESPONSE:
                         case WSIntentService.RESULT_ERROR_TIMEOUT:
-                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_server_error), Snackbar.LENGTH_LONG);
+                            mSnackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_server_error), Snackbar.LENGTH_LONG);
 
-                            snackbar.show();
+                            mSnackbar.show();
                             break;
                         default:
                             break;
@@ -132,6 +136,7 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                     mLoadingProgressBar.setVisibility(View.GONE);
                     mLoadingTextView.setVisibility(View.GONE);
                     mSwipeRefreshLayout.setRefreshing(false);
+                    // using a new cursor because mCursor is not ready yet
                     c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns.MANGA_ID + "=?", new String[]{ String.valueOf(mMangaId) }, null);
                     if (c != null) {
                         try {
@@ -158,9 +163,9 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                                         if (!c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.LAST_SCAN)).equals(lastScan)) {
                                             // new scan available to download, inform user
                                             ((AppCompatActivity) getActivity()).getSupportActionBar().setLogo(R.drawable.ic_fiber_new_blue_24dp);
-                                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_new_scans_available), Snackbar.LENGTH_LONG);
+                                            mSnackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_new_scans_available), Snackbar.LENGTH_LONG);
 
-                                            snackbar.show();
+                                            mSnackbar.show();
                                         }
                                     }
                                 } finally {
@@ -169,16 +174,16 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                             }
                             break;
                         case WSIntentService.RESULT_ERROR_NO_INTERNET:
-                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_no_internet), Snackbar.LENGTH_LONG);
+                            mSnackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_no_internet), Snackbar.LENGTH_LONG);
 
-                            snackbar.show();
+                            mSnackbar.show();
                             break;
                         case WSIntentService.RESULT_ERROR_BAD_RESPONSE:
                         case WSIntentService.RESULT_ERROR_TIMEOUT:
                             mLoadingProgressBar.setVisibility(View.GONE);
-                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_server_error), Snackbar.LENGTH_LONG);
+                            mSnackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_server_error), Snackbar.LENGTH_LONG);
 
-                            snackbar.show();
+                            mSnackbar.show();
                             break;
                         default:
                             break;
@@ -188,14 +193,14 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                 case WSIntentService.DOWNLOAD_PAGES_FOR_SCAN:
                     switch (intent.getIntExtra(WSIntentService.EXTRA_RESULT_CODE, 0)) {
                         case WSIntentService.RESULT_ERROR_NO_INTERNET:
-                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_no_internet), Snackbar.LENGTH_LONG);
+                            mSnackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_no_internet), Snackbar.LENGTH_LONG);
 
-                            snackbar.show();
+                            mSnackbar.show();
                             break;
                         case WSIntentService.RESULT_ERROR_ALREADY_DOWNLOADING:
-                            snackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_scan_download_already_in_progress), Snackbar.LENGTH_LONG);
+                            mSnackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_scan_download_already_in_progress), Snackbar.LENGTH_LONG);
 
-                            snackbar.show();
+                            mSnackbar.show();
                             break;
                         default:
                             break;
@@ -219,6 +224,7 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_scans, null, false);
     }
 
@@ -466,6 +472,64 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                 break;
         }
     }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem item = menu.findItem(R.id.action_favorite);
+
+        if (item != null) {
+            Cursor c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Manga.CONTENT_URI, null, ShonenTouchContract.MangaColumns._ID + "=?", new String[]{ String.valueOf(mMangaId) }, null);
+            if (c != null && c.getCount() == 1) {
+                try {
+                    c.moveToFirst();
+                    if (c.getInt(c.getColumnIndex(ShonenTouchContract.MangaColumns.FAVORITE)) == 1) {
+                        DrawableCompat.setTint(item.getIcon(), ContextCompat.getColor(getActivity(), android.R.color.holo_orange_dark));
+                    } else {
+                        DrawableCompat.setTint(item.getIcon(), ContextCompat.getColor(getActivity(), android.R.color.darker_gray));
+                    }
+                } finally {
+                    c.close();
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_favorite:
+                Cursor c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Manga.CONTENT_URI, null, ShonenTouchContract.MangaColumns._ID + "=?", new String[]{ String.valueOf(mMangaId) }, null);
+                if (c != null && c.getCount() == 1) {
+                    try {
+                        c.moveToFirst();
+                        ContentValues updatedManga = new ContentValues();
+                        if (c.getInt(c.getColumnIndex(ShonenTouchContract.MangaColumns.FAVORITE)) == 1) {
+                            updatedManga.put(ShonenTouchContract.MangaColumns.FAVORITE, false);
+                            DrawableCompat.setTint(item.getIcon(), ContextCompat.getColor(getActivity(), android.R.color.darker_gray));
+                            mSnackbar = Snackbar.make(mSnackbarCoordinatorLayout, c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.NAME)) + " retiré des favoris", Snackbar.LENGTH_LONG);
+                        } else {
+                            updatedManga.put(ShonenTouchContract.MangaColumns.FAVORITE, true);
+                            DrawableCompat.setTint(item.getIcon(), ContextCompat.getColor(getActivity(), android.R.color.holo_orange_dark));
+                            mSnackbar = Snackbar.make(mSnackbarCoordinatorLayout, c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.NAME)) + " ajouté aux favoris", Snackbar.LENGTH_LONG);
+                        }
+                        getActivity().getContentResolver().update(ShonenTouchContract.Manga.CONTENT_URI, updatedManga, ShonenTouchContract.MangaColumns._ID + "=?", new String[]{String.valueOf(mMangaId)});
+                        mSnackbar.show();
+                    } finally {
+                        c.close();
+                    }
+                }
+                break;
+            case android.R.id.home:
+                getActivity().finish();
+                break;
+            default:
+                break;
+        }
+
+        return true;
+    }
+
 
     @Override
     public void onRefresh() {

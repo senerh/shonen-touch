@@ -6,7 +6,6 @@ import android.os.Parcelable;
 /**
  * Created by Johnhetour on 08/07/2017.
  */
-
 public class Manga implements Parcelable {
     public static final Creator<Manga> CREATOR = new Creator<Manga>() {
         @Override
@@ -28,14 +27,17 @@ public class Manga implements Parcelable {
 
     private String mIconPath;
 
+    private boolean mFavorite;
+
     public Manga() {
     }
 
-    public Manga(String name, String slug, String lastScan, String iconPath) {
+    public Manga(String name, String slug, String lastScan, String iconPath, boolean favorite) {
         mSlug = slug;
         mName = name;
         mLastScan = lastScan;
         mIconPath = iconPath;
+        mFavorite = favorite;
     }
 
     protected Manga(Parcel in) {
@@ -43,6 +45,7 @@ public class Manga implements Parcelable {
         mName = in.readString();
         mLastScan = in.readString();
         mIconPath = in.readString();
+        mFavorite = in.readByte() != 0;
     }
 
     public String getName() {
@@ -77,6 +80,14 @@ public class Manga implements Parcelable {
         this.mIconPath = iconPath;
     }
 
+    public boolean isFavorite() {
+        return mFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        mFavorite = favorite;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -88,5 +99,6 @@ public class Manga implements Parcelable {
         dest.writeString(mName);
         dest.writeString(mLastScan);
         dest.writeString(mIconPath);
+        dest.writeByte((byte) (mFavorite ? 1 : 0));
     }
 }

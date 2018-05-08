@@ -25,13 +25,15 @@ public final class ShonenTouchContract {
         public static final String SLUG = "slug";
         public static final String LAST_SCAN = "lastScan";
         public static final String ICON_PATH = "iconPath";
+        public static final String FAVORITE = "favorite";
 
         String[] PROJECTION = {
                 _ID,
                 NAME,
                 SLUG,
                 LAST_SCAN,
-                ICON_PATH
+                ICON_PATH,
+                FAVORITE
         };
     }
 

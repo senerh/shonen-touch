@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 /**
  * Created by Thibaut SORIANO on 29/03/2017.
  */
-
 public class ShonenTouchDatabase extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "Manga.db";
@@ -22,6 +21,7 @@ public class ShonenTouchDatabase extends SQLiteOpenHelper {
                         ShonenTouchContract.MangaColumns.NAME + " TEXT, " +
                         ShonenTouchContract.MangaColumns.LAST_SCAN + " TEXT, " +
                         ShonenTouchContract.MangaColumns.ICON_PATH + " TEXT, " +
+                        ShonenTouchContract.MangaColumns.FAVORITE + " BOOLEAN, " +
                         ShonenTouchContract.MangaColumns.SLUG + " TEXT UNIQUE);";
 
         /**

@@ -1,5 +1,6 @@
 package ui.fragments;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -24,22 +25,21 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.List;
 
+import model.adapters.OnItemClickListener;
 import ui.activities.HelpActivity;
 import ui.activities.MangaActivity;
 import io.github.senerh.shonentouch.R;
 import model.adapters.MangaAdapter;
-import model.adapters.OnItemClickListener;
 import model.database.ShonenTouchContract;
 import model.entities.Manga;
 import model.services.WSIntentService;
 
-public class MangaListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,OnItemClickListener, SearchView.OnQueryTextListener, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class MangaListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnItemClickListener, SearchView.OnQueryTextListener, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
     // Loaders
     private static final int MANGA_LOADER = 1;
     private Cursor mCursor;
@@ -83,6 +83,7 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
                                             newManga.put(ShonenTouchContract.MangaColumns.SLUG, manga.getSlug());
                                             newManga.put(ShonenTouchContract.MangaColumns.LAST_SCAN, manga.getLastScan());
                                             newManga.put(ShonenTouchContract.MangaColumns.ICON_PATH, manga.getIconPath());
+                                            newManga.put(ShonenTouchContract.MangaColumns.FAVORITE, false);
 
                                             // persisting manga
                                             getActivity().getApplicationContext().getContentResolver().insert(ShonenTouchContract.Manga.CONTENT_URI, newManga);
@@ -116,6 +117,7 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
                     mLoadingProgressBar.setVisibility(View.GONE);
                     mLoadingTextView.setVisibility(View.GONE);
                     mSwipeRefreshLayout.setRefreshing(false);
+                    // using a new cursor because mCursor is not ready yet
                     Cursor c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Manga.CONTENT_URI, null, null, null, null);
                     if (c != null) {
                         try {
@@ -186,9 +188,9 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (id == MANGA_LOADER) {
             if (mCursorFilter == null || mCursorFilter.equals("")) {
-                return new CursorLoader(getContext().getApplicationContext(), ShonenTouchContract.Manga.CONTENT_URI, null, null, null, null);
+                return new CursorLoader(getContext().getApplicationContext(), ShonenTouchContract.Manga.CONTENT_URI, null, null, null, ShonenTouchContract.MangaColumns.FAVORITE + " DESC");
             } else {
-                return new CursorLoader(getContext().getApplicationContext(), ShonenTouchContract.Manga.CONTENT_URI, null, ShonenTouchContract.MangaColumns.NAME + " LIKE ?", new String[]{ "%" + mCursorFilter + "%" }, null);
+                return new CursorLoader(getContext().getApplicationContext(), ShonenTouchContract.Manga.CONTENT_URI, null, ShonenTouchContract.MangaColumns.NAME + " LIKE ?", new String[]{ "%" + mCursorFilter + "%" }, ShonenTouchContract.MangaColumns.FAVORITE + " DESC");
             }
         }
 

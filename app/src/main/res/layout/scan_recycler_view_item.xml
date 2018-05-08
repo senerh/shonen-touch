@@ -22,7 +22,8 @@
         <TextView
             android:id="@+id/text_view_scan_name"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content" />
+            android:layout_width="wrap_content"
+            android:layout_alignParentStart="true" />
 
         <TextView
             android:id="@+id/text_view_download_status"
@@ -30,6 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="20dp"
+            android:layout_toStartOf="@id/text_view_scan_name"
             android:layout_toEndOf="@id/text_view_scan_name" />
 
         <ImageView

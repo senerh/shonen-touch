@@ -2,6 +2,7 @@ package model.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -12,7 +13,7 @@ public class MangaViewHolder extends RecyclerView.ViewHolder implements View.OnC
 
     // Views
     public TextView mMangaNameTextView;
-    public ImageView mMangaIconImageView;
+    public ImageView mMangaIconImageView, mFavoriteImageView;
 
     // Listener
     private OnItemClickListener mAdapterListener;
@@ -21,6 +22,8 @@ public class MangaViewHolder extends RecyclerView.ViewHolder implements View.OnC
         super(itemView);
         mMangaNameTextView = (TextView) itemView.findViewById(R.id.text_view_manga_name);
         mMangaIconImageView = (ImageView) itemView.findViewById(R.id.image_view_manga_icon);
+        mFavoriteImageView = (ImageView) itemView.findViewById(R.id.image_view_favorite);
+        mFavoriteImageView.setOnClickListener(this);
     }
 
     public MangaViewHolder(View itemView, OnItemClickListener listener) {

@@ -4,6 +4,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
@@ -41,6 +44,19 @@ public class MangaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 options.inPreferredConfig = Bitmap.Config.ARGB_8888;
                 ((MangaViewHolder) holder).mMangaIconImageView.setImageBitmap(BitmapFactory.decodeFile(filePath, options));
             }
+            String name = c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.NAME));
+            if (c.getInt(c.getColumnIndex(ShonenTouchContract.MangaColumns.FAVORITE)) == 1) {
+                Drawable d = ((MangaViewHolder) holder).mFavoriteImageView.getDrawable();
+                d = DrawableCompat.wrap(d);
+                DrawableCompat.setTint(d.mutate(), ContextCompat.getColor(mContext, android.R.color.holo_orange_dark));
+//                DrawableCompat.setTint(((MangaViewHolder) holder).mFavoriteImageView.getDrawable(), ContextCompat.getColor(mContext, android.R.color.holo_orange_dark));
+            } else {
+                Drawable d = ((MangaViewHolder) holder).mFavoriteImageView.getDrawable();
+                d = DrawableCompat.wrap(d);
+                DrawableCompat.setTint(d.mutate(), ContextCompat.getColor(mContext, android.R.color.darker_gray));
+//                DrawableCompat.setTint(((MangaViewHolder) holder).mFavoriteImageView.getDrawable(), ContextCompat.getColor(mContext, android.R.color.darker_gray));
+            }
+
 
         }
     }
@@ -54,6 +70,4 @@ public class MangaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         mCursorAdapter.swapCursor(cursor);
         notifyDataSetChanged();
     }
-
-    
 }

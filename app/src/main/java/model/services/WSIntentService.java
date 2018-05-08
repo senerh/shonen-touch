@@ -150,24 +150,31 @@ public class WSIntentService extends IntentService {
 
             for (int i = 0; i < tabManga.length(); i++) {
                 JSONObject currentManga = tabManga.getJSONObject(i);
-                mangas.add(new Manga(currentManga.getString("name"), currentManga.getString("slug"), currentManga.getString("lastScan"), currentManga.getString("url")));
+                mangas.add(new Manga(currentManga.getString("name"), currentManga.getString("slug"), currentManga.getString("lastScan"), currentManga.getString("url"), false));
             }
 
             // download icons for the mangas
             for (int i = 0; i < mangas.size(); i++) {
-                try {
-                    Bitmap downloadedBitmap = BitmapFactory.decodeStream(new URL(mangas.get(i).getIconPath()).openStream());
-                    if (downloadedBitmap != null) {
-                        File imageFile = new File(new ContextWrapper(this).getDir(IMAGES_FOLDER_NAME, 0), mangas.get(i).getSlug() + HelpFormatter.DEFAULT_OPT_PREFIX + "icon");
-                        OutputStream fileOutputStream = new FileOutputStream(imageFile);
-                        downloadedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
-                        fileOutputStream.close();
-                        mangas.get(i).setIconPath(imageFile.getAbsolutePath());
+                // optimization : verifying if current manga exists in db
+                Cursor c = getContentResolver().query(ShonenTouchContract.Manga.CONTENT_URI, null, ShonenTouchContract.MangaColumns.SLUG + "=?", new String[]{ mangas.get(i).getSlug() }, null);
+                if (c != null && c.getCount() == 0) {
+                    try {
+                        try {
+                            Bitmap downloadedBitmap = BitmapFactory.decodeStream(new URL(mangas.get(i).getIconPath()).openStream());
+                            if (downloadedBitmap != null) {
+                                File imageFile = new File(new ContextWrapper(this).getDir(IMAGES_FOLDER_NAME, 0), mangas.get(i).getSlug() + HelpFormatter.DEFAULT_OPT_PREFIX + "icon");
+                                OutputStream fileOutputStream = new FileOutputStream(imageFile);
+                                downloadedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                                fileOutputStream.close();
+                                mangas.get(i).setIconPath(imageFile.getAbsolutePath());
+                            }
+                        } catch (FileNotFoundException e) {
+                            mangas.get(i).setIconPath("");
+                        }
+                    } finally {
+                        c.close();
                     }
-                } catch (FileNotFoundException e) {
-                    mangas.get(i).setIconPath("");
                 }
-
             }
 
             intent.putParcelableArrayListExtra(PARAM_MANGAS_LIST, (ArrayList<? extends Parcelable>) mangas);
