@@ -56,12 +56,12 @@ public class ShonenTouchSyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, final Bundle bundle, String s, ContentProviderClient contentProviderClient, SyncResult syncResult) {
-        System.out.println("******************");
-        System.out.println("******************");
-        System.out.println("sync shonen touch");
-        System.out.println("******************");
-        System.out.println("******************");
-        System.out.println("******************");
+//        System.out.println("******************");
+//        System.out.println("******************");
+//        System.out.println("sync shonen touch");
+//        System.out.println("******************");
+//        System.out.println("******************");
+//        System.out.println("******************");
         try {
             URL url = new URL(WSIntentService.URL_ALL_MANGA);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

@@ -24,6 +24,8 @@ public class HelpFragment extends Fragment implements View.OnClickListener {
     private TextView mDownloadDescriptionTextView;
     private ImageButton mExtendRefreshImageButton;
     private TextView mRefreshDescriptionTextView;
+    private ImageButton mExtendFavoritesImageButton;
+    private TextView mFavoritesDescriptionTextView;
     private ImageButton mExtendContactUsImageButton;
     private TextView mContactUsDescriptionTextView;
     private ImageButton mExtendCreditsImageButton;
@@ -34,6 +36,7 @@ public class HelpFragment extends Fragment implements View.OnClickListener {
     private boolean mIsAddMangaCardExtended = false;
     private boolean mIsDownloadCardExtended = false;
     private boolean mIsRefreshCardExtended = false;
+    private boolean mIsFavoritesCardExtended = false;
     private boolean mIsContactUsCardExtended = false;
     private boolean mIsCreditsCardExtended = false;
 
@@ -55,6 +58,8 @@ public class HelpFragment extends Fragment implements View.OnClickListener {
         mExtendDownloadImageButton.setOnClickListener(this);
         mExtendRefreshImageButton = (ImageButton) view.findViewById(R.id.image_button_refresh_extend);
         mExtendRefreshImageButton.setOnClickListener(this);
+        mExtendFavoritesImageButton = (ImageButton) view.findViewById(R.id.image_button_favorites_extend);
+        mExtendFavoritesImageButton.setOnClickListener(this);
         mExtendContactUsImageButton = (ImageButton) view.findViewById(R.id.image_button_contact_us_extend);
         mExtendContactUsImageButton.setOnClickListener(this);
         mExtendCreditsImageButton = (ImageButton) view.findViewById(R.id.image_button_credits_extend);
@@ -65,6 +70,7 @@ public class HelpFragment extends Fragment implements View.OnClickListener {
         mAddMangaDescriptionTextView = (TextView) view.findViewById(R.id.text_view_add_manga_content);
         mDownloadDescriptionTextView = (TextView) view.findViewById(R.id.text_view_download_description);
         mRefreshDescriptionTextView = (TextView) view.findViewById(R.id.text_view_refresh_description);
+        mFavoritesDescriptionTextView = (TextView) view.findViewById(R.id.text_view_favorites_description);
         mContactUsDescriptionTextView = (TextView) view.findViewById(R.id.text_view_contact_us_description);
         mCreditsDescriptionTextView = (TextView) view.findViewById(R.id.text_view_credits_description);
 
@@ -88,6 +94,9 @@ public class HelpFragment extends Fragment implements View.OnClickListener {
                 break;
             case (R.id.image_button_refresh_extend) :
                 mIsRefreshCardExtended = extendOrCloseCard(mIsRefreshCardExtended, mExtendRefreshImageButton, mRefreshDescriptionTextView);
+                break;
+            case (R.id.image_button_favorites_extend) :
+                mIsFavoritesCardExtended = extendOrCloseCard(mIsFavoritesCardExtended, mExtendFavoritesImageButton, mFavoritesDescriptionTextView);
                 break;
             case (R.id.image_button_contact_us_extend) :
                 mIsContactUsCardExtended = extendOrCloseCard(mIsContactUsCardExtended, mExtendContactUsImageButton, mContactUsDescriptionTextView);
