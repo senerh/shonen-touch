@@ -1,7 +1,10 @@
 package ui.fragments;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -43,6 +47,9 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
     // Loaders
     private static final int MANGA_LOADER = 1;
     private Cursor mCursor;
+    private Account mAccount;
+
+    private static final int SYNC_FREQUENCY_SECONDS = 24 * 60 * 60;
 
     private MangaAdapter mAdapter;
     private String mCursorFilter;
@@ -163,8 +170,12 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
         mSnackbarCoordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.coordinator_layout_snackbar);
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
+        Button ronaldo = (Button) view.findViewById(R.id.meurguez);
+        ronaldo.setOnClickListener(this);
 
         getLoaderManager().initLoader(MANGA_LOADER, null, this);
+
+        setupPeriodicSync();
 
         Cursor c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Manga.CONTENT_URI, null, null, null, null);
         if (c != null) {
@@ -261,6 +272,17 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
             case R.id.search_view_manga:
                 mMangaSearchView.setIconified(false);
                 break;
+            case R.id.meurguez:
+                Account[] accs = AccountManager.get(getContext()).getAccountsByType(getContext().getString(R.string.account_type));
+                Account account;
+                if (accs.length > 0) {
+                    account = accs[0];
+                } else {
+                    account = new Account(getContext().getString(R.string.account_name), getContext().getString(R.string.account_type));
+                    boolean accountCreated = AccountManager.get(getContext()).addAccountExplicitly(account, "", null);
+                }
+                ContentResolver.requestSync(account, getContext().getString(R.string.authorities), new Bundle());
+                break;
             default:
                 break;
         }
@@ -290,5 +312,23 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
 
         intent.setAction(WSIntentService.GET_ALL_MANGA);
         getActivity().startService(intent);
+    }
+
+    private void createOrFindAccount() {
+        Account[] accounts = AccountManager.get(getActivity()).getAccountsByType(getString(R.string.account_type));
+        if (accounts.length > 0) {
+            mAccount = accounts[0];
+        } else {
+            mAccount = new Account("Sync Shonen Touch", getString(R.string.account_type));
+            boolean accountCreated = AccountManager.get(getActivity()).addAccountExplicitly(mAccount, "password", null);
+        }
+    }
+
+    private void setupPeriodicSync() {
+        createOrFindAccount();
+        ContentResolver.setIsSyncable(mAccount, getString(R.string.authorities), 1);
+        ContentResolver.setSyncAutomatically(mAccount, getString(R.string.authorities), true);
+        // 86400 seconds for a one day period
+        ContentResolver.addPeriodicSync(mAccount, getString(R.string.authorities), new Bundle(), SYNC_FREQUENCY_SECONDS);
     }
 }

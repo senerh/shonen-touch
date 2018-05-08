@@ -46,7 +46,7 @@ public class WSIntentService extends IntentService {
     public static final String CHECK_LAST_SCAN = "CHECK_LAST_SCAN";
 
     private static final String URL_SERVER = "http://senerh.xyz:8080/shonen-touch-api-3/";
-    private static final String URL_ALL_MANGA = URL_SERVER + "mangas";
+    public static final String URL_ALL_MANGA = URL_SERVER + "mangas";
     private static final String URL_ALL_SCANS_FOR_MANGA = URL_SERVER + "mangas/%1$s/scans";
     private static final String URL_ALL_PAGES_FOR_MANGA_AND_SCAN = URL_SERVER + "mangas/%1$s/scans/%2$s/pages";
     private static final String URL_SPECIFIC_MANGA = URL_SERVER + "mangas/%1$s";

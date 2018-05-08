@@ -11,7 +11,12 @@
         android:clickable="true"
         android:focusable="true"
         android:visibility="gone"/>
-
+    <Button
+        android:id="@+id/meurguez"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="lancer la synchronisation"
+        />
     <TextView
         android:id="@+id/text_view_loading"
         android:layout_height="wrap_content"

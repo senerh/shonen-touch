@@ -44,20 +44,13 @@ public class MangaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 options.inPreferredConfig = Bitmap.Config.ARGB_8888;
                 ((MangaViewHolder) holder).mMangaIconImageView.setImageBitmap(BitmapFactory.decodeFile(filePath, options));
             }
-            String name = c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.NAME));
+            Drawable d = ((MangaViewHolder) holder).mFavoriteImageView.getDrawable();
+            d = DrawableCompat.wrap(d);
             if (c.getInt(c.getColumnIndex(ShonenTouchContract.MangaColumns.FAVORITE)) == 1) {
-                Drawable d = ((MangaViewHolder) holder).mFavoriteImageView.getDrawable();
-                d = DrawableCompat.wrap(d);
                 DrawableCompat.setTint(d.mutate(), ContextCompat.getColor(mContext, android.R.color.holo_orange_dark));
-//                DrawableCompat.setTint(((MangaViewHolder) holder).mFavoriteImageView.getDrawable(), ContextCompat.getColor(mContext, android.R.color.holo_orange_dark));
             } else {
-                Drawable d = ((MangaViewHolder) holder).mFavoriteImageView.getDrawable();
-                d = DrawableCompat.wrap(d);
                 DrawableCompat.setTint(d.mutate(), ContextCompat.getColor(mContext, android.R.color.darker_gray));
-//                DrawableCompat.setTint(((MangaViewHolder) holder).mFavoriteImageView.getDrawable(), ContextCompat.getColor(mContext, android.R.color.darker_gray));
             }
-
-
         }
     }
 

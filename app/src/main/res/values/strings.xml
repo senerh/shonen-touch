@@ -43,4 +43,12 @@
     <string name="snackbar_new_scans_available">Nouveau(x) scan(s) disponible(s)</string>
     <string name="snackbar_scan_download_already_in_progress">Téléchargement d\'un scan déjà en cours</string>
 
+    <!--Sync adapter-->
+    <string name="account_name">Sync Shonen Touch</string>
+    <string name="account_type">io.github.senerh.shonentouch</string>
+    <string name="authorities">io.github.senerh.shonentouch.synchronization</string>
+    <string name="notification_title">Nouveau(x) scan(s)</string>
+    <string name="notification_content">%1$s : scan %2$s disponible !</string>
+    <string name="notification_generic_content">Pour plusieurs mangas</string>
+
 </resources>

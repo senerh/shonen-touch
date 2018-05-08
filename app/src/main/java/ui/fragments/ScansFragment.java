@@ -29,6 +29,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -231,6 +232,8 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mMangaId = getArguments().getInt("mangaId", -1);
+        Button ronaldo = (Button) view.findViewById(R.id.meurguez);
+        ronaldo.setOnClickListener(this);
         mLoadingProgressBar = (ProgressBar) view.findViewById(R.id.progress_bar_loading);
         mLoadingTextView = (TextView) view.findViewById(R.id.text_view_loading);
         mEmptyStateTextView = (TextView) view.findViewById(R.id.text_view_empty_state);
@@ -467,6 +470,11 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
         switch (view.getId()) {
             case R.id.search_view_scans:
                 mScansSearchView.setIconified(false);
+                break;
+            case R.id.meurguez:
+                ContentValues updatedManga = new ContentValues();
+                updatedManga.put(ShonenTouchContract.MangaColumns.LAST_SCAN, "zhengqin");
+                getActivity().getContentResolver().update(ShonenTouchContract.Manga.CONTENT_URI, updatedManga, ShonenTouchContract.MangaColumns._ID + "=?", new String[]{String.valueOf(mMangaId)});
                 break;
             default:
                 break;

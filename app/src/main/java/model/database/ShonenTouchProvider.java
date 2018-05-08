@@ -16,7 +16,7 @@
 ///**
 // * Created by Thibaut SORIANO on 04/04/2017.
 // */
-//public class ShonenTouchProvider extends ContentProvider {
+//public class ShonenTouchSyncProvider extends ContentProvider {
 //    // Database
 //    protected ShonenTouchDatabase mDatabase;
 //
