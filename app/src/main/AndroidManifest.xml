@@ -2,6 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.github.senerh.shonentouch">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+
     <application
         android:allowBackup="true"
         android:label="@string/app_name"
@@ -9,22 +16,96 @@
         android:largeHeap="true"
         android:theme="@style/AppTheme"
         android:icon="@mipmap/ic_launcher">
+
         <activity
-            android:name="activity.MainActivity"
+            android:name="ui.activities.HomeActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="activity.PageActivity" />
-        <activity android:name="activity.ChatActivity" />
 
+        <activity
+            android:name="ui.activities.MangaActivity"
+            android:parentActivityName="ui.activities.HomeActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop" />
+
+        <activity
+        android:name="ui.activities.PageActivity"
+        android:parentActivityName="ui.activities.MangaActivity"/>
+
+        <activity
+            android:name="ui.activities.HelpActivity"
+            android:parentActivityName="ui.activities.HomeActivity"
+            android:screenOrientation="portrait"/>
+
+        <!--
+   Authorities is the package name, while name is the file of the provider
+   Add content provider so android's content resolver can see it.
+   The authority matches package, name represents the file the provider is in.
+   The syncable flag lets android now we're going to synchronize our content provider with the server.
+   Changing the exported tag to false means that only our app can see the content.
+        -->
+        <provider
+            android:name="model.database.ShonenTouchProvider"
+            android:authorities="io.github.senerh.shonentouch"
+            android:exported="false"
+            android:protectionLevel="signature"
+            android:syncable="true" />
+
+        <meta-data
+            android:name="DATABASE"
+            android:value="manga.db" />
+        <meta-data
+            android:name="VERSION"
+            android:value="1" />
+        <meta-data
+            android:name="QUERY_LOG"
+            android:value="true" />
+        <meta-data
+            android:name="DOMAIN_PACKAGE_NAME"
+            android:value="io.github.senerh.shonentouch.model.entities" />
+
+        <service
+            android:name="model.services.WSIntentService" />
+        <service
+            android:name="model.services.HeavyActionsIntentService" />
+
+        <service
+            android:name="model.synchronization.ShonenTouchSyncService"
+            android:process=":sync"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
+        </service>
+
+        <provider
+            android:name="model.synchronization.ShonenTouchSyncProvider"
+            android:authorities="@string/authorities"
+            android:label="Sync Provider"
+            android:exported="false"
+            android:multiprocess="true"
+            android:syncable="true"/>
+
+        <service
+            android:name="model.synchronization.AuthenticatorService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
 
     </application>
-
-    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
-
 
 </manifest>

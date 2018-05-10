@@ -1,37 +1,58 @@
 <resources>
     <string name="app_name">Shonen Touch</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="action_settings">Settings</string>
-    <string name="scan">Scan %1$s</string>
+    <!--Dialogs-->
+    <string name="dialog_delete_scan_title">Suppression d\'un scan</string>
+    <string name="dialog_delete_scan_message">Voulez-vous supprimer toutes les pages du scan %1$s ?</string>
+    <string name="dialog_stop_download_title">Interruption du téléchargement</string>
+    <string name="dialog_stop_download_message">Voulez-vous interrompre le téléchargement des pages du scan %1$s ?</string>
+    <string name="dialog_resume_or_delete_download_title">Téléchargement interrompu</string>
+    <string name="dialog_resume_or_delete_download_message">Voulez-vous supprimer le contenu téléchargé ou reprendre le téléchargement du scan %1$s ?</string>
+    <string name="dialog_resume_or_delete_download_delete_button">Supprimer</string>
+    <string name="dialog_resume_or_delete_download_resume_button">Reprendre</string>
+    <string name="dialog_resume_or_delete_download_cancel_button">Ne rien faire</string>
 
-    <string name="menu_item_home" id="home">Accueil</string>
-    <string name="menu_item_favorites">Favoris</string>
-    <string name="menu_item_chat">Chat</string>
-    <string name="menu_item_history">Historique</string>
-    <string name="menu_item_prefs">Réglages</string>
-    <string name="menu_item_about">À propos</string>
-    <string name="menu_item_accueil">Accueil</string>
+    <!--Help-->
+    <string name="help_title_what_is_a_scan">Qu\'est-ce qu\'un scan ?</string>
+    <string name="help_content_what_is_a_scan">Un scan fait référence à un manga qui a été numérisé (scanné) et traduit par des fans depuis sa langue originale vers une autre.</string>
+    <string name="help_title_scan_missing">Pourquoi manque-t-il certains scans ?</string>
+    <string name="help_content_scan_missing">Pour inciter les lecteurs à acheter l\'oeuvre originale une fois que celle-ci est disponible en France.</string>
+    <string name="help_title_wrong_language_scans">Pourquoi certains scans ne sont pas en français ?</string>
+    <string name="help_content_wrong_language_scans">Certains scans (ou spoilers) sont disponibles avant d\'être traduits. Vous pouvez les supprimer et les télécharger à nouveau plus tard pour les avoir en français.</string>
+    <string name="help_title_add_manga">Pouvez-vous ajouter un manga ?</string>
+    <string name="help_content_add_manga">Seuls les mangas présents sur le site lirescan.net peuvent être disponibles sur l\'application.</string>
+    <string name="help_title_download">Téléchargement</string>
+    <string name="help_content_download">Pour lire un scan, vous devez d\'abord le télécharger. Vous pouvez télécharger un seul scan à la fois.\nLorsqu\'un scan est téléchargé, toutes ses pages (images png) sont enregistrées dans l\'espace de stockage de votre périphérique.\nPour supprimer un scan, appuyez longtemps dessus.\nVeillez à supprimer les scans déjà lus pour optimiser votre espace.</string>
+    <string name="help_title_refresh">Rafraîchissement</string>
+    <string name="help_content_refresh">Sur les vues des mangas et scans, vous pouvez actualiser la liste en glissant le doigt vers le bas.</string>
+    <string name="help_title_favorites">Favoris</string>
+    <string name="help_content_favorites">Ajouter un manga en favori vous permet de :\n- Le placer en tête de la liste\n- Recevoir une notification lorsque de nouveaux scans seront disponibles</string>
+    <string name="help_title_contact_us">Comment nous contacter ?</string>
+    <string name="help_content_contact_us">En publiant (ou en modifiant) un commentaire sur la page Playstore de l\'application.</string>
+    <string name="help_title_credits">Crédits</string>
+    <string name="help_content_credits">Version : Shonen Touch 2.0\nPar : Nathan FRANCOIS, Franck LACASTAIGNERATTE, Hakan SENER et Thibaut SORIANO</string>
 
-    <string name="validate">Valider</string>
-    <string name="cancel">Annuler</string>
+    <!--Fragments-->
+    <string name="lastScan">Dernier scan : %1$s</string>
+    <string name="fragment_manga_list_loading">Téléchargement des mangas\nVeuillez patienter…</string>
+    <string name="fragment_manga_list_empty_state">Echec de la récupération des manga\nVeuillez réessayer</string>
+    <string name="fragment_scans_loading">Chargement en cours\nVeuillez patienter…</string>
+    <string name="fragment_scans_empty_state">Echec de la récupération des scans\nVeuillez réessayer</string>
 
-    <string name="chat">Chat</string>
-    <string name="username">Pseudonyme</string>
-    <string name="about_footer">Codée avec le </string>
-    <string name="about_content">
-        L’application a été réalisée dans le cadre des études à l’école de Polytech Lyon par l’équipe suivante :
-    </string>
-    <string name="about_authors">
-        Nathan FRANCOIS\n
-        Franck LACASTAIGNERATTE\n
-        <a href="https://senerh.github.io">Hakan SENER</a>
-    </string>
-    <string name="updateFavoritesText">Modifier</string>
-    <string name="updateFavoritesDescriptionText">Sélectionnez vos mangas favoris qui apparaitrons sur l\'accueil</string>
-    <string name="emptyHistoryText">L\'historique ne contient aucun élément.</string>
-    <string name="continueLastScan">Reprendre la lecture du scan %1$s</string>
-    <string name="emptyFavortiteText"><![CDATA[Sélectionnez vos favoris depuis le menu Réglages > Favoris]]></string>
+    <!--Snackbars-->
+    <string name="snackbar_no_internet">Aucune connexion internet</string>
+    <string name="snackbar_server_error">Erreur de communication avec le serveur</string>
+    <string name="snackbar_scans_received">Liste de scans récupérée</string>
+    <string name="snackbar_mangas_received">Liste de mangas récupérée</string>
+    <string name="snackbar_new_scans_available">Nouveau(x) scan(s) disponible(s)</string>
+    <string name="snackbar_scan_download_already_in_progress">Téléchargement d\'un scan déjà en cours</string>
+
+    <!--Sync adapter-->
+    <string name="account_name">Sync Shonen Touch</string>
+    <string name="account_type">io.github.senerh.shonentouch</string>
+    <string name="authorities">io.github.senerh.shonentouch.synchronization</string>
+    <string name="notification_title">Nouveau(x) scan(s)</string>
+    <string name="notification_content">%1$s : scan %2$s disponible !</string>
+    <string name="notification_generic_content">Pour plusieurs mangas</string>
 
 </resources>
