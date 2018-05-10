@@ -56,12 +56,6 @@ public class ShonenTouchSyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, final Bundle bundle, String s, ContentProviderClient contentProviderClient, SyncResult syncResult) {
-//        System.out.println("******************");
-//        System.out.println("******************");
-//        System.out.println("sync shonen touch");
-//        System.out.println("******************");
-//        System.out.println("******************");
-//        System.out.println("******************");
         try {
             URL url = new URL(WSIntentService.URL_ALL_MANGA);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -89,7 +83,6 @@ public class ShonenTouchSyncAdapter extends AbstractThreadedSyncAdapter {
                                 c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.ICON_PATH)),
                                 true)
                         );
-//                        System.out.println("**********favorite : " + c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.NAME)));
                     }
                 } finally {
                     c.close();
@@ -127,7 +120,7 @@ public class ShonenTouchSyncAdapter extends AbstractThreadedSyncAdapter {
                             Notification n  = new Notification.Builder(getContext())
                                     .setContentTitle(getContext().getString(R.string.notification_title))
                                     .setContentText(getContext().getString(R.string.notification_content, mangasFromServer.get(j).getName(), mangasFromServer.get(j).getLastScan()))
-                                    .setSmallIcon(R.mipmap.ic_launcher)
+                                    .setSmallIcon(R.drawable.ic_notification_white)
                                     .setContentIntent(pIntent)
                                     .setAutoCancel(true)
                                     .build();
@@ -160,7 +153,6 @@ public class ShonenTouchSyncAdapter extends AbstractThreadedSyncAdapter {
                 notificationManager.notify(0, n);
             } else {
                 for (int i = 0; i < notificationsList.size(); i++) {
-//                    System.out.println("****************trigger notif");
                     notificationManager.notify(i, notificationsList.get(i));
                 }
             }

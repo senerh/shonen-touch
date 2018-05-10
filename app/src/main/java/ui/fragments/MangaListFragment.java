@@ -2,7 +2,6 @@ package ui.fragments;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -28,20 +27,19 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.List;
 
-import model.adapters.OnItemClickListener;
-import ui.activities.HelpActivity;
-import ui.activities.MangaActivity;
 import io.github.senerh.shonentouch.R;
 import model.adapters.MangaAdapter;
+import model.adapters.OnItemClickListener;
 import model.database.ShonenTouchContract;
 import model.entities.Manga;
 import model.services.WSIntentService;
+import ui.activities.HelpActivity;
+import ui.activities.MangaActivity;
 
 public class MangaListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnItemClickListener, SearchView.OnQueryTextListener, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
     // Loaders
@@ -170,8 +168,6 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
         mSnackbarCoordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.coordinator_layout_snackbar);
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
-        Button ronaldo = (Button) view.findViewById(R.id.meurguez);
-        ronaldo.setOnClickListener(this);
 
         getLoaderManager().initLoader(MANGA_LOADER, null, this);
 
@@ -271,17 +267,6 @@ public class MangaListFragment extends Fragment implements LoaderManager.LoaderC
         switch (view.getId()) {
             case R.id.search_view_manga:
                 mMangaSearchView.setIconified(false);
-                break;
-            case R.id.meurguez:
-                Account[] accs = AccountManager.get(getContext()).getAccountsByType(getContext().getString(R.string.account_type));
-                Account account;
-                if (accs.length > 0) {
-                    account = accs[0];
-                } else {
-                    account = new Account(getContext().getString(R.string.account_name), getContext().getString(R.string.account_type));
-                    boolean accountCreated = AccountManager.get(getContext()).addAccountExplicitly(account, "", null);
-                }
-                ContentResolver.requestSync(account, getContext().getString(R.string.authorities), new Bundle());
                 break;
             default:
                 break;

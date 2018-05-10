@@ -17,6 +17,8 @@
     <string name="help_content_what_is_a_scan">Un scan fait référence à un manga qui a été numérisé (scanné) et traduit par des fans depuis sa langue originale vers une autre.</string>
     <string name="help_title_scan_missing">Pourquoi manque-t-il certains scans ?</string>
     <string name="help_content_scan_missing">Pour inciter les lecteurs à acheter l\'oeuvre originale une fois que celle-ci est disponible en France.</string>
+    <string name="help_title_wrong_language_scans">Pourquoi certains scans ne sont pas en français ?</string>
+    <string name="help_content_wrong_language_scans">Certains scans (ou spoilers) sont disponibles avant d\'être traduits. Vous pouvez les supprimer et les télécharger à nouveau plus tard pour les avoir en français.</string>
     <string name="help_title_add_manga">Pouvez-vous ajouter un manga ?</string>
     <string name="help_content_add_manga">Seuls les mangas présents sur le site lirescan.net peuvent être disponibles sur l\'application.</string>
     <string name="help_title_download">Téléchargement</string>
@@ -28,7 +30,7 @@
     <string name="help_title_contact_us">Comment nous contacter ?</string>
     <string name="help_content_contact_us">En publiant (ou en modifiant) un commentaire sur la page Playstore de l\'application.</string>
     <string name="help_title_credits">Crédits</string>
-    <string name="help_content_credits">Version : Shonen Touch 2.0\nPar : Hakan SENER et Thibaut SORIANO</string>
+    <string name="help_content_credits">Version : Shonen Touch 2.0\nPar : Nathan FRANCOIS, Franck LACASTAIGNERATTE, Hakan SENER et Thibaut SORIANO</string>
 
     <!--Fragments-->
     <string name="lastScan">Dernier scan : %1$s</string>
