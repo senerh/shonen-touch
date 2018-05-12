@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId 'io.github.senerh.shonentouch'
         minSdkVersion 19
-        targetSdkVersion 24
+        targetSdkVersion 26
         versionCode 3
         versionName "2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

@@ -58,7 +58,6 @@
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
-
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/coordinator_layout_snackbar"
         android:layout_width="match_parent"
@@ -66,7 +65,5 @@
         android:layout_alignParentBottom="true">
 
     </android.support.design.widget.CoordinatorLayout>
-
-
 
 </RelativeLayout>

@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -279,11 +281,23 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                     Intent intent = new Intent();
                     switch (Scan.Status.valueOf(mCursor.getString(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns.STATUS)))) {
                         case NOT_DOWNLOADED:
-                            intent = new Intent(getActivity(), WSIntentService.class);
-                            intent.setAction(WSIntentService.DOWNLOAD_PAGES_FOR_SCAN);
-                            intent.putExtra(WSIntentService.PARAM_MANGA_SLUG, c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.SLUG)));
-                            intent.putExtra(WSIntentService.PARAM_SCAN_ID, mCursor.getInt(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns._ID)));
-                            getActivity().startService(intent);
+                            if (isConnected()) {
+                                intent = new Intent(getActivity(), PageActivity.class);
+                                intent.putExtra(WSIntentService.PARAM_MANGA_SLUG, c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.SLUG)));
+                                intent.putExtra(PageActivity.EXTRA_SCAN_ID, mCursor.getInt(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns._ID)));
+                                intent.putExtra(PageActivity.EXTRA_ONLINE_READING, true);
+                                startActivity(intent);
+                            } else {
+                                mSnackbar = Snackbar.make(mSnackbarCoordinatorLayout, getResources().getString(R.string.snackbar_no_internet), Snackbar.LENGTH_LONG);
+
+                                mSnackbar.show();
+                            }
+
+//                            intent = new Intent(getActivity(), WSIntentService.class);
+//                            intent.setAction(WSIntentService.DOWNLOAD_PAGES_FOR_SCAN);
+//                            intent.putExtra(WSIntentService.PARAM_MANGA_SLUG, c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.SLUG)));
+//                            intent.putExtra(WSIntentService.PARAM_SCAN_ID, mCursor.getInt(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns._ID)));
+//                            getActivity().startService(intent);
                             break;
                         case DOWNLOAD_COMPLETE:
                             intent = new Intent(getActivity(), PageActivity.class);
@@ -329,6 +343,15 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                             alertDialogFragment.setTargetFragment(this, REQUEST_DELETE_SCAN_DIALOG);
                             alertDialogFragment.show(getFragmentManager(), AlertDialogFragment.TAG);
                             break;
+                        case NOT_DOWNLOADED:
+                            intent = new Intent(getActivity(), WSIntentService.class);
+                            intent.setAction(WSIntentService.DOWNLOAD_PAGES_FOR_SCAN);
+                            intent.putExtra(WSIntentService.PARAM_MANGA_SLUG, c.getString(c.getColumnIndex(ShonenTouchContract.MangaColumns.SLUG)));
+                            intent.putExtra(WSIntentService.PARAM_SCAN_ID, mCursor.getInt(mCursor.getColumnIndex(ShonenTouchContract.ScanColumns._ID)));
+                            getActivity().startService(intent);
+                            break;
+                        default:
+                            break;
                     }
                 }
             } finally {
@@ -354,10 +377,22 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
             case REQUEST_STOP_DOWNLOAD_DIALOG:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
+                        // check that the status is still DOWNLOAD_IN_PROGRESS
                         int scanId = data.getIntExtra(EXTRA_SCAN_ID, -1);
-                        ContentValues updatedScan = new ContentValues();
-                        updatedScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.DOWNLOAD_STOPPED.name());
-                        getActivity().getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
+                        Cursor c = getActivity().getApplicationContext().getContentResolver().query(ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{ String.valueOf(scanId) }, null);
+                        if (c != null && c.getCount() == 1) {
+                            try {
+                                c.moveToFirst();
+                                if (Scan.Status.valueOf(c.getString(c.getColumnIndex(ShonenTouchContract.ScanColumns.STATUS))) == Scan.Status.DOWNLOAD_IN_PROGRESS) {
+                                    // stop download only if download is in progress
+                                    ContentValues updatedScan = new ContentValues();
+                                    updatedScan.put(ShonenTouchContract.ScanColumns.STATUS, Scan.Status.DOWNLOAD_STOPPED.name());
+                                    getActivity().getContentResolver().update(ShonenTouchContract.Scan.CONTENT_URI, updatedScan, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)});
+                                }
+                            } finally {
+                                c.close();
+                            }
+                        }
                         break;
                 }
                 break;
@@ -570,5 +605,15 @@ public class ScansFragment extends Fragment implements OnItemClickListener, Load
                 c.close();
             }
         }
+    }
+
+    /**
+     * Indicates whether network connectivity exists.
+     * @return true if network connectivity exists, false otherwise.
+     */
+    private boolean isConnected() {
+        final ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

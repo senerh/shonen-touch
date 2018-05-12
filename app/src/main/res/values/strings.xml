@@ -46,6 +46,10 @@
     <string name="snackbar_mangas_received">Liste de mangas récupérée</string>
     <string name="snackbar_new_scans_available">Nouveau(x) scan(s) disponible(s)</string>
     <string name="snackbar_scan_download_already_in_progress">Téléchargement d\'un scan déjà en cours</string>
+    <string name="snackbar_next_page_not_ready_yet">La page suivante n\'est pas encore prête</string>
+    <string name="snackbar_swipe_start_page">Vous lisez le scan %1$s du manga %2$s</string>
+    <string name="snackbar_swipe_again_to_load_next">Glissez encore une fois pour lire le scan suivant</string>
+    <string name="snackbar_last_scan">Vous venez de lire le dernier scan !</string>
 
     <!--Sync adapter-->
     <string name="account_name">Sync Shonen Touch</string>
