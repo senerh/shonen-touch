@@ -1,9 +1,9 @@
 package ui.activities;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -12,8 +12,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.Parcelable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -21,7 +19,6 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -33,21 +30,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.BufferedInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.Semaphore;
 
 import io.github.senerh.shonentouch.R;
 import model.database.ShonenTouchContract;
 import model.database.ShonenTouchContract.PageColumns;
-import model.entities.Manga;
 import model.entities.Scan;
 import model.services.WSIntentService;
 import ui.views.ExtendedViewPager;
@@ -74,97 +67,96 @@ public class PageActivity extends AppCompatActivity implements ExtendedViewPager
     private int mScanId;
     private boolean mThreadInterrupted;
     private long mLastSwipeEndTimestamp;
-    private ImagePagerAdapter mImagePagerAdapter;
+//    private ImagePagerAdapter mImagePagerAdapter;
+//    private ProgressDialogFragment progressDialogFragment;
 
-    private TextView mCurrentPageTextView;
+    private ProgressDialog progressDialog;
 
     private ExtendedViewPager mExtendedViewPager;
 //    private Thread mThread;
 
-    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Cursor c;
-            switch (intent.getAction()) {
-                case WSIntentService.GET_PAGES_URLS_FOR_SCAN:
-                    switch (intent.getIntExtra(WSIntentService.EXTRA_RESULT_CODE, 0)) {
-                        case WSIntentService.RESULT_OK:
-                            mImagesUrlsList = intent.getStringArrayListExtra(WSIntentService.PARAM_PAGES_URLS);
-                            Intent requestIntent = new Intent(getApplicationContext(), WSIntentService.class);
-
-                            requestIntent.setAction(WSIntentService.GET_BITMAP_PAGE);
-                            if (mImagesList.isEmpty()) {
-//                                requestIntent.putExtra(WSIntentService.PARAM_PAGE_URL, mImagesUrlsList.get(0));
-                                new DownloadImageTask().execute(mImagesUrlsList.get(0));
-                            } else {
-//                                requestIntent.putExtra(WSIntentService.PARAM_PAGE_URL, mImagesUrlsList.get(mImagesList.size() - 1));
-                                new DownloadImageTask().execute(mImagesUrlsList.get(mImagesList.size() - 1));
-                            }
-
-                            mProgressBar.setProgress(100 / mImagesUrlsList.size());
-                            mImagesCount = mImagesUrlsList.size();
-                            startService(requestIntent);
-                            break;
-                        case WSIntentService.RESULT_ERROR_NO_INTERNET:
-                            break;
-                        case WSIntentService.RESULT_ERROR_BAD_RESPONSE:
-                        case WSIntentService.RESULT_ERROR_TIMEOUT:
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                case WSIntentService.GET_BITMAP_PAGE:
-                    switch (intent.getIntExtra(WSIntentService.EXTRA_RESULT_CODE, 0)) {
-                        case WSIntentService.RESULT_OK:
-
-//                            mImagesList.add((Bitmap) intent.getParcelableExtra(WSIntentService.PARAM_BITMAP));
-//                            mExtendedViewPager.getAdapter().notifyDataSetChanged();
-                            String url = intent.getStringExtra(WSIntentService.PARAM_PAGE_URL);
-                            // look for the next url to call
-                            for (int i = 0; i < mImagesUrlsList.size(); i++) {
-                                if (mImagesUrlsList.get(i).equals(url)) {
-                                    if (i < (mImagesUrlsList.size() - 1)) {
-                                        // launch download of next image
-                                        new DownloadImageTask().execute(mImagesUrlsList.get(i + 1));
-                                        mCurrentPageTextView.setText("Page " + i + " sur " + mImagesUrlsList.size());
-//                                        Intent requestIntent = new Intent(getApplicationContext(), WSIntentService.class);
+//    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            Cursor c;
+//            switch (intent.getAction()) {
+//                case WSIntentService.GET_PAGES_URLS_FOR_SCAN:
+//                    switch (intent.getIntExtra(WSIntentService.EXTRA_RESULT_CODE, 0)) {
+//                        case WSIntentService.RESULT_OK:
+//                            mImagesUrlsList = intent.getStringArrayListExtra(WSIntentService.PARAM_PAGES_URLS);
+//                            Intent requestIntent = new Intent(getApplicationContext(), WSIntentService.class);
 //
-//                                        requestIntent.setAction(WSIntentService.GET_BITMAP_PAGE);
-//                                        requestIntent.putExtra(WSIntentService.PARAM_PAGE_URL, mImagesUrlsList.get(i + 1));
-//                                        startService(requestIntent);
-                                    } else {
-                                        mCurrentPageTextView.setVisibility(View.GONE);
-                                    }
-                                }
-                            }
-                            break;
-                        case WSIntentService.RESULT_ERROR_NO_INTERNET:
-                            break;
-                        case WSIntentService.RESULT_ERROR_BAD_RESPONSE:
-                        case WSIntentService.RESULT_ERROR_TIMEOUT:
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                default :
-                    break;
-            }
-        }
-    };
+//                            requestIntent.setAction(WSIntentService.GET_BITMAP_PAGE);
+//                            if (mImagesList.isEmpty()) {
+////                                requestIntent.putExtra(WSIntentService.PARAM_PAGE_URL, mImagesUrlsList.get(0));
+//                                new DownloadImageTask().execute(mImagesUrlsList.get(0));
+//                            } else {
+////                                requestIntent.putExtra(WSIntentService.PARAM_PAGE_URL, mImagesUrlsList.get(mImagesList.size() - 1));
+//                                new DownloadImageTask().execute(mImagesUrlsList.get(mImagesList.size() - 1));
+//                            }
+//
+//                            mProgressBar.setProgress(100 / mImagesUrlsList.size());
+//                            mImagesCount = mImagesUrlsList.size();
+//                            startService(requestIntent);
+//                            break;
+//                        case WSIntentService.RESULT_ERROR_NO_INTERNET:
+//                            break;
+//                        case WSIntentService.RESULT_ERROR_BAD_RESPONSE:
+//                        case WSIntentService.RESULT_ERROR_TIMEOUT:
+//                            break;
+//                        default:
+//                            break;
+//                    }
+//                    break;
+//                case WSIntentService.GET_BITMAP_PAGE:
+//                    switch (intent.getIntExtra(WSIntentService.EXTRA_RESULT_CODE, 0)) {
+//                        case WSIntentService.RESULT_OK:
+//
+////                            mImagesList.add((Bitmap) intent.getParcelableExtra(WSIntentService.PARAM_BITMAP));
+////                            mExtendedViewPager.getAdapter().notifyDataSetChanged();
+//                            String url = intent.getStringExtra(WSIntentService.PARAM_PAGE_URL);
+//                            // look for the next url to call
+//                            for (int i = 0; i < mImagesUrlsList.size(); i++) {
+//                                if (mImagesUrlsList.get(i).equals(url)) {
+//                                    if (i < (mImagesUrlsList.size() - 1)) {
+//                                        // launch download of next image
+//                                        new DownloadImageTask().execute(mImagesUrlsList.get(i + 1));
+//                                        mCurrentPageTextView.setText("Page " + i + " sur " + mImagesUrlsList.size());
+////                                        Intent requestIntent = new Intent(getApplicationContext(), WSIntentService.class);
+////
+////                                        requestIntent.setAction(WSIntentService.GET_BITMAP_PAGE);
+////                                        requestIntent.putExtra(WSIntentService.PARAM_PAGE_URL, mImagesUrlsList.get(i + 1));
+////                                        startService(requestIntent);
+//                                    } else {
+//                                        mCurrentPageTextView.setVisibility(View.GONE);
+//                                    }
+//                                }
+//                            }
+//                            break;
+//                        case WSIntentService.RESULT_ERROR_NO_INTERNET:
+//                            break;
+//                        case WSIntentService.RESULT_ERROR_BAD_RESPONSE:
+//                        case WSIntentService.RESULT_ERROR_TIMEOUT:
+//                            break;
+//                        default:
+//                            break;
+//                    }
+//                    break;
+//                default :
+//                    break;
+//            }
+//        }
+//    };
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pager);
 
         setImmersiveScreen();
-        mCurrentPageTextView = (TextView) findViewById(R.id.text_view_current_page);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mSnackbarCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout_snackbar);
         mExtendedViewPager = (ExtendedViewPager) findViewById(R.id.view_pager);
         mExtendedViewPager.setOnSwipeOutListener(this);
-        mImagePagerAdapter = new ImagePagerAdapter(new ArrayList<Bitmap>());
 
         mExtendedViewPager.addOnPageChangeListener(new DetailOnPageChangeListener());
 
@@ -178,39 +170,32 @@ public class PageActivity extends AppCompatActivity implements ExtendedViewPager
                 if (savedInstanceState != null) {
                     System.out.println("******sauvegarde : ");
                     mImagesCount = savedInstanceState.getInt(EXTRA_IMAGES_COUNT);
-                    List<String> imagesUrls = savedInstanceState.getStringArrayList(EXTRA_IMAGES_URLS_LIST);
-                    if (imagesUrls != null) {
-                        mImagesUrlsList = imagesUrls;
-                        List<Bitmap> bitmaps = savedInstanceState.getParcelableArrayList(EXTRA_BITMAPS_LIST);
-                        if (bitmaps != null) {
-                            System.out.println("************le add du save instance");
-                            mImagesList = bitmaps;
-//                            Intent requestIntent = new Intent(this, WSIntentService.class);
-//
-//                            requestIntent.setAction(WSIntentService.GET_BITMAP_PAGE);
-//                            requestIntent.putExtra(WSIntentService.PARAM_PAGE_URL, mImagesUrlsList.get(mImagesList.size() - 1));
-//                            startService(requestIntent);
-                            if (mImagesList.size() < mImagesUrlsList.size()) {
-                                new DownloadImageTask().execute(mImagesUrlsList.get(mImagesList.size() - 1));
-                            } else {
-                                mExtendedViewPager.setAdapter(mImagePagerAdapter);
-                            }
-                        }
-                    } else {
-                        Intent requestIntent = new Intent(this, WSIntentService.class);
+                    List<Bitmap> bitmaps = savedInstanceState.getParcelableArrayList(EXTRA_BITMAPS_LIST);
+                    if (bitmaps != null) {
+                        System.out.println("************le add du save instance");
+                        mImagesList = bitmaps;
+                        mExtendedViewPager.setAdapter(new ImagePagerAdapter());
 
-                        requestIntent.setAction(WSIntentService.GET_PAGES_URLS_FOR_SCAN);
-                        requestIntent.putExtra(WSIntentService.PARAM_MANGA_SLUG, getMangaSlug());
-                        requestIntent.putExtra(WSIntentService.PARAM_SCAN_NAME, getScanName());
-                        startService(requestIntent);
                     }
+//                    List<String> imagesUrls = savedInstanceState.getStringArrayList(EXTRA_IMAGES_URLS_LIST);
+//                    if (imagesUrls != null) {
+//                        mImagesUrlsList = imagesUrls;
+//
+//                    }
                 } else {
-                    Intent requestIntent = new Intent(this, WSIntentService.class);
-
-                    requestIntent.setAction(WSIntentService.GET_PAGES_URLS_FOR_SCAN);
-                    requestIntent.putExtra(WSIntentService.PARAM_MANGA_SLUG, getMangaSlug());
-                    requestIntent.putExtra(WSIntentService.PARAM_SCAN_NAME, getScanName());
-                    startService(requestIntent);
+                    progressDialog = new ProgressDialog(this);
+                    progressDialog.setTitle("Lecture en ligne (long clic sur le scan pour télécharger)");
+                    progressDialog.setMessage("Initialisation");
+                    progressDialog.setIndeterminate(true);
+                    progressDialog.setCanceledOnTouchOutside(false);
+                    progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener(){
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            finish();
+                        }
+                    });
+                    progressDialog.show();
+                    new DownloadImageTask(getMangaSlug(), getScanName()).execute();
                 }
             } else {
                 // read downloaded pages, offline reading
@@ -226,7 +211,7 @@ public class PageActivity extends AppCompatActivity implements ExtendedViewPager
                         }
                         mProgressBar.setProgress(100 / mImagesList.size());
                         mImagesCount = mImagesList.size();
-                        mExtendedViewPager.setAdapter(mImagePagerAdapter);
+                        mExtendedViewPager.setAdapter(new ImagePagerAdapter());
                     } finally {
                         c.close();
                     }
@@ -247,20 +232,20 @@ public class PageActivity extends AppCompatActivity implements ExtendedViewPager
     @Override
     public void onResume() {
         super.onResume();
-        IntentFilter filter = new IntentFilter();
-
-        filter.addAction(WSIntentService.GET_PAGES_URLS_FOR_SCAN);
-        filter.addAction(WSIntentService.GET_BITMAP_PAGE);
-
-        registerReceiver(mBroadcastReceiver, filter);
+//        IntentFilter filter = new IntentFilter();
+//
+//        filter.addAction(WSIntentService.GET_PAGES_URLS_FOR_SCAN);
+//        filter.addAction(WSIntentService.GET_BITMAP_PAGE);
+//
+//        registerReceiver(mBroadcastReceiver, filter);
         setImmersiveScreen();
     }
 
-    @Override
-    public void onPause() {
-        unregisterReceiver(mBroadcastReceiver);
-        super.onPause();
-    }
+//    @Override
+//    public void onPause() {
+//        unregisterReceiver(mBroadcastReceiver);
+//        super.onPause();
+//    }
 
     @Override
     protected void onDestroy() {
@@ -342,46 +327,65 @@ public class PageActivity extends AppCompatActivity implements ExtendedViewPager
         }
     }
 
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        String currentUrl;
+    private class DownloadImageTask extends AsyncTask<Void, Void, Void> {
+        String mangaSlug, scanName;
+        List<String> urls;
 
-        public DownloadImageTask() {
+        public DownloadImageTask(String mangaSlug, String scanName) {
+            this.mangaSlug = mangaSlug;
+            this.scanName = scanName;
         }
 
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            currentUrl = urls[0];
-            Bitmap mIcon11 = null;
+        @Override
+        protected void onPreExecute() {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... voids) {
             try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
+                HttpURLConnection urlConnection = (HttpURLConnection) new URL(String.format(WSIntentService.URL_ALL_PAGES_FOR_MANGA_AND_SCAN, mangaSlug, scanName)).openConnection();
+                Scanner s = new Scanner(new BufferedInputStream(urlConnection.getInputStream())).useDelimiter("\\A");
+                String result = s.hasNext() ? s.next() : "";
+                urls = new ArrayList<>();
+
+                JSONArray pagesJSONArray = new JSONArray(result);
+
+                for (int i = 0; i < pagesJSONArray.length(); i++) {
+                    urls.add(pagesJSONArray.getJSONObject(i).getString("url"));
+                }
+                mImagesCount = urls.size();
+                urlConnection.disconnect();
+            } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
-            return mIcon11;
-        }
+            for (int i = 0; i < urls.size(); i++) {
+                try {
+                    final int p = i;
+                    mImagesList.add(BitmapFactory.decodeStream(new URL(urls.get(i)).openStream()));
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressDialog.setMessage("Page " + p + " sur " + urls.size());
+                        }
+                    });
 
-        protected void onPostExecute(Bitmap result) {
-            System.out.println("************le on post execute");
-            boolean alreadyHere = false;
-
-            for (Bitmap b : mImagesList) {
-                if (b.sameAs(result)) {
-                    alreadyHere = true;
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
 
-            if (!alreadyHere) {
-                mImagesList.add(result);
-                int position = mExtendedViewPager.getCurrentItem();
-                mExtendedViewPager.setAdapter(new ImagePagerAdapter(cloneBitmapList(mImagesList)));
-                mExtendedViewPager.setCurrentItem(position);
-                Intent intent = new Intent(WSIntentService.GET_BITMAP_PAGE);
+            return null;
+        }
 
-                intent.putExtra(WSIntentService.PARAM_PAGE_URL, currentUrl);
-                intent.putExtra(WSIntentService.EXTRA_RESULT_CODE, WSIntentService.RESULT_OK);
-                sendBroadcast(intent);
-            }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+            progressDialog.dismiss();
+            mProgressBar.setProgress(100 / mImagesList.size());
+            mExtendedViewPager.setAdapter(new ImagePagerAdapter());
         }
     }
 
@@ -447,23 +451,12 @@ public class PageActivity extends AppCompatActivity implements ExtendedViewPager
 
     class ImagePagerAdapter extends PagerAdapter {
         TouchImageView mPhotoView;
-        List<Bitmap> images;
 
-        ImagePagerAdapter(List<Bitmap> bitmaps) {
-            images = bitmaps;
+        ImagePagerAdapter() {
         }
 
         public int getCount() {
-//            return mViewPagerItemsCount;
-            int returnValue = 0;
-
-                    returnValue = images != null ? images.size() : 0;
-                    System.out.println("***********current count : " + returnValue);
-                    return returnValue;
-
-
-
-//            return mImagesList != null ? mImagesList.size() : 0;
+            return mImagesList != null ? mImagesList.size() : 0;
         }
 
         public boolean isViewFromObject(View view, Object object) {
@@ -480,7 +473,7 @@ public class PageActivity extends AppCompatActivity implements ExtendedViewPager
 
             Options options = new Options();
             options.inPreferredConfig = Config.ARGB_8888;
-            mPhotoView.setImageBitmap(images.get(position));
+            mPhotoView.setImageBitmap(mImagesList.get(position));
             container.addView(mPhotoView, -1, -1);
 
             return mPhotoView;
@@ -505,13 +498,13 @@ public class PageActivity extends AppCompatActivity implements ExtendedViewPager
         }
     }
 
-    public List<Bitmap> cloneBitmapList(List<Bitmap> toClone) {
-        List<Bitmap> result = new ArrayList<>();
-
-        for (Bitmap b : toClone) {
-            result.add(b.copy(b.getConfig(), true));
-        }
-
-        return result;
-    }
+//    public List<Bitmap> cloneBitmapList(List<Bitmap> toClone) {
+//        List<Bitmap> result = new ArrayList<>();
+//
+//        for (Bitmap b : toClone) {
+//            result.add(b.copy(b.getConfig(), true));
+//        }
+//
+//        return result;
+//    }
 }

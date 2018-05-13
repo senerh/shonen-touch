@@ -12,29 +12,11 @@
         android:scaleY="2.5"
         style="?android:attr/progressBarStyleHorizontal" />
 
-
-
     <ui.views.ExtendedViewPager
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/progressBar" />
-
-    <TextView
-        android:id="@+id/text_view_loading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:textColor="@android:color/white"
-        android:text="Préparation des images en cours..."/>
-
-    <TextView
-        android:id="@+id/text_view_current_page"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/text_view_loading"/>
 
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/coordinator_layout_snackbar"
