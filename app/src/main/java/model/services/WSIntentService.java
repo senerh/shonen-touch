@@ -12,6 +12,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.util.Base64;
 
 import org.apache.commons.cli.HelpFormatter;
 import org.json.JSONArray;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +48,8 @@ public class WSIntentService extends IntentService {
     public static final String DOWNLOAD_PAGES_FOR_SCAN = "DOWNLOAD_PAGES_FOR_SCAN";
     public static final String CHECK_LAST_SCAN = "CHECK_LAST_SCAN";
     public static final String GET_BITMAPS_PAGES_FOR_SCAN = "GET_BITMAPS_PAGES_FOR_SCAN";
+    public static final String GET_PAGES_URLS_FOR_SCAN = "GET_PAGES_URLS_FOR_SCAN";
+    public static final String GET_BITMAP_PAGE = "GET_BITMAP_PAGE";
 
     private static final String URL_SERVER = "http://senerh.xyz:8080/shonen-touch-api-3/";
     public static final String URL_ALL_MANGA = URL_SERVER + "mangas";
@@ -57,11 +61,13 @@ public class WSIntentService extends IntentService {
 
     public static final String PARAM_MANGAS_LIST = "mangasList";
     public static final String PARAM_MANGA_SLUG = "mangaSlug";
+    public static final String PARAM_SCAN_NAME = "scanName";
     public static final String PARAM_SCANS_LIST = "scansList";
     public static final String PARAM_SCAN_ID = "scanId";
     public static final String PARAM_LAST_SCAN = "lastScan";
-    public static final String PARAM_BITMAP_AT = "bitmapAt";
-    public static final String PARAM_BITMAPS_LIST_SIZE = "bitmapsListSize";
+    public static final String PARAM_BITMAP = "bitmap";
+    public static final String PARAM_PAGE_URL = "pageUrl";
+    public static final String PARAM_PAGES_URLS = "pagesUrls";
 
     public static final String EXTRA_RESULT_CODE = "EXTRA_RESULT_CODE";
 
@@ -128,9 +134,14 @@ public class WSIntentService extends IntentService {
                     }).start();
                 }
                 break;
-            case GET_BITMAPS_PAGES_FOR_SCAN:
-                if (!"".equals(intent.getStringExtra(PARAM_MANGA_SLUG)) && intent.getIntExtra(PARAM_SCAN_ID, -1) != -1) {
-                    getBitmapPagesForScan(intent.getStringExtra(PARAM_MANGA_SLUG), intent.getIntExtra(PARAM_SCAN_ID, -1));
+//            case GET_BITMAP_PAGE:
+//                if (!"".equals(intent.getStringExtra(PARAM_PAGE_URL))) {
+//                    getBitmapPage(intent.getStringExtra(PARAM_PAGE_URL));
+//                }
+//                break;
+            case GET_PAGES_URLS_FOR_SCAN:
+                if (!"".equals(intent.getStringExtra(PARAM_MANGA_SLUG)) && !"".equals(intent.getStringExtra(PARAM_SCAN_NAME))) {
+                    getPagesUrlsForScan(intent.getStringExtra(PARAM_MANGA_SLUG), intent.getStringExtra(PARAM_SCAN_NAME));
                 }
                 break;
             default:
@@ -357,10 +368,8 @@ public class WSIntentService extends IntentService {
         }
     }
 
-    private void getBitmapPagesForScan(String mangaSlug, int scanId) {
-        final Intent intent = new Intent(GET_BITMAPS_PAGES_FOR_SCAN);
-
-        int pagesCount = 0;
+    private void getPagesUrlsForScan(final String mangaSlug, final String scanName) {
+        Intent intent = new Intent(GET_PAGES_URLS_FOR_SCAN);
 
         if (!isConnected()) {
             intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_NO_INTERNET);
@@ -368,56 +377,188 @@ public class WSIntentService extends IntentService {
             return;
         }
 
-        Cursor c = getContentResolver().query(ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)}, null);
-        if (c != null) {
-            try {
-                if (c.getCount() == 1) {
-                    c.moveToFirst();
-                    String scanName = c.getString(c.getColumnIndex(ShonenTouchContract.ScanColumns.NAME));
+        try {
+            HttpURLConnection urlConnection = (HttpURLConnection) new URL(String.format(WSIntentService.URL_ALL_PAGES_FOR_MANGA_AND_SCAN, mangaSlug, scanName)).openConnection();
+            Scanner s = new Scanner(new BufferedInputStream(urlConnection.getInputStream())).useDelimiter("\\A");
+            String result = s.hasNext() ? s.next() : "";
+            List<String> urls = new ArrayList<>();
 
-                    HttpURLConnection urlConnection = (HttpURLConnection) new URL(String.format(URL_ALL_PAGES_FOR_MANGA_AND_SCAN, mangaSlug, scanName)).openConnection();
-                    Scanner s = new Scanner(new BufferedInputStream(urlConnection.getInputStream())).useDelimiter("\\A");
-                    String result = s.hasNext() ? s.next() : "";
-                    List<Page> pages = new ArrayList<>();
-                    JSONArray pagesJSONArray = new JSONArray(result);
+            JSONArray pagesJSONArray = new JSONArray(result);
 
-                    for (int i = 0; i < pagesJSONArray.length(); i++) {
-                        pages.add(new Page(pagesJSONArray.getJSONObject(i).getString("num"), pagesJSONArray.getJSONObject(i).getString("url")));
-                    }
-
-                    for (int i = 0; i < pages.size(); i++) {
-                        try {
-                            Bitmap downloadedBitmap = BitmapFactory.decodeStream(new URL(pages.get(i).getPath()).openStream());
-                            if (downloadedBitmap != null) {
-                                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                                downloadedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                                intent.putExtra(PARAM_BITMAP_AT + pagesCount, stream.toByteArray());
-                                pagesCount++;
-                                intent.putExtra(EXTRA_RESULT_CODE, RESULT_OK);
-                                sendBroadcast(intent);
-                            }
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    urlConnection.disconnect();
-//                    intent.putExtra(PARAM_BITMAPS_LIST_SIZE, pagesCount);
-//                    intent.putExtra(EXTRA_RESULT_CODE, RESULT_OK);
-//                    sendBroadcast(intent);
-                }
-            } catch (IOException e) {
-                intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_TIMEOUT);
-                sendBroadcast(intent);
-                e.printStackTrace();
-            } catch (JSONException e) {
-                intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_BAD_RESPONSE);
-                sendBroadcast(intent);
-                e.printStackTrace();
-            } finally {
-                c.close();
+            for (int i = 0; i < pagesJSONArray.length(); i++) {
+                urls.add(pagesJSONArray.getJSONObject(i).getString("url"));
             }
+
+            intent.putExtra(PARAM_PAGES_URLS, (ArrayList<String>) urls);
+            intent.putExtra(EXTRA_RESULT_CODE, RESULT_OK);
+            sendBroadcast(intent);
+            urlConnection.disconnect();
+        } catch (IOException e) {
+            intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_TIMEOUT);
+            sendBroadcast(intent);
+            e.printStackTrace();
+        } catch (JSONException e) {
+            intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_BAD_RESPONSE);
+            sendBroadcast(intent);
+            e.printStackTrace();
         }
     }
+
+//    private void getBitmapPage(final String url) {
+//        Intent intent = new Intent(GET_BITMAP_PAGE);
+//
+//        if (!isConnected()) {
+//            intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_NO_INTERNET);
+//            sendBroadcast(intent);
+//            return;
+//        }
+//
+//        try {
+//            final Bitmap downloadedBitmap = BitmapFactory.decodeStream(new URL(url).openStream());
+//            if (downloadedBitmap != null) {
+//                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//                downloadedBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+//                intent.putExtra(PARAM_BITMAP, Base64.encodeToString(baos.toByteArray(), 0));
+//                intent.putExtra(PARAM_PAGE_URL, url);
+//                intent.putExtra(EXTRA_RESULT_CODE, RESULT_OK);
+//                sendBroadcast(intent);
+//            }
+//        } catch (IOException e) {
+//            intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_TIMEOUT);
+//            sendBroadcast(intent);
+//            e.printStackTrace();
+//        }
+//    }
+
+//    private void getBitmapPagesForScan(final String mangaSlug, final int scanId) {
+//        int initialIndex = mImagesList.size();
+//        Cursor c = getContentResolver().query(ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)}, null);
+//        if (c != null) {
+//            try {
+//                if (c.getCount() == 1) {
+//                    c.moveToFirst();
+//                    String scanName = c.getString(c.getColumnIndex(ShonenTouchContract.ScanColumns.NAME));
+//
+//                    if (mImagesUrlsList == null) {
+//                        mImagesUrlsList = new ArrayList<>();
+//                        HttpURLConnection urlConnection = (HttpURLConnection) new URL(String.format(WSIntentService.URL_ALL_PAGES_FOR_MANGA_AND_SCAN, mangaSlug, scanName)).openConnection();
+//                        Scanner s = new Scanner(new BufferedInputStream(urlConnection.getInputStream())).useDelimiter("\\A");
+//                        String result = s.hasNext() ? s.next() : "";
+//
+//                        JSONArray pagesJSONArray = new JSONArray(result);
+//
+//                        for (int i = 0; i < pagesJSONArray.length(); i++) {
+//                            mImagesUrlsList.add(pagesJSONArray.getJSONObject(i).getString("url"));
+//                        }
+//
+//                        mProgressBar.setProgress(100 / mImagesUrlsList.size());
+//                        mImagesCount = mImagesUrlsList.size();
+//                        urlConnection.disconnect();
+//                    }
+//
+//                    for (int i = initialIndex; i < mImagesUrlsList.size(); i++) {
+//                        try {
+//                            final Bitmap downloadedBitmap = BitmapFactory.decodeStream(new URL(mImagesUrlsList.get(i)).openStream());
+//                            if (downloadedBitmap != null) {
+//                                // if thread is stopped, do not add image in the list
+//                                if (mThreadInterrupted) {
+//                                    mThreadInterrupted = false;
+//                                    return;
+//                                }
+//
+//                                runOnUiThread(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//
+//                                        while (!ALLOWED) {
+//
+//                                        }
+//                                        mImagesList.add(downloadedBitmap);
+//                                        System.out.println("************current list size : " + mImagesList.size());
+//
+//                                        ALLOWED = false;
+//
+//                                        mExtendedViewPager.getAdapter().notifyDataSetChanged();
+////                                                available.release();
+//
+//
+//                                    }
+//                                });
+//                            }
+//                        } catch (FileNotFoundException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            } catch (IOException | JSONException e) {
+//                e.printStackTrace();
+//            } finally {
+//                c.close();
+//            }
+//        }
+//    }
+
+//    private void getBitmapPagesForScan(String mangaSlug, int scanId) {
+//        final Intent intent = new Intent(GET_BITMAPS_PAGES_FOR_SCAN);
+//
+//        int pagesCount = 0;
+//
+//        if (!isConnected()) {
+//            intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_NO_INTERNET);
+//            sendBroadcast(intent);
+//            return;
+//        }
+//
+//        Cursor c = getContentResolver().query(ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)}, null);
+//        if (c != null) {
+//            try {
+//                if (c.getCount() == 1) {
+//                    c.moveToFirst();
+//                    String scanName = c.getString(c.getColumnIndex(ShonenTouchContract.ScanColumns.NAME));
+//
+//                    HttpURLConnection urlConnection = (HttpURLConnection) new URL(String.format(URL_ALL_PAGES_FOR_MANGA_AND_SCAN, mangaSlug, scanName)).openConnection();
+//                    Scanner s = new Scanner(new BufferedInputStream(urlConnection.getInputStream())).useDelimiter("\\A");
+//                    String result = s.hasNext() ? s.next() : "";
+//                    List<Page> pages = new ArrayList<>();
+//                    JSONArray pagesJSONArray = new JSONArray(result);
+//
+//                    for (int i = 0; i < pagesJSONArray.length(); i++) {
+//                        pages.add(new Page(pagesJSONArray.getJSONObject(i).getString("num"), pagesJSONArray.getJSONObject(i).getString("url")));
+//                    }
+//
+//                    for (int i = 0; i < pages.size(); i++) {
+//                        try {
+//                            Bitmap downloadedBitmap = BitmapFactory.decodeStream(new URL(pages.get(i).getPath()).openStream());
+//                            if (downloadedBitmap != null) {
+//                                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//                                downloadedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+//                                intent.putExtra(PARAM_BITMAP_AT + pagesCount, stream.toByteArray());
+//                                pagesCount++;
+//                                intent.putExtra(EXTRA_RESULT_CODE, RESULT_OK);
+//                                sendBroadcast(intent);
+//                            }
+//                        } catch (FileNotFoundException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                    urlConnection.disconnect();
+////                    intent.putExtra(PARAM_BITMAPS_LIST_SIZE, pagesCount);
+////                    intent.putExtra(EXTRA_RESULT_CODE, RESULT_OK);
+////                    sendBroadcast(intent);
+//                }
+//            } catch (IOException e) {
+//                intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_TIMEOUT);
+//                sendBroadcast(intent);
+//                e.printStackTrace();
+//            } catch (JSONException e) {
+//                intent.putExtra(EXTRA_RESULT_CODE, RESULT_ERROR_BAD_RESPONSE);
+//                sendBroadcast(intent);
+//                e.printStackTrace();
+//            } finally {
+//                c.close();
+//            }
+//        }
+//    }
 
     private boolean isAllowedToKeepDownloading(int scanId) {
         Cursor c = getContentResolver().query(ShonenTouchContract.Scan.CONTENT_URI, null, ShonenTouchContract.ScanColumns._ID + "=?", new String[]{String.valueOf(scanId)}, null);
